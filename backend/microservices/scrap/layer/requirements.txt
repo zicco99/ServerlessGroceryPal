@@ -1,0 +1,13 @@
+pydantic
+psycopg2-binary
+SQLAlchemy
+marshmallow
+jsonify
+marshmallow_sqlalchemy
+aws-lambda-powertools
+boto3
+requests
+watchtower
+pyjwt
+selenium==3.8.0
+bs4

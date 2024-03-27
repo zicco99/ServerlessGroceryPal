@@ -1,0 +1,85 @@
+Table ingredient {
+  id int [primary key, unique, increment]
+  name varchar [not null]
+  unit varchar
+}
+
+Table product {
+  barcode int [primary key]
+  ingredient_id int 
+  name varchar
+  brand varchar
+  labels boolean [note: 'Gluten Free, Vegan etc.']
+  eco_score int
+  nova_score int
+  big_image_url varchar
+  mini_image_url varchar
+  meal boolean [note: 'Breakfast, Lunch, Snack, Dinner']
+  allergens varchar [note: 'Comma separated list']
+  quantity int
+}
+
+Table ingredient_product {
+  ingredient_id int [ref: > ingredient.id]
+  product_barcode int [ref: > product.barcode]
+  quantity float
+}
+
+Table feedback {
+  id int [primary key, unique, increment]
+  user_id int [ref: > user.id]
+  recipe_id int [ref: > recipe.id]
+  is_chosen boolean
+  rating int
+  notes varchar
+}
+
+Table fridge {
+  id int [primary key, unique, increment]
+  name varchar
+}
+
+Table fridge_product {
+  id int [primary key, unique, increment]
+  fridge_id int [ref: > fridge.id]
+  product_barcode int [ref: > product.barcode]
+  quantity int
+}
+
+Table recipe {
+  id int [primary key, unique, increment]
+  title varchar
+  category varchar
+  image_url varchar
+}
+
+Table recipe_ingredient {
+  id int [primary key, unique, increment]
+  recipe_id int [ref: > recipe.id]
+  ingredient_id int [ref: > ingredient.id]
+  amount_text varchar
+  amount float
+}
+
+Table step {
+  id int [primary key, unique, increment]
+  recipe_id int [ref: > recipe.id]
+  n_step int
+  image_url varchar
+  explaining varchar
+}
+
+Table user {
+  id int [primary key, unique, increment]
+  name varchar
+  email varchar
+  profile_pic varchar
+}
+
+Table user_fridge {
+  id int [primary key, unique, increment]
+  user_id int [ref: > user.id]
+  fridge_id int [ref: > fridge.id]
+  is_admin boolean
+  is_owner boolean
+}

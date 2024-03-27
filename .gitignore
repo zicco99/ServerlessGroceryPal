@@ -1,0 +1,68 @@
+# Compiled Python files
+__pycache__/
+*.pyc
+
+# Compiled files
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# Python env
+venv/
+
+# Ignore stack output and lock files
+cdk.out/
+*.lock
+
+# Ignore frontend build artifacts
+frontend/nextjs-app/node_modules/
+frontend/nextjs-app/dist
+
+# Ignore generated files
+.deso_node/
+
+# Ignore local development settings
+*.env
+
+# Ignore IDE settings
+.idea/
+.vscode/
+
+
+# Ignore macOS directory metadata
+.DS_Store
+
+# Ignore compiled Python bytecode
+__pycache__/
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore compiled Python bytecode
+__pycache__/
+
+# Ignore local Python environment
+__env/
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore CDK synth artifacts
+cdk.out/
+
+# Ignore backend layer dependencies
+backend/layer/lib/__pycache__/
+backend/layer/lib/cdk.out/
+
+# Ignore frontend build artifacts
+frontend/react-app/node_modules
+frontend/react-app/dist
+frontend/react-app/.vite
+
+# Ignore local development settings
+*.env
+
+# Ignore stack output
+cdk.out/
+*.lock

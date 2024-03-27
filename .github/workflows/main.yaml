@@ -1,0 +1,118 @@
+name: "AWS CDK action"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      NODE_VERSION: '20'
+      PYTHON_VERSION: '3.10'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Print directory contents
+        run: ls -la
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/*.json') }}
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/pip
+          key: ${{ runner.os }}-python-${{ hashFiles('**/*.lock') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Updating the AWS-CDK
+        run: sudo npm install -g aws-cdk@latest
+
+      - name: Compile NestJS ScrapAPI
+        run: |
+          cd backend/microservices/scrap/api/
+          npm install
+          npm run build # Build dist
+          cd ../../../..
+
+      - name: Install CDK dependencies
+        run: |
+          npm install -g aws-cdk
+          python3 -m pip install -r requirements.txt  # Make sure to adjust based on your project structure
+          
+      - name: Bootstrap CDK app
+        run: cdk bootstrap
+
+      - name: Synthesize CDK app
+        run: |
+          mkdir -p cdk.out  # Create the output directory if it doesn't exist
+          cdk synth --app="python3 app.py" --output=cdk.out
+
+      - name: Deploy to AWS
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          cdk deploy --app="cdk.out" --require-approval=never --all --outputs-file=./cdk_outputs.json
+
+      - name: Install dependencies and generate .env file
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # Use the captured output in your subsequent steps
+          frontend_directory="$(pwd)/frontend/react-app"
+          npm install --prefix "$frontend_directory" -g npm@10.4.0
+          npm install --prefix "$frontend_directory"        
+
+          env_file_path="$frontend_directory/.env"
+          > "$env_file_path"
+
+          # they have to be PUBLIC or browser wont be able to access the env variables
+          # basically for each output add a _ between lower and upper case letters to then convert to uppercase and add REACT_PUBLIC_ prefix -> in the end we have a .env file
+          jq -r '.AppStack | to_entries | .[] | "VITE_\(.key | ascii_upcase | gsub("([a-z])([A-Z])"; "\\1_\\2"))=\(.value)"' cdk_outputs.json >> "$env_file_path"
+
+          cat "$env_file_path"
+
+      - name: Run Frontend Build and Upload on the S3 bucket
+        run: |
+          frontend_directory="$(pwd)/frontend/react-app"
+
+          CI=false && npm run build --prefix "$frontend_directory" 
+
+          bucket_name=$(cat cdk_outputs.json | jq -r .AppStack.FrontendBucketName)
+          aws s3 cp "$frontend_directory/dist" "s3://$bucket_name" --recursive
+      
+      - name: Invalidate CloudFront Cache
+        run: |
+          distribution_id=$(cat cdk_outputs.json | jq -r .AppStack.FrontendDistributionId)
+          aws cloudfront create-invalidation --distribution-id "$distribution_id" --paths "/*"
+
+      #- name: Destroy stack
+      #  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      #  run: cdk destroy --app="cdk.out" --force --all

@@ -19,7 +19,7 @@ from constructs import Construct
 # It represents a microservice but to add a security layer, the will be not be exposed
 # but other microservices but access through a private API Gateway (boto3 invoke-based + aws_power_tool)) 
 
-class ScrapStackParams:
+class BackendStackParams:
     def __init__(self, stage, base_environment, layer_lambda, user_pool, user_pool_client, user_pool_domain):
         self.stage : Stage = stage
         self.base_environment : dict = base_environment
@@ -28,30 +28,30 @@ class ScrapStackParams:
         self.user_pool_client : cognito.UserPoolClient = user_pool_client
         self.user_pool_domain : cognito.UserPoolDomain = user_pool_domain
 
-class ScrapStackOutputs:
-    def __init__(self,scrap_api_base_url):
-        self.scrap_api_base_url = scrap_api_base_url
+class BackendStackOutputs:
+    def __init__(self,backend_api_base_url):
+        self.backend_api_base_url = backend_api_base_url
 
 class Permission(Enum):
-    RW_PERM_SCRAP_DB = "rw_scrap_db"
+    RW_PERM_SCRAP_DB = "rw_backend_db"
     READ_USERPOOL = "r_user_pool"
     WRITE_USERPOOL = "w_user_pool"
     ADMIN_ACCESS_USERPOOL = "a_user_pool"
 
 
-class ScrapStack(NestedStack):
+class BackendStack(NestedStack):
 
-    def get_outputs(self) -> ScrapStackOutputs:
-        return ScrapStackOutputs(self.scrap_api_base_url)
+    def get_outputs(self) -> BackendStackOutputs:
+        return BackendStackOutputs(self.backend_api_base_url)
     
-    def __init__(self, scope: Construct, id: str, params: ScrapStackParams, **kwargs):
+    def __init__(self, scope: Construct, id: str, params: BackendStackParams, **kwargs):
         super().__init__(scope, id, **kwargs)
 
-        base_name = f"scrap-microservice-{params.stage}"
+        base_name = f"backend-microservice-{params.stage}"
         
         vpc_cidr = "10.0.0.0/16"
 
-        scrap_vpc = ec2.Vpc(
+        backend_vpc = ec2.Vpc(
             self, f"{base_name}-VPC",
             max_azs=3,
             cidr=vpc_cidr,
@@ -71,19 +71,19 @@ class ScrapStack(NestedStack):
 
         # Define security groups
         lambda_security_group = ec2.SecurityGroup(self, f"{base_name}-lambda-security-group",
-            vpc=scrap_vpc,
+            vpc=backend_vpc,
             description="Security group for Lambda functions",
             allow_all_outbound=True
         )
 
         rds_security_group = ec2.SecurityGroup(self, f"{base_name}-rds-security-group",
-            vpc=scrap_vpc,
+            vpc=backend_vpc,
             description="Security group for RDS instance",
             allow_all_outbound=True
         )
 
         # Define DB credentials
-        scrap_db_creds = secretsmanager.Secret(
+        backend_db_creds = secretsmanager.Secret(
             self,
             f"{base_name}-postgres-creds",
             removal_policy=RemovalPolicy.DESTROY,
@@ -96,7 +96,7 @@ class ScrapStack(NestedStack):
         )
 
         # Create RDS database instance
-        scrap_db = rds.DatabaseInstance(
+        backend_db = rds.DatabaseInstance(
             self, f"{base_name}-db",
             multi_az=True,  # Enable multi-AZ deployment
             engine=rds.DatabaseInstanceEngine.postgres(
@@ -109,25 +109,25 @@ class ScrapStack(NestedStack):
             allocated_storage=20,
             max_allocated_storage=100,
             delete_automated_backups=True,
-            database_name="scrapdb",
+            database_name="backenddb",
             backup_retention=Duration.days(0),
-            vpc=scrap_vpc,
-            credentials=rds.Credentials.from_secret(scrap_db_creds),
+            vpc=backend_vpc,
+            credentials=rds.Credentials.from_secret(backend_db_creds),
             security_groups=[rds_security_group],
             publicly_accessible=True,
             port=5432,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)
         )
 
-        scrap_db_proxy = rds.DatabaseProxy(
+        backend_db_proxy = rds.DatabaseProxy(
             self, 
             f"{base_name}-db-proxy",
-            proxy_target=rds.ProxyTarget.from_instance(scrap_db),
-            vpc=scrap_vpc,
+            proxy_target=rds.ProxyTarget.from_instance(backend_db),
+            vpc=backend_vpc,
             security_groups=[rds_security_group],
             db_proxy_name=f"{base_name}-db-proxy",
             debug_logging=False,
-            secrets=[scrap_db.secret],
+            secrets=[backend_db.secret],
             require_tls=True,
             vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)
         )
@@ -146,7 +146,7 @@ class ScrapStack(NestedStack):
 
         # Declare security group
         ec2_security_group = ec2.SecurityGroup(self, f"{base_name}-ec2-security-group",
-            vpc=scrap_vpc,
+            vpc=backend_vpc,
             description="Security group for EC2 instance",
             allow_all_outbound=True  # Allow all outbound traffic
         )
@@ -166,10 +166,10 @@ class ScrapStack(NestedStack):
         api = ecs.FargateTaskDefinition(self, f"{base_name}-api")
 
         api_container = api.add_container(f"{base_name}-api",
-            image=ecs.AssetImage.from_asset("backend/microservices/scrap/api"),
+            image=ecs.AssetImage.from_asset("backend/microservices/backend/api"),
             environment={
-                "SCRAP_DB_CREDS_SECRET_ARN": scrap_db_creds.secret_arn,
-                "SCRAP_DB_PROXY_ENDPOINT": scrap_db_proxy.endpoint,
+                "SCRAP_DB_CREDS_SECRET_ARN": backend_db_creds.secret_arn,
+                "SCRAP_DB_PROXY_ENDPOINT": backend_db_proxy.endpoint,
             },
             command=["npm run start:prod"],
             logging=ecs.LogDrivers.aws_logs(stream_prefix="api")
@@ -177,14 +177,14 @@ class ScrapStack(NestedStack):
 
         api_container.add_port_mappings(ecs.PortMapping(container_port=3000))
 
-        service = ecs_patterns.ApplicationLoadBalancedFargateService(self, f"{base_name}-scrap-service",
+        service = ecs_patterns.ApplicationLoadBalancedFargateService(self, f"{base_name}-backend-service",
             task_definition=api,
             desired_count=1,
             public_load_balancer=True,
             assign_public_ip=True,
             listener_port=3000,
             enable_execute_command=True,
-            vpc=scrap_vpc,
+            vpc=backend_vpc,
             security_groups=[ec2_security_group]
         )
 
@@ -193,11 +193,11 @@ class ScrapStack(NestedStack):
         # ------------------------------------------#
 
         '''
-        scrap_layer = lambd_experimental.PythonLayerVersion(
+        backend_layer = lambd_experimental.PythonLayerVersion(
             self,
             f"{base_name}-layer",
             layer_version_name=f"{base_name}-layer",
-            entry="backend/microservices/scrap/layer",
+            entry="backend/microservices/backend/layer",
             compatible_runtimes=[lambd.Runtime.PYTHON_3_10]
         )
 
@@ -205,13 +205,13 @@ class ScrapStack(NestedStack):
             scope=self,
             function_name=f"{base_name}-db-bootstrap",
             id=f"{base_name}-db-bootstrap",
-            code=lambd.Code.from_asset("backend/microservices/scrap/lambdas/db_bootstrap"),
+            code=lambd.Code.from_asset("backend/microservices/backend/lambdas/db_bootstrap"),
             handler="db_bootstrap.handler",
-            layers=[params.layer_lambda, scrap_layer],
+            layers=[params.layer_lambda, backend_layer],
             environment=params.base_environment,
             runtime=lambd.Runtime.PYTHON_3_10,
             timeout=Duration.seconds(900),
-            vpc=scrap_vpc,
+            vpc=backend_vpc,
             vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
             security_groups=[lambda_security_group],
             allow_public_subnet=True
@@ -221,13 +221,13 @@ class ScrapStack(NestedStack):
             scope=self,
             function_name=f"{base_name}-syncronizer",
             id=f"{base_name}-syncronizer",
-            code=lambd.Code.from_asset("backend/microservices/scrap/lambdas/syncronizer"),
+            code=lambd.Code.from_asset("backend/microservices/backend/lambdas/syncronizer"),
             handler="syncronizer.handler",
-            layers=[params.layer_lambda, scrap_layer],
+            layers=[params.layer_lambda, backend_layer],
             environment=params.base_environment,
             runtime=lambd.Runtime.PYTHON_3_10,
             timeout=Duration.seconds(900),
-            vpc=scrap_vpc,
+            vpc=backend_vpc,
             vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
             security_groups=[lambda_security_group],
             allow_public_subnet=True
@@ -243,12 +243,12 @@ class ScrapStack(NestedStack):
             scope=self,
             function_name=f"{base_name}-recipes",
             id=f"{base_name}-recipes",
-            code=lambd.Code.from_asset("backend/microservices/scrap/api/recipes"),
+            code=lambd.Code.from_asset("backend/microservices/backend/api/recipes"),
             handler="recipes.handler",
-            layers=[params.layer_lambda, scrap_layer],
+            layers=[params.layer_lambda, backend_layer],
             environment=params.base_environment,
             runtime=lambd.Runtime.PYTHON_3_10,
-            vpc=scrap_vpc,
+            vpc=backend_vpc,
             security_groups=[lambda_security_group]
         )
         '''
@@ -272,23 +272,23 @@ class ScrapStack(NestedStack):
         authorized_api_method_options = apigateway.MethodOptions(authorizer=user_pool_authorizer)
 
         # CORS work only without proxy integration, otherwise the CORS are managed by the lambda
-        scrap_api_cors = apigateway.CorsOptions(
+        backend_api_cors = apigateway.CorsOptions(
             allow_origins=apigateway.Cors.ALL_ORIGINS,
             allow_methods=apigateway.Cors.ALL_METHODS,
             allow_headers=["*"],
             expose_headers=["*"],
         )
 
-        scrap_api = apigateway.RestApi(
+        backend_api = apigateway.RestApi(
             self,
             f"{base_name}-gateway",
             deploy_options=apigateway.StageOptions(stage_name=params.stage),
             rest_api_name=f"{base_name}-gateway",
-            default_cors_preflight_options=scrap_api_cors,
+            default_cors_preflight_options=backend_api_cors,
         )
 
 
-        scrap_api.root.add_resource("recipes").add_proxy(
+        backend_api.root.add_resource("recipes").add_proxy(
             any_method=True,
             default_integration=apigateway.LambdaIntegration(recipes),
             default_method_options=authorized_api_method_options
@@ -318,20 +318,20 @@ class ScrapStack(NestedStack):
 
 
         '''
-        scrap_serverless_cluster = rds.DatabaseCluster(
+        backend_serverless_cluster = rds.DatabaseCluster(
             self,
-            f'{base_name}-scrap-db-serverless-cluster',
+            f'{base_name}-backend-db-serverless-cluster',
             engine=rds.DatabaseClusterEngine.aurora_postgres(version=rds.AuroraPostgresEngineVersion.VER_15_2),
             serverless_v2_max_capacity=1,
             serverless_v2_min_capacity=0.5,
-            credentials=rds.Credentials.from_secret(scrap_db_creds),
+            credentials=rds.Credentials.from_secret(backend_db_creds),
             default_database_name="mydb",
             removal_policy=RemovalPolicy.DESTROY,
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
-            writer=rds.ClusterInstance.serverless_v2(f'{base_name}-scrap-db-writer'),
+            writer=rds.ClusterInstance.serverless_v2(f'{base_name}-backend-db-writer'),
             readers=[
-                rds.ClusterInstance.serverless_v2(f'{base_name}-scrap-db-reader',scale_with_writer=True),
+                rds.ClusterInstance.serverless_v2(f'{base_name}-backend-db-reader',scale_with_writer=True),
             ]
         )
         '''
@@ -342,7 +342,7 @@ class ScrapStack(NestedStack):
             self,
             "db_bootstrap_trigger",
             handler=db_bootstrap,
-            execute_after=[scrap_serverless_cluster],
+            execute_after=[backend_serverless_cluster],
             #execute_on_handler_change=False,
         )
         '''
@@ -448,15 +448,15 @@ class ScrapStack(NestedStack):
 
 
 
-        scrap_db_policy_env = {
-            "SCRAP_DB_CREDS_SECRET_ARN": scrap_db_creds.secret_arn,
-            "SCRAP_DB_PROXY_ENDPOINT": scrap_db_proxy.endpoint,
+        backend_db_policy_env = {
+            "SCRAP_DB_CREDS_SECRET_ARN": backend_db_creds.secret_arn,
+            "SCRAP_DB_PROXY_ENDPOINT": backend_db_proxy.endpoint,
         }
         
 
-        scrap_db_proxy_policy = iam.Policy(
+        backend_db_proxy_policy = iam.Policy(
             self,
-            "{base_name}-scrap-db-write-permissions-policy",
+            "{base_name}-backend-db-write-permissions-policy",
             statements=[
                 iam.PolicyStatement(
                     actions=[ 
@@ -473,16 +473,16 @@ class ScrapStack(NestedStack):
                         "rds-db:Connect"
                     ],
                     resources=[
-                        scrap_db_creds.secret_arn,
-                        scrap_db_proxy.db_proxy_arn,
+                        backend_db_creds.secret_arn,
+                        backend_db_proxy.db_proxy_arn,
                     ],
                 )
             ],
         )
 
         enum_perm_to_policy_and_env[Permission.RW_PERM_SCRAP_DB] = (
-            scrap_db_proxy_policy,
-            scrap_db_policy_env,
+            backend_db_proxy_policy,
+            backend_db_policy_env,
         )
 
         lambda_perms_association = {
@@ -501,7 +501,7 @@ class ScrapStack(NestedStack):
                 for key, value in env.items():
                     lamdba.add_environment(key, value)
 
-        self.scrap_api_base_url = f"{service.load_balancer.load_balancer_dns_name}:3000/"
+        self.backend_api_base_url = f"{service.load_balancer.load_balancer_dns_name}:3000/"
         
 
 

@@ -8,11 +8,11 @@ from aws_lib.lambda_utils import LambdaResponse, LambdaResponseCode
 
 from aws_lib.logger import logger
 
-from scrap_db.connection import ScrapDBClient
-from scrap_db.models.mappers import *
-from scrap_db.models.schemas import *
+from backend_db.connection import BackendDBClient
+from backend_db.models.mappers import *
+from backend_db.models.schemas import *
 
-from scrap_db.models import custom_base
+from backend_db.models import custom_base
 
 debug = False
 recipe_schema = RecipeSchema()
@@ -62,11 +62,11 @@ def findSteps(soup):
     return steps
 
 def handler(event, context):
-    scrap_db_engine = ScrapDBClient().get_client()
-    Session = sessionmaker(bind=scrap_db_engine)
+    backend_db_engine = BackendDBClient().get_client()
+    Session = sessionmaker(bind=backend_db_engine)
     session = Session()
     metadata = MetaData()
-    metadata.reflect(bind=scrap_db_engine)
+    metadata.reflect(bind=backend_db_engine)
     try:
         # Check number of pages
         numberOfPages = 0
@@ -76,7 +76,7 @@ def handler(event, context):
         for tag in soup.find_all(attrs={'class': 'disabled total-pages'}):
             numberOfPages = int(tag.text)
 
-        # Scrap
+        # Backend
         for pageNumber in range(1, numberOfPages + 1):  # numberOfPages
             linkList = 'https://www.giallozafferano.it/ricette-cat/page' + \
                 str(pageNumber)

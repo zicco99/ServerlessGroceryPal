@@ -9,7 +9,7 @@ import urllib.parse
 from aws_lib.logger import logger
 from aws_lib.errors import DatabaseConnectionError
 
-class ScrapDBClient():
+class BackendDBClient():
     Session = None
 
     @classmethod

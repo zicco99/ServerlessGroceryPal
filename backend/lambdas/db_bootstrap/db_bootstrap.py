@@ -9,13 +9,13 @@ from aws_lib.lambda_utils import LambdaResponse, LambdaResponseCode
 # Each mapper should use the same Base instance. This is usually done by importing the 
 # Base instance from a separate module or file, so that all the mappers use the same instance of Base.
 
-from scrap_db.connection import ScrapDBClient
-from scrap_db.models.mappers import *
+from backend_db.connection import BackendDBClient
+from backend_db.models.mappers import *
 logger.info("Mappers loaded")
-from scrap_db.models.schemas import *
+from backend_db.models.schemas import *
 logger.info("Schemas loaded")
 
-from scrap_db.models import *
+from backend_db.models import *
 
 def recreate_db(engine):
 
@@ -43,17 +43,17 @@ def recreate_db(engine):
 
 def handler(event, context):
     try:
-        scrap_db_engine = ScrapDBClient().get_client()
-        Session = sessionmaker(bind=scrap_db_engine)
+        backend_db_engine = BackendDBClient().get_client()
+        Session = sessionmaker(bind=backend_db_engine)
         session = Session()
         session.commit()
         metadata = MetaData()
-        metadata.reflect(bind=scrap_db_engine)
+        metadata.reflect(bind=backend_db_engine)
 
         # Running options
         if (True): 
             print("Recreating db")
-            recreate_db(scrap_db_engine)
+            recreate_db(backend_db_engine)
 
         session.commit()
         session.close()

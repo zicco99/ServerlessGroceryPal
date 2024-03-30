@@ -2,7 +2,7 @@ from marshmallow import fields
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 
 from . import custom_base
-from scrap_db.models.mappers import *
+from backend_db.models.mappers import *
 
 class UserSchema(SQLAlchemySchema):
     class Meta:

@@ -57,7 +57,7 @@ jobs:
       - name: Updating the AWS-CDK
         run: sudo npm install -g aws-cdk@latest
 
-      - name: Compile NestJS ScrapAPI
+      - name: Compile NestJS BackendAPI
         run: |
           cd backend/api
           npm install

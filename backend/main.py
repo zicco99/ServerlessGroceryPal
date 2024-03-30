@@ -166,7 +166,7 @@ class BackendStack(NestedStack):
         api = ecs.FargateTaskDefinition(self, f"{base_name}-api")
 
         api_container = api.add_container(f"{base_name}-api",
-            image=ecs.AssetImage.from_asset("backend/microservices/backend/api"),
+            image=ecs.AssetImage.from_asset("backend/api"),
             environment={
                 "SCRAP_DB_CREDS_SECRET_ARN": backend_db_creds.secret_arn,
                 "SCRAP_DB_PROXY_ENDPOINT": backend_db_proxy.endpoint,
@@ -197,7 +197,7 @@ class BackendStack(NestedStack):
             self,
             f"{base_name}-layer",
             layer_version_name=f"{base_name}-layer",
-            entry="backend/microservices/backend/layer",
+            entry="backend/layer",
             compatible_runtimes=[lambd.Runtime.PYTHON_3_10]
         )
 
@@ -205,7 +205,7 @@ class BackendStack(NestedStack):
             scope=self,
             function_name=f"{base_name}-db-bootstrap",
             id=f"{base_name}-db-bootstrap",
-            code=lambd.Code.from_asset("backend/microservices/backend/lambdas/db_bootstrap"),
+            code=lambd.Code.from_asset("backend/lambdas/db_bootstrap"),
             handler="db_bootstrap.handler",
             layers=[params.layer_lambda, backend_layer],
             environment=params.base_environment,
@@ -221,7 +221,7 @@ class BackendStack(NestedStack):
             scope=self,
             function_name=f"{base_name}-syncronizer",
             id=f"{base_name}-syncronizer",
-            code=lambd.Code.from_asset("backend/microservices/backend/lambdas/syncronizer"),
+            code=lambd.Code.from_asset("backend/lambdas/syncronizer"),
             handler="syncronizer.handler",
             layers=[params.layer_lambda, backend_layer],
             environment=params.base_environment,
@@ -243,7 +243,7 @@ class BackendStack(NestedStack):
             scope=self,
             function_name=f"{base_name}-recipes",
             id=f"{base_name}-recipes",
-            code=lambd.Code.from_asset("backend/microservices/backend/api/recipes"),
+            code=lambd.Code.from_asset("backend/api/recipes"),
             handler="recipes.handler",
             layers=[params.layer_lambda, backend_layer],
             environment=params.base_environment,

@@ -10,7 +10,7 @@ from constructs import Construct
 
 from backend.main import BackendStack, BackendStackOutputs, BackendStackParams
 from frontend.main import FrontendStack, FrontendStackOutputs, FrontendStackParams
-from backend.microservices.scrap.main import ScrapStack, ScrapStackOutputs, ScrapStackParams
+from backend.main import ScrapStack, ScrapStackOutputs, ScrapStackParams
 
 
 class AppStack(Stack):

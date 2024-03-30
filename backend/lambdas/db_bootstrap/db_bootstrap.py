@@ -20,6 +20,7 @@ from scrap_db.models import *
 def recreate_db(engine):
 
     print("Deleting old database....")
+    
 
     # Drop all tables
     custom_base.metadata.drop_all(bind=engine)

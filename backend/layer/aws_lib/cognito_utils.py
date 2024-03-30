@@ -3,11 +3,9 @@ import os
 from aws_lib.logger import logger
 from aws_lib.errors import AuthenticationTokenError
 
-cognito = boto3.client("cognito-idp")
-user_pool_client_id = os.environ.get("EGOLIVE_COGNITO_USER_POOL_CLIENT_ID")
-user_pool_id = os.environ.get("EGOLIVE_COGNITO_USER_POOL_ID")
 
 #TODO FIX HERE
+
 
 '''
 
@@ -18,9 +16,6 @@ class CognitoUtils:
         user_attributes = [
             {"Name": "given_name", "Value": user.firstname},
             {"Name": "family_name", "Value": user.lastname},
-            {"Name": "custom:ego_live_user_id", "Value": str(user.id)},
-            {"Name": "custom:selected_company_id", "Value": "null"},
-            {"Name": "custom:lang", "Value": "null"},
         ]
 
         if user.phone is not None:

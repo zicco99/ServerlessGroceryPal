@@ -34,6 +34,7 @@ class AppStack(Stack):
             "STAGE": stage,
             "LOGGER_LEVEL": "DEBUG" if stage == "staging" else "INFO",
         }
+        
 
         ###################
         #     FRONTEND    #

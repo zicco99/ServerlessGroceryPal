@@ -166,20 +166,25 @@ class BackendStack(NestedStack):
         api = ecs.FargateTaskDefinition(self, f"{base_name}-api")
 
         api_container = api.add_container(f"{base_name}-api",
+            container_name=f"{base_name}-api",
             image=ecs.AssetImage.from_asset("backend/api"),
             environment={
                 "SCRAP_DB_CREDS_SECRET_ARN": backend_db_creds.secret_arn,
                 "SCRAP_DB_PROXY_ENDPOINT": backend_db_proxy.endpoint,
             },
-            command=["npm run start:prod"],
             logging=ecs.LogDrivers.aws_logs(stream_prefix="api")
         )
 
         api_container.add_port_mappings(ecs.PortMapping(container_port=3000))
 
         service = ecs_patterns.ApplicationLoadBalancedFargateService(self, f"{base_name}-backend-service",
-            task_definition=api,
+            service_name=f"{base_name}-backend-service",
+            task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
+                image=ecs.ContainerImage.from_asset("backend/api"),
+            ),
             desired_count=1,
+            memory_limit_mib=512,
+            cpu=256,
             public_load_balancer=True,
             assign_public_ip=True,
             listener_port=3000,
@@ -188,6 +193,10 @@ class BackendStack(NestedStack):
             security_groups=[ec2_security_group]
         )
 
+        service.target_group.configure_health_check(
+            path="/",
+        )
+        
         # ------------------------------------------#
         #                   LAMBDAS                 #
         # ------------------------------------------#

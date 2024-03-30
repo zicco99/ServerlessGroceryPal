@@ -10,3 +10,5 @@ COPY ./dist ./dist
 COPY package*.json ./
 
 RUN npm install
+
+CMD [ "npm", "run", "start:prod" ]

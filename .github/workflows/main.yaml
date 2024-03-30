@@ -59,10 +59,10 @@ jobs:
 
       - name: Compile NestJS ScrapAPI
         run: |
-          cd backend/microservices/scrap/api/
+          cd backend/api
           npm install
           npm run build # Build dist
-          cd ../../../..
+          cd ../../
 
       - name: Install CDK dependencies
         run: |

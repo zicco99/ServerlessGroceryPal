@@ -182,7 +182,6 @@ class BackendStack(NestedStack):
             assign_public_ip=True,
             listener_port=3000,
             enable_execute_command=True,
-            vpc=backend_vpc,
             security_groups=[ec2_security_group]
         )
 

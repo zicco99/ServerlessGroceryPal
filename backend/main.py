@@ -196,10 +196,11 @@ class BackendStack(NestedStack):
         service.target_group.configure_health_check(
             path="/",
         )
-        
+
         # ------------------------------------------#
         #                   LAMBDAS                 #
         # ------------------------------------------#
+
 
         '''
         backend_layer = lambd_experimental.PythonLayerVersion(

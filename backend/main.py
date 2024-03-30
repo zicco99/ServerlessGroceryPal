@@ -167,9 +167,7 @@ class BackendStack(NestedStack):
             self, f"{base_name}-cluster",
             cluster_name=f"{base_name}-cluster",
             vpc=backend_vpc,
-            security_groups=[ec2_security_group]
         )
-        
 
         service = ecs_patterns.ApplicationLoadBalancedFargateService(self, f"{base_name}-backend-service",
             service_name=f"{base_name}-backend-service",

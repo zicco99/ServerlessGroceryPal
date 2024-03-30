@@ -162,26 +162,21 @@ class BackendStack(NestedStack):
         # Configure inbound and outbound rules in RDS security group
         rds_security_group.add_ingress_rule(peer=ec2_security_group, connection=ec2.Port.all_traffic(), description="Allow inbound traffic from EC2 instances")
         rds_security_group.add_egress_rule(peer=ec2_security_group, connection=ec2.Port.all_traffic(), description="Allow outbound traffic to EC2 instances")
-        
-        api = ecs.FargateTaskDefinition(self, f"{base_name}-api")
 
-        api_container = api.add_container(f"{base_name}-api",
-            container_name=f"{base_name}-api",
-            image=ecs.AssetImage.from_asset("backend/api"),
-            environment={
-                "SCRAP_DB_CREDS_SECRET_ARN": backend_db_creds.secret_arn,
-                "SCRAP_DB_PROXY_ENDPOINT": backend_db_proxy.endpoint,
-            },
-            logging=ecs.LogDrivers.aws_logs(stream_prefix="api")
+        cluster = ecs.Cluster(
+            self, f"{base_name}-cluster",
+            cluster_name=f"{base_name}-cluster",
+            vpc=backend_vpc,
+            security_groups=[ec2_security_group]
         )
-
-        api_container.add_port_mappings(ecs.PortMapping(container_port=3000))
+        
 
         service = ecs_patterns.ApplicationLoadBalancedFargateService(self, f"{base_name}-backend-service",
             service_name=f"{base_name}-backend-service",
             task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
                 image=ecs.ContainerImage.from_asset("backend/api"),
             ),
+            cluster=cluster,
             desired_count=1,
             memory_limit_mib=512,
             cpu=256,

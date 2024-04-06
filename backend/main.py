@@ -190,11 +190,7 @@ class BackendStack(NestedStack):
             task_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             security_groups=[ec2_security_group]
         )
-
-        service.target_group.configure_health_check(
-            path="/",
-        )
-
+        
         # ------------------------------------------#
         #                   LAMBDAS                 #
         # ------------------------------------------#

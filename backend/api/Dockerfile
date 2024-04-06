@@ -1,14 +1,27 @@
-# Base image
-FROM node:18
+FROM node:20-alpine as BUILD
+WORKDIR /app
 
-# Create app directory
-WORKDIR /usr/src/app
 
-COPY ./dist ./dist
-
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
+COPY nest-cli.json ./
+COPY .eslintrc.js ./
+COPY tsconfig*.json ./
+COPY ./src ./src
 
-RUN npm install
+RUN npm ci && npm run build
 
-CMD [ "npm", "run", "start:prod" ]
+FROM node:20-alpine as PRODUCTION
+
+RUN apk --no-cache add curl
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install --production
+COPY --from=BUILD /app/dist/ dist/
+
+EXPOSE 3000
+
+HEALTHCHECK CMD curl --fail http://localhost:3000/api/healthcheck || exit 1
+
+CMD ["npm", "run", "start:prod"]

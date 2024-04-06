@@ -67,6 +67,7 @@ class BackendStack(NestedStack):
                     subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS
                 )
             ]
+            nat_gateways=1
         )
 
         # Define security groups
@@ -169,10 +170,14 @@ class BackendStack(NestedStack):
             vpc=backend_vpc,
         )
 
+
         service = ecs_patterns.ApplicationLoadBalancedFargateService(self, f"{base_name}-backend-service",
             service_name=f"{base_name}-backend-service",
             task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
                 image=ecs.ContainerImage.from_asset("backend/api"),
+                environment={
+                    "STAGE": params.stage
+                }
             ),
             cluster=cluster,
             desired_count=1,
@@ -182,6 +187,7 @@ class BackendStack(NestedStack):
             assign_public_ip=True,
             listener_port=3000,
             enable_execute_command=True,
+            task_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             security_groups=[ec2_security_group]
         )
 

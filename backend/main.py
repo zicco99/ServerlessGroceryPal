@@ -66,7 +66,7 @@ class BackendStack(NestedStack):
                     name='private',
                     subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS
                 )
-            ]
+            ],
             nat_gateways=1
         )
 

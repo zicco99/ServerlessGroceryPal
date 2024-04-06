@@ -188,7 +188,11 @@ class BackendStack(NestedStack):
             listener_port=3000,
             enable_execute_command=True,
             task_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
-            security_groups=[ec2_security_group]
+            security_groups=[ec2_security_group],
+            load_balancer=ecs_patterns.ApplicationLoadBalancerProps(
+                vpc=backend_vpc,
+                public_load_balancer=True,
+            )
         )
 
         service.target_group.configure_health_check(

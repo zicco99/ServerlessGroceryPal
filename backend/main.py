@@ -194,8 +194,10 @@ class BackendStack(NestedStack):
         service.target_group.configure_health_check(
             enabled=True,
             path="/",
-            interval = Duration.seconds(10),
-            unhealthy_threshold_count= 5,
+            interval=Duration.seconds(30),
+            timeout=Duration.seconds(5),   
+            healthy_threshold_count=5, 
+            unhealthy_threshold_count=2, 
             port="3000"
         )
 

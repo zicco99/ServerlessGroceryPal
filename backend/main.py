@@ -196,7 +196,7 @@ class BackendStack(NestedStack):
             path="/",
             interval = Duration.seconds(10),
             unhealthy_threshold_count= 5,
-            port=3000
+            port="3000"
         )
 
         # ------------------------------------------#

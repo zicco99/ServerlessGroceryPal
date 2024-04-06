@@ -167,7 +167,7 @@ class BackendStack(NestedStack):
         cluster = ecs.Cluster(
             self, f"{base_name}-cluster",
             cluster_name=f"{base_name}-cluster",
-            vpc=backend_vpc,
+            vpc=backend_vpc
         )
 
 
@@ -191,11 +191,13 @@ class BackendStack(NestedStack):
             security_groups=[ec2_security_group]
         )
 
-        '''
         service.target_group.configure_health_check(
+            enabled=True,
             path="/",
+            interval = Duration.seconds(10),
+            unhealthy_threshold_count= 5,
+            port=3000
         )
-        '''
 
         # ------------------------------------------#
         #                   LAMBDAS                 #

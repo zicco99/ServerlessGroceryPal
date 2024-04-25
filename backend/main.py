@@ -21,14 +21,13 @@ from constructs import Construct
 # but other microservices but access through a private API Gateway (boto3 invoke-based + aws_power_tool)) 
 
 class BackendStackParams:
-    def __init__(self, stage, base_environment, layer_lambda, user_pool, user_pool_client, user_pool_domain, ecr_repository):
+    def __init__(self, stage, base_environment, layer_lambda, user_pool, user_pool_client, user_pool_domain):
         self.stage : Stage = stage
         self.base_environment : dict = base_environment
         self.layer_lambda : lambd.LayerVersion = layer_lambda
         self.user_pool : cognito.UserPool = user_pool
         self.user_pool_client : cognito.UserPoolClient = user_pool_client
         self.user_pool_domain : cognito.UserPoolDomain = user_pool_domain
-        self.ecr_repository : ecr.Repository = ecr_repository
 
 class BackendStackOutputs:
     def __init__(self, backend_bucket_name):

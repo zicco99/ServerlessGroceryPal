@@ -19,8 +19,6 @@ class AppStack(Stack):
 
         base_name = f"{repository_name}-{stage}"
 
-        ecr_repository = ecr.Repository(self, f"{base_name}-repository", repository_name=f"{base_name}-repository")
-
         # Shared resources -----------------------------------------
         #----------------------------------------------------
 
@@ -174,7 +172,6 @@ class AppStack(Stack):
                 user_pool,
                 user_pool_client,
                 user_pool_domain,
-                ecr_repository,
             )
         )
 

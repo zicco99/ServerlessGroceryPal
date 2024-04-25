@@ -9,7 +9,7 @@ from aws_cdk import (
     aws_secretsmanager as secretsmanager,
     aws_cognito as cognito,
     aws_ecr as ecr,
-    aws_lambda_nodejs as lambda_,
+    aws_lambda as lambda_,
     aws_s3 as s3,
     Stage
 )
@@ -176,12 +176,12 @@ class BackendStack(NestedStack):
 
         self.backend_bucket_name = backend_bucket.bucket_name
 
-        nest_js_serverless = lambda_.NodejsFunction(
+        nest_js_serverless = lambda_.Function(
             self,
             f"{base_name}-nest-js-serverless",
             entry="backend/lambdas/nest_js_serverless",
             handler="index.handler",
-            runtime=lambd.Runtime.NODEJS_14_X,
+            runtime=lambd.Runtime.NODEJS_18_X
         )
 
 

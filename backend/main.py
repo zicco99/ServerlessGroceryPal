@@ -9,6 +9,7 @@ from aws_cdk import (
     aws_secretsmanager as secretsmanager,
     aws_cognito as cognito,
     aws_ecr as ecr,
+    aws_lambda_nodejs as lambda_,
     aws_s3 as s3,
     Stage
 )
@@ -111,7 +112,7 @@ class BackendStack(NestedStack):
             allocated_storage=20,
             max_allocated_storage=100,
             delete_automated_backups=True,
-            database_name="backend-db",
+            database_name="backenddb",
             backup_retention=Duration.days(0),
             vpc=backend_vpc,
             credentials=rds.Credentials.from_secret(backend_db_creds),
@@ -174,6 +175,17 @@ class BackendStack(NestedStack):
         )
 
         self.backend_bucket_name = backend_bucket.bucket_name
+
+        nest_js_serverless = lambda_.NodejsFunction(
+            self,
+            f"{base_name}-nest-js-serverless",
+            id=f"{base_name}-nest-js-serverless",
+            entry="backend/lambdas/nest_js_serverless",
+            handler="index.handler",
+            runtime=lambd.Runtime.NODEJS_14_X,
+        )
+
+
 
         # ------------------------------------------#
         #                   LAMBDAS                 #

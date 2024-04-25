@@ -99,6 +99,17 @@ jobs:
 
           cat "$env_file_path"
 
+      - name: Build nestjs backend dist and upload on the S3 bucket
+        run: |
+          cd backend/api
+          npm run build
+          cd ../../
+
+          bucket_name=$(cat cdk_outputs.json | jq -r .AppStack.BackendBucketName)
+          zip -r nestjs-backend.zip backend/api/dist
+
+          aws s3 cp nestjs-backend.zip "s3://$bucket_name" --recursive
+
       - name: Run Frontend Build and Upload on the S3 bucket
         run: |
           frontend_directory="$(pwd)/frontend/react-app"

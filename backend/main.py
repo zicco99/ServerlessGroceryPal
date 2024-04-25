@@ -179,7 +179,7 @@ class BackendStack(NestedStack):
         nest_js_serverless = lambda_.Function(
             self,
             f"{base_name}-nest-js-serverless",
-            entry="backend/lambdas/nest_js_serverless",
+            code=lambda_.Code.from_asset("backend/lambdas/nest_js_serverless"),
             handler="index.handler",
             runtime=lambd.Runtime.NODEJS_18_X
         )

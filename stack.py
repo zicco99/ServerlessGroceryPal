@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_cognito as cognito,
     aws_ssm as ssm,
+    aws_ecr as ecr,
 )
 from constructs import Construct
 
@@ -17,6 +18,8 @@ class AppStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         base_name = f"{repository_name}-{stage}"
+
+        ecr_repository = ecr.Repository(self, f"{base_name}-repository", repository_name=f"{base_name}-repository")
 
         # Shared resources -----------------------------------------
         #----------------------------------------------------
@@ -170,7 +173,8 @@ class AppStack(Stack):
                 layer_lambda,
                 user_pool,
                 user_pool_client,
-                user_pool_domain
+                user_pool_domain,
+                ecr_repository,
             )
         )
 
@@ -183,6 +187,7 @@ class AppStack(Stack):
         CfnOutput(self, "StackRegion", value=self.region, description="AWS Region")
         CfnOutput(self, "DistributionUrl", value=frontend_stack_outputs.distribution_url)
         CfnOutput(self, "FrontendBucketName", value=frontend_stack_outputs.frontend_bucket_name)
+        CfnOutput(self, "BackendBucketName", value=backend_stack_outputs.backend_bucket_name)
         CfnOutput(self, "FrontendDistributionId", value=frontend_stack_outputs.distribution_id)
         CfnOutput(self, "UserPoolId",value=user_pool.user_pool_id, description="Cognito User Pool ID")
         CfnOutput(self, "UserPoolClientId",value=user_pool_client.user_pool_client_id, description="Cognito User Pool Client ID")

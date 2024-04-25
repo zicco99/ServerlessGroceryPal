@@ -10,6 +10,8 @@ from aws_cdk import (
     aws_cognito as cognito,
     aws_ecs as ecs,
     aws_ecs_patterns as ecs_patterns,
+    aws_ecr as ecr,
+    aws_s3 as s3,
     Stage
 )
 
@@ -20,17 +22,19 @@ from constructs import Construct
 # but other microservices but access through a private API Gateway (boto3 invoke-based + aws_power_tool)) 
 
 class BackendStackParams:
-    def __init__(self, stage, base_environment, layer_lambda, user_pool, user_pool_client, user_pool_domain):
+    def __init__(self, stage, base_environment, layer_lambda, user_pool, user_pool_client, user_pool_domain, ecr_repository):
         self.stage : Stage = stage
         self.base_environment : dict = base_environment
         self.layer_lambda : lambd.LayerVersion = layer_lambda
         self.user_pool : cognito.UserPool = user_pool
         self.user_pool_client : cognito.UserPoolClient = user_pool_client
         self.user_pool_domain : cognito.UserPoolDomain = user_pool_domain
+        self.ecr_repository : ecr.Repository = ecr_repository
 
 class BackendStackOutputs:
-    def __init__(self,backend_api_base_url):
+    def __init__(self,backend_api_base_url, backend_bucket_name):
         self.backend_api_base_url = backend_api_base_url
+        self.backend_bucket_name = backend_bucket_name
 
 class Permission(Enum):
     RW_PERM_SCRAP_DB = "rw_backend_db"
@@ -110,7 +114,7 @@ class BackendStack(NestedStack):
             allocated_storage=20,
             max_allocated_storage=100,
             delete_automated_backups=True,
-            database_name="backenddb",
+            database_name="backend-db",
             backup_retention=Duration.days(0),
             vpc=backend_vpc,
             credentials=rds.Credentials.from_secret(backend_db_creds),
@@ -164,42 +168,15 @@ class BackendStack(NestedStack):
         rds_security_group.add_ingress_rule(peer=ec2_security_group, connection=ec2.Port.all_traffic(), description="Allow inbound traffic from EC2 instances")
         rds_security_group.add_egress_rule(peer=ec2_security_group, connection=ec2.Port.all_traffic(), description="Allow outbound traffic to EC2 instances")
 
-        cluster = ecs.Cluster(
-            self, f"{base_name}-cluster",
-            cluster_name=f"{base_name}-cluster",
-            vpc=backend_vpc
+        backend_bucket = s3.Bucket(
+            self, f"backend-bucket",
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            removal_policy=RemovalPolicy.DESTROY,
+            bucket_name=f"{base_name}-bucket",
+            auto_delete_objects=True,
         )
 
-
-        service = ecs_patterns.ApplicationLoadBalancedFargateService(self, f"{base_name}-backend-service",
-            service_name=f"{base_name}-backend-service",
-            task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
-                image=ecs.ContainerImage.from_asset("backend/api"),
-                environment={
-                    "STAGE": params.stage
-                }
-            ),
-            cluster=cluster,
-            desired_count=1,
-            memory_limit_mib=512,
-            cpu=256,
-            public_load_balancer=True,
-            assign_public_ip=True,
-            listener_port=3000,
-            enable_execute_command=True,
-            task_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
-            security_groups=[ec2_security_group,rds_security_group]
-        )
-
-        service.target_group.configure_health_check(
-            enabled=True,
-            path="/",
-            interval=Duration.seconds(30),
-            timeout=Duration.seconds(5),   
-            healthy_threshold_count=5, 
-            unhealthy_threshold_count=2, 
-            port="3000"
-        )
+        self.backend_bucket_name = backend_bucket.bucket_name
 
         # ------------------------------------------#
         #                   LAMBDAS                 #
@@ -515,7 +492,6 @@ class BackendStack(NestedStack):
                 for key, value in env.items():
                     lamdba.add_environment(key, value)
 
-        self.backend_api_base_url = f"{service.load_balancer.load_balancer_dns_name}:3000/"
         
 
 

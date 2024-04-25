@@ -181,9 +181,7 @@ class AppStack(Stack):
 
 
         backend_stack_outputs : BackendStackOutputs = backend.get_outputs()
-
-        CfnOutput(self, "BackendApiBaseUrl",value=backend_stack_outputs.backend_api_base_url,description="Public IP address of the EC2 instance running Nest.js application")
-
+        
         CfnOutput(self, "StackRegion", value=self.region, description="AWS Region")
         CfnOutput(self, "DistributionUrl", value=frontend_stack_outputs.distribution_url)
         CfnOutput(self, "FrontendBucketName", value=frontend_stack_outputs.frontend_bucket_name)

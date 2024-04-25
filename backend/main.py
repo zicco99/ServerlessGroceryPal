@@ -43,7 +43,7 @@ class Permission(Enum):
 class BackendStack(NestedStack):
 
     def get_outputs(self) -> BackendStackOutputs:
-        return BackendStackOutputs(self.backend_api_base_url)
+        return BackendStackOutputs(self.backend_bucket_name)
     
     def __init__(self, scope: Construct, id: str, params: BackendStackParams, **kwargs):
         super().__init__(scope, id, **kwargs)

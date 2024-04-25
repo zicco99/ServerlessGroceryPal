@@ -119,7 +119,7 @@ class BackendStack(NestedStack):
             security_groups=[rds_security_group],
             publicly_accessible=True,
             port=5432,
-            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
         )
 
         backend_db_proxy = rds.DatabaseProxy(
@@ -179,7 +179,6 @@ class BackendStack(NestedStack):
         nest_js_serverless = lambda_.NodejsFunction(
             self,
             f"{base_name}-nest-js-serverless",
-            id=f"{base_name}-nest-js-serverless",
             entry="backend/lambdas/nest_js_serverless",
             handler="index.handler",
             runtime=lambd.Runtime.NODEJS_14_X,

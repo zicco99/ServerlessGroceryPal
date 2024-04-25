@@ -179,11 +179,16 @@ class BackendStack(NestedStack):
         nest_js_serverless = lambda_.Function(
             self,
             f"{base_name}-nest-js-serverless",
-            code=lambda_.Code.from_asset("backend/lambdas/nest_js_serverless"),
-            handler="index.handler",
-            runtime=lambd.Runtime.NODEJS_18_X
+            code=lambda_.Code.from_asset("backend/lambdas/nest_js_serverless"),  # Path to your Lambda code directory
+            handler="nest_js_serverless.handler",  # Handler function in your Nest.js application
+            runtime=lambd.Runtime.NODEJS_18_X,
+            environment={
+                'DB_HOST': backend_db_proxy.endpoint,
+                'DB_USERNAME': backend_db_creds.secret_value_from_json('username').to_string(),
+                'DB_PASSWORD': backend_db_creds.secret_value_from_json('password').to_string(),
+                'DB_NAME': f"{base_name}-db"
+            }
         )
-
 
 
         # ------------------------------------------#

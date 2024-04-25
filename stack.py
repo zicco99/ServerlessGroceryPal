@@ -181,7 +181,7 @@ class AppStack(Stack):
 
 
         backend_stack_outputs : BackendStackOutputs = backend.get_outputs()
-        
+
         CfnOutput(self, "StackRegion", value=self.region, description="AWS Region")
         CfnOutput(self, "DistributionUrl", value=frontend_stack_outputs.distribution_url)
         CfnOutput(self, "FrontendBucketName", value=frontend_stack_outputs.frontend_bucket_name)
@@ -194,6 +194,7 @@ class AppStack(Stack):
         CfnOutput(self, "UserPoolClientCallbackUrlRemote", value=user_pool_client_urls["remote_callback_url"], description="Cognito User Pool Client Callback URL - Remote")
         CfnOutput(self, "UserPoolClientLogoutUrlLocal", value=user_pool_client_urls["local_logout_url"], description="Cognito User Pool Client Callback URL - Local") 
         CfnOutput(self, "UserPoolClientLogoutUrlRemote", value=user_pool_client_urls["remote_logout_url"], description="Cognito User Pool Client Callback URL - Remote")
+
 
 
 

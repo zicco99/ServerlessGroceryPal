@@ -8,8 +8,6 @@ from aws_cdk import (
     aws_iam as iam,
     aws_secretsmanager as secretsmanager,
     aws_cognito as cognito,
-    aws_ecs as ecs,
-    aws_ecs_patterns as ecs_patterns,
     aws_ecr as ecr,
     aws_s3 as s3,
     Stage
@@ -32,8 +30,7 @@ class BackendStackParams:
         self.ecr_repository : ecr.Repository = ecr_repository
 
 class BackendStackOutputs:
-    def __init__(self,backend_api_base_url, backend_bucket_name):
-        self.backend_api_base_url = backend_api_base_url
+    def __init__(self, backend_bucket_name):
         self.backend_bucket_name = backend_bucket_name
 
 class Permission(Enum):

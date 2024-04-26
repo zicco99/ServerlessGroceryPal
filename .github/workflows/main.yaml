@@ -109,9 +109,9 @@ jobs:
 
           npm run build --prefix backend/api
 
-          zip -r ./nestjs-backend.zip backend/api/dist/*
+          zip -r nestjs-backend.zip backend/api/dist/*
 
-          aws s3 cp nestjs-backend.zip "s3://$bucket_name" --recursive
+          aws s3 cp backend/api/nestjs-backend.zip "s3://$bucket_name" --recursive
 
 
       - name: Run Frontend Build and Upload on the S3 bucket

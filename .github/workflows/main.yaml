@@ -103,14 +103,15 @@ jobs:
         run: |
           cd backend/api
           npm run build
-          cd ../../
 
-          zip -r nestjs-backend.zip backend/api/dist
+          zip -r nestjs-backend.zip dist
 
           bucket_name=$(cat cdk_outputs.json | jq -r .AppStack.BackendBucketName)
           zip -r nestjs-backend.zip backend/api/dist
 
           aws s3 cp nestjs-backend.zip "s3://$bucket_name" --recursive
+
+          cd ../../
 
       - name: Run Frontend Build and Upload on the S3 bucket
         run: |

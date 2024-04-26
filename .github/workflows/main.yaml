@@ -105,6 +105,8 @@ jobs:
           npm run build
           cd ../../
 
+          zip -r nestjs-backend.zip backend/api/dist
+
           bucket_name=$(cat cdk_outputs.json | jq -r .AppStack.BackendBucketName)
           zip -r nestjs-backend.zip backend/api/dist
 

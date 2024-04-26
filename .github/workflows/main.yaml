@@ -102,9 +102,9 @@ jobs:
       - name: Build nestjs backend dist and upload on the S3 bucket
         run: |
           bucket_name=$(cat cdk_outputs.json | jq -r .AppStack.BackendBucketName)
-          npm install
-          
           cd backend/api
+
+          npm install
 
           ls -la
 

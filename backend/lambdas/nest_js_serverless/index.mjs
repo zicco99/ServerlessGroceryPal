@@ -2,35 +2,30 @@ import { S3 } from 'aws-sdk';
 import { NestFactory } from '@nestjs/core';
 import AdmZip from 'adm-zip';
 import { exec } from 'child_process';
+import { promisify } from 'util';
 
 const s3 = new S3();
+const execPromise = promisify(exec);
 
-// Initialize Nest.js application outside the handler function to reuse resources
 let nestApp = null;
 
 async function initializeNestApp() {
     try {
-        // Download 'dist' folder from S3
         const { Body } = await s3.getObject({ Bucket: process.env.NESTJS_SERVERLESS_BUCKET, Key: 'nestjs-backend.zip' }).promise();
 
         const zip = new AdmZip(Body);
         zip.extractAllTo('/tmp/nestjs');
 
-        // Install dependencies
         console.log('Installing dependencies...');
-        await new Promise((resolve, reject) => {
-            exec('npm install --omit=dev', { cwd: '/tmp/nestjs' }, (error, stdout, stderr) => {
-                if (error) {
-                    console.error('Error installing dependencies:', error);
-                    reject(error);
-                } else {
-                    console.log('Dependencies installed successfully!');
-                    resolve();
-                }
-            });
-        });
+        try {
+            const { stdout, stderr } = await execPromise('npm install --omit=dev', { cwd: '/tmp/nestjs' });
+            console.log('Dependencies installed successfully!', stdout);
+            console.error('Installation error:', stderr);
+        } catch (error) {
+            console.error('Error installing dependencies:', error);
+            throw error;
+        }
 
-        // Import and initialize Nest.js application
         const { default: AppModule } = require('/tmp/nestjs/app.module');
         nestApp = await NestFactory.create(AppModule);
         await nestApp.init();

@@ -17,7 +17,7 @@ const initializeNestApp = async () => {
         const zip = new AdmZip(Body);
         zip.extractAllTo('/tmp/nestjs');
 
-        const { AppModule } = require('/tmp/nestjs/dist/app.module');
+        const { AppModule } = require('/tmp/nestjs/backend/api/dist/app.module');
         const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(express()));
 
         app = serverlessExpress({ app: nestApp.getHttpAdapter().getInstance() });

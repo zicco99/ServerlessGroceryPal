@@ -109,8 +109,8 @@ jobs:
 
           sudo apt install zip
 
-          zip -r ./nestjs-backend.zip backend/api/dist package.json
-          
+          zip -r ./nestjs-backend.zip backend/api/dist backend/api/package.json
+
           aws s3 cp nestjs-backend.zip "s3://$bucket_name"
 
 

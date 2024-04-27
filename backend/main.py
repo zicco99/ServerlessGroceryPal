@@ -183,6 +183,7 @@ class BackendStack(NestedStack):
             f"{base_name}-nest-js-serverless",
             entry="backend/lambdas/nest_js_serverless/index.mjs",
             handler="index.handler",
+            project_root="backend/lambdas/nest_js_serverless",
             runtime=lambd.Runtime.NODEJS_18_X,
             environment={
                 'DB_HOST': backend_db_proxy.endpoint,

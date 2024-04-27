@@ -1,5 +1,5 @@
 from enum import Enum
-from aws_cdk import Duration, NestedStack, RemovalPolicy
+from aws_cdk import Duration, NestedStack, RemovalPolicy, Size
 from aws_cdk import (
     aws_lambda as lambd,
     aws_lambda_python_alpha as lambd_experimental,
@@ -176,7 +176,7 @@ class BackendStack(NestedStack):
                 'DB_NAME': f"{base_name}-db",
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name
             },
-            ephemeral_storage_size=1024,
+            ephemeral_storage_size= Size.mebibytes(1024),
             memory_size=1024+512,
             timeout=Duration.minutes(10),
             tracing=lambd.Tracing.ACTIVE

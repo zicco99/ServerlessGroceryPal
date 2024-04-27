@@ -176,7 +176,10 @@ class BackendStack(NestedStack):
                 'DB_NAME': f"{base_name}-db",
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name
             },
-            timeout=Duration.minutes(10)
+            memory_size=512,
+            reserved_concurrent_executions=1,
+            timeout=Duration.minutes(10),
+            tracing=lambd.Tracing.ACTIVE
         )
 
         backend_bucket.grant_read_write(nest_js_serverless)

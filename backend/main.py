@@ -184,6 +184,7 @@ class BackendStack(NestedStack):
             entry="backend/lambdas/nest_js_serverless/index.mjs",
             handler="index.handler",
             project_root="backend/lambdas/nest_js_serverless",
+            deps_lock_file_path="backend/lambdas/nest_js_serverless/package-lock.json",
             runtime=lambd.Runtime.NODEJS_18_X,
             environment={
                 'DB_HOST': backend_db_proxy.endpoint,

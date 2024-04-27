@@ -20,24 +20,27 @@ export async function handler(event, context) {
             throw new Error('S3_BUCKET and S3_KEY environment variables are required.');
         }
 
-        // Download NestJS application ZIP file from S3
+        console.log(`Retrieving ${s3Bucket}/${s3Key} from S3...`);
         const { Body } = await s3.getObject({ Bucket: s3Bucket, Key: s3Key }).promise();
 
-        // Extract NestJS application to temporary directory
         const zip = new AdmZip(Body);
         zip.extractAllTo('/tmp/nestjs');
 
-        // Install dependencies and start the application
+        console.log('Installing dependencies...');
         await execPromise('npm install --production', { cwd: '/tmp/nestjs' });
+        console.log('Installed dependencies!');
+
         const { default: AppModule } = require('/tmp/nestjs/app.module');
+
         const nestApp = await NestFactory.create(AppModule);
         await nestApp.init();
 
-        // Handle HTTP requests
-        const handler = nestApp.getHttpAdapter().getInstance();
+        console.log('NestJS initialized!');
 
-        // Proxy incoming request to NestJS application
+        const handler = nestApp.getHttpAdapter().getInstance();
         const response = await handler(event, context);
+
+        console.log('NestJS response:', response);
 
         return response;
     } catch (error) {

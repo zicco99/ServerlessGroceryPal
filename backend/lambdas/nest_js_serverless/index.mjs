@@ -1,8 +1,8 @@
-const { S3 } = require('aws-sdk');
-const { NestFactory } = require('@nestjs/core');
-const { default: AdmZip } = require('adm-zip');
-const { promisify } = require('util');
-const { exec } = require('child_process');
+import { S3 } from 'aws-sdk';
+import { NestFactory } from '@nestjs/core';
+import { default as AdmZip } from 'adm-zip';
+import { promisify } from 'util';
+import { exec } from 'child_process';
 
 // Create S3 client
 const s3 = new S3();
@@ -11,7 +11,7 @@ const s3 = new S3();
 const execPromise = promisify(exec);
 
 // Lambda handler function
-exports.handler = async (event, context) => {
+export async function handler(event, context) {
     try {
         const s3Bucket = process.env.NESTJS_SERVERLESS_BUCKET;
         const s3Key = "nestjs-backend.zip";
@@ -50,4 +50,4 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ message: 'Internal Server Error' }),
         };
     }
-};
+}

@@ -70,14 +70,14 @@ class BackendStack(NestedStack):
                     subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS
                 )
             ],
-            nat_gateways=1
+            nat_gateways=1,
+            nat_gateway_provider=ec2.NatProvider.gateway()
         )
 
         # Define security groups
         lambda_security_group = ec2.SecurityGroup(self, f"{base_name}-lambda-security-group",
             vpc=backend_vpc,
-            description="Security group for Lambda functions",
-            allow_all_outbound=True
+            description="Security group for Lambda functions"
         )
 
         rds_security_group = ec2.SecurityGroup(self, f"{base_name}-rds-security-group",

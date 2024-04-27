@@ -33,7 +33,7 @@ const initializeNestApp = async () => {
         console.log('Nest.js application extracted successfully.');
 
         process.env.NODE_ENV = 'production';
-        execSync('npm install --omit=dev --prefix /tmp/nestjs/backend/api/dist --cache /tmp/npm-cache', { stdio: 'inherit' });
+        execSync('npm install --omit=dev --prefix /tmp/nestjs/backend/api/dist --cache /tmp/npm-cache --loglevel=verbose', { stdio: 'inherit' });
 
         process.chdir('/tmp/nestjs/backend/api/dist');
 

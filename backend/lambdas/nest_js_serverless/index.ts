@@ -4,6 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import serverlessExpress from '@vendia/serverless-express';
 import express from 'express';
+import { execSync } from 'child_process';
+import fs from 'fs';
 
 const s3 = new S3();
 
@@ -17,13 +19,17 @@ const initializeNestApp = async () => {
         const zip = new AdmZip(Body);
         zip.extractAllTo('/tmp/nestjs');
 
-        const { execSync } = require('child_process');
+        const cacheDir = '/tmp/npm-cache';
+        if (!fs.existsSync(cacheDir)) {
+            fs.mkdirSync(cacheDir);
+        }
+
         execSync('mv /tmp/nestjs/backend/api/package.json /tmp/nestjs/backend/api/dist/package.json', { stdio: 'inherit' });
 
         console.log('Nest.js application extracted successfully.');
 
         process.env.NODE_ENV = 'production';
-        execSync('npm install --omit=dev --prefix /tmp/nestjs/backend/api/dist', { stdio: 'inherit' });
+        execSync('npm install --omit=dev --prefix /tmp/nestjs/backend/api/dist --cache /tmp/npm-cache', { stdio: 'inherit' });
 
         process.chdir('/tmp/nestjs/backend/api/dist');
 
@@ -39,9 +45,10 @@ const initializeNestApp = async () => {
     }
 };
 
-export const handler = async (event: any, context: any) => {
+exports.handler = async (event: any, context: any) => {
     if (!app) {
         await initializeNestApp();
     }
     return app(event, context);
 };
+

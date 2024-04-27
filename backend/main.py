@@ -192,7 +192,8 @@ class BackendStack(NestedStack):
                 'DB_PASSWORD': backend_db_creds.secret_value_from_json('password').to_string(),
                 'DB_NAME': f"{base_name}-db",
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name
-            }
+            },
+            timeout=Duration.minutes(10)
         )
 
         backend_bucket.grant_read_write(nest_js_serverless)

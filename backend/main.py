@@ -176,12 +176,20 @@ class BackendStack(NestedStack):
 
         self.backend_bucket_name = backend_bucket.bucket_name
 
+        nodejs_layer = lambda_.LayerVersion(
+            self,
+            f"{base_name}-nodejs-layer",
+            code=lambda_.Code.from_asset("backend/layer/js/utils/nodejs"),
+            compatible_runtimes=[lambd.Runtime.NODEJS_18_X]
+        )
+
         nest_js_serverless = lambda_.Function(
             self,
             f"{base_name}-nest-js-serverless",
             code=lambda_.Code.from_asset("backend/lambdas/nest_js_serverless"),
             handler="index.handler",
             runtime=lambd.Runtime.NODEJS_18_X,
+            layers=[nodejs_layer],
             environment={
                 'DB_HOST': backend_db_proxy.endpoint,
                 'DB_USERNAME': backend_db_creds.secret_value_from_json('username').to_string(),

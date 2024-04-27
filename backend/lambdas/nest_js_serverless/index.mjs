@@ -1,16 +1,18 @@
-// Adjusted import statements
 import { S3 } from 'aws-sdk';
 import { NestFactory } from '@nestjs/core';
+import AdmZip from 'adm-zip';
 import { promisify } from 'util';
 import { exec } from 'child_process';
+
+// Create S3 client
+const s3 = new S3();
+
+// Promisify child_process.exec function
+const execPromise = promisify(exec);
 
 // Lambda handler function
 export async function handler(event, context) {
     try {
-        const AdmZip = require('adm-zip');
-        const { ValidationPipe } = require('@nestjs/common');
-        const { ClassSerializerInterceptor } = require('@nestjs/common/serializer');
-
         const s3Bucket = process.env.NESTJS_SERVERLESS_BUCKET;
         const s3Key = "nestjs-backend.zip";
 
@@ -26,7 +28,6 @@ export async function handler(event, context) {
         zip.extractAllTo('/tmp/nestjs');
 
         // Install dependencies and start the application
-        const execPromise = promisify(exec);
         await execPromise('npm install --production', { cwd: '/tmp/nestjs' });
         const { default: AppModule } = require('/tmp/nestjs/app.module');
         const nestApp = await NestFactory.create(AppModule);

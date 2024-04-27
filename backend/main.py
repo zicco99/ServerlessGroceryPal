@@ -177,7 +177,6 @@ class BackendStack(NestedStack):
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name
             },
             memory_size=512,
-            reserved_concurrent_executions=1,
             timeout=Duration.minutes(10),
             tracing=lambd.Tracing.ACTIVE
         )

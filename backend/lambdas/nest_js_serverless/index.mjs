@@ -27,8 +27,9 @@ export async function handler(event, context) {
         zip.extractAllTo('/tmp/nestjs');
 
         console.log('Installing dependencies...');
-        await execPromise('npm install --production', { cwd: '/tmp/nestjs' });
-        console.log('Installed dependencies!');
+        const { stdout, stderr } = await execPromise('npm install --production', { cwd: '/tmp/nestjs' });
+        console.log('Installation output:', stdout);
+        console.error('Installation error:', stderr);
 
         const { default: AppModule } = require('/tmp/nestjs/app.module');
 

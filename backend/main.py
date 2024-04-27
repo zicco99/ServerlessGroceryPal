@@ -176,6 +176,7 @@ class BackendStack(NestedStack):
                 'DB_NAME': f"{base_name}-db",
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name
             },
+            ephemeral_storage_size=1024,
             memory_size=1024+512,
             timeout=Duration.minutes(10),
             tracing=lambd.Tracing.ACTIVE

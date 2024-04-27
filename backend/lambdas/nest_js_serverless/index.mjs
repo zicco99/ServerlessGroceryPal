@@ -1,6 +1,6 @@
 import { S3 } from 'aws-sdk';
 import { NestFactory } from '@nestjs/core';
-import { default as AdmZip } from 'adm-zip';
+import AdmZip from 'adm-zip'; // Updated import for adm-zip
 import { promisify } from 'util';
 import { exec } from 'child_process';
 

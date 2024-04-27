@@ -191,11 +191,19 @@ class BackendStack(NestedStack):
             }
         )
 
+        backend_api_cors = apigateway.CorsOptions(
+            allow_origins=apigateway.Cors.ALL_ORIGINS,
+            allow_methods=apigateway.Cors.ALL_METHODS,
+            allow_headers=["*"],
+            expose_headers=["*"],
+        )
+
         api = apigateway.RestApi(
             self,
             "NestJsServerlessApi",
             rest_api_name="NestJsServerlessApi",
-            description="API Gateway proxy for Nest.js serverless application"
+            description="API Gateway proxy for Nest.js serverless application",
+            default_cors_preflight_options=backend_api_cors
         )
 
         lambda_integration = apigateway.LambdaIntegration(
@@ -209,13 +217,14 @@ class BackendStack(NestedStack):
             }]
         )
 
-        api.root.add_resource("nest-js-serverless").add_method(
-            "ANY",
-            lambda_integration
+        #authorized_api_method_options = apigateway.MethodOptions(authorizer=user_pool_authorizer)
+
+
+        api.root.add_resource("nest-js-serverless").add_proxy(
+            any_method=True,
+            default_integration=apigateway.LambdaIntegration(lambda_integration),
+            # default_method_options=authorized_api_method_options
         )
-
-        api.root.add_proxy()
-
 
 
         # ------------------------------------------#

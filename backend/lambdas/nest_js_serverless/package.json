@@ -2,10 +2,8 @@
   "dependencies": {
     "@nestjs/core": "^10.3.8",
     "adm-zip": "^0.5.12",
-    "aws-cdk": "^2.139.0",
     "aws-sdk": "^2.1608.0",
     "child_process": "^1.0.2",
-    "nestjs": "^0.0.1",
     "util": "^0.12.5"
   }
 }

@@ -148,25 +148,6 @@ class BackendStack(NestedStack):
         rds_security_group.add_ingress_rule(peer=ec2.Peer.ipv4('0.0.0.0/0'), connection=ec2.Port.all_traffic())
         rds_security_group.add_egress_rule(peer=ec2.Peer.ipv4('0.0.0.0/0'), connection=ec2.Port.all_traffic())
 
-        # Declare security group
-        ec2_security_group = ec2.SecurityGroup(self, f"{base_name}-ec2-security-group",
-            vpc=backend_vpc,
-            description="Security group for EC2 instance",
-            allow_all_outbound=True  # Allow all outbound traffic
-        )
-
-        # Allow inbound SSH traffic from a specific IP address
-        ec2_security_group.add_ingress_rule(peer=ec2.Peer.ipv4('0.0.0.0/0'), connection=ec2.Port.tcp(22), description="Allow SSH access from specific IP")
-        ec2_security_group.add_ingress_rule(peer=ec2.Peer.ipv4('0.0.0.0/0'), connection=ec2.Port.tcp(443), description="Allow inbound traffic for your application")
-       
-        # Configure inbound and outbound rules in EC2 security group
-        ec2_security_group.add_ingress_rule(peer=rds_security_group, connection=ec2.Port.all_traffic(), description="Allow inbound traffic from RDS instances")
-        ec2_security_group.add_egress_rule(peer=rds_security_group, connection=ec2.Port.all_traffic(), description="Allow outbound traffic to RDS instances")
-
-        # Configure inbound and outbound rules in RDS security group
-        rds_security_group.add_ingress_rule(peer=ec2_security_group, connection=ec2.Port.all_traffic(), description="Allow inbound traffic from EC2 instances")
-        rds_security_group.add_egress_rule(peer=ec2_security_group, connection=ec2.Port.all_traffic(), description="Allow outbound traffic to EC2 instances")
-
         backend_bucket = s3.Bucket(
             self, f"backend-bucket",
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
@@ -186,6 +167,8 @@ class BackendStack(NestedStack):
             project_root="backend/lambdas/nest_js_serverless",
             deps_lock_file_path="backend/lambdas/nest_js_serverless/package-lock.json",
             runtime=lambd.Runtime.NODEJS_18_X,
+            vpc=backend_vpc,
+            security_groups=[lambda_security_group],
             environment={
                 'DB_HOST': backend_db_proxy.endpoint,
                 'DB_USERNAME': backend_db_creds.secret_value_from_json('username').to_string(),

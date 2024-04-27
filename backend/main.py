@@ -208,13 +208,7 @@ class BackendStack(NestedStack):
 
         lambda_integration = apigateway.LambdaIntegration(
             nest_js_serverless,
-            proxy=True,
-            integration_responses=[{
-                'statusCode': '200',
-                'responseParameters': {
-                    'method.response.header.Content-Type': "'application/json'",
-                }
-            }]
+            proxy=True
         )
 
         #authorized_api_method_options = apigateway.MethodOptions(authorizer=user_pool_authorizer)

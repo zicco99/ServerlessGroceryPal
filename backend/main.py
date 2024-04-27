@@ -206,11 +206,29 @@ class BackendStack(NestedStack):
             default_cors_preflight_options=backend_api_cors
         )
 
-        lambda_integration = apigateway.LambdaIntegration(
-            nest_js_serverless,
-            proxy=True
+        api.add_gateway_response(
+            "access-deny",
+            type=apigateway.ResponseType.ACCESS_DENIED,
+            status_code="401",
+            response_headers={
+                # Note that values must be enclosed within a pair of single quotes
+                "Access-Control-Allow-Origin": "'*'",
+                "Access-Control-Allow-Headers": "'*'",
+                "Access-Control-Allow-Methods": "'OPTIONS,POST,GET,PUT'",
+            },
+            templates={
+                "application/json": '{ "message": $context.error.messageString, "statusCode": "401", "type": "$context.error.responseType" }'
+            },
         )
 
+        lambda_integration = apigateway.LambdaIntegration(
+            nest_js_serverless,
+            proxy=True,
+            passthrough_behavior=apigateway.PassthroughBehavior.WHEN_NO_MATCH,
+        )
+
+        # (Root) resource.add_method("GET", apigateway.LambdaIntegration(companies))
+        
         #authorized_api_method_options = apigateway.MethodOptions(authorizer=user_pool_authorizer)
 
 

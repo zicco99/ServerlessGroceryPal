@@ -3,6 +3,7 @@ from aws_cdk import Duration, NestedStack, RemovalPolicy
 from aws_cdk import (
     aws_lambda as lambd,
     aws_lambda_python_alpha as lambd_experimental,
+    aws_apigateway as apigateway,
     aws_rds as rds,
     aws_ec2 as ec2,
     aws_iam as iam,
@@ -189,6 +190,32 @@ class BackendStack(NestedStack):
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name
             }
         )
+
+        api = apigateway.RestApi(
+            self,
+            "NestJsServerlessApi",
+            rest_api_name="NestJsServerlessApi",
+            description="API Gateway proxy for Nest.js serverless application"
+        )
+
+        lambda_integration = apigateway.LambdaIntegration(
+            nest_js_serverless,
+            proxy=True,
+            integration_responses=[{
+                'statusCode': '200',
+                'responseParameters': {
+                    'method.response.header.Content-Type': "'application/json'",
+                }
+            }]
+        )
+
+        api.root.add_resource("nest-js-serverless").add_method(
+            "ANY",
+            lambda_integration
+        )
+
+        api.root.add_proxy()
+
 
 
         # ------------------------------------------#

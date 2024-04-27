@@ -111,7 +111,7 @@ jobs:
 
           zip -r ./nestjs-backend.zip backend/api/dist backend/api/package.json
 
-          aws s3 cp nestjs-backend.zip "s3://$bucket_name"
+          aws s3 cp nestjs-backend.zip "s3://$bucket_name" --overwrite
 
 
       - name: Run Frontend Build and Upload on the S3 bucket

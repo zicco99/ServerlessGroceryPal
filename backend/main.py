@@ -195,6 +195,8 @@ class BackendStack(NestedStack):
             }
         )
 
+        backend_bucket.grant_read_write(nest_js_serverless)
+
         backend_api_cors = apigateway.CorsOptions(
             allow_origins=apigateway.Cors.ALL_ORIGINS,
             allow_methods=apigateway.Cors.ALL_METHODS,

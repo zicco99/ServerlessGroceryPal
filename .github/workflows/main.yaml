@@ -109,9 +109,9 @@ jobs:
 
           sudo apt install zip
 
-          zip -r ./nestjs-backend.zip backend/api/dist backend/api/package.json
+          zip -r ./nestjs-backend.zip backend/api/dist backend/api/package.json backend/api/package-lock.json 
 
-          aws s3 cp nestjs-backend.zip "s3://$bucket_name" --overwrite
+          aws s3 cp nestjs-backend.zip "s3://$bucket_name"
 
 
       - name: Run Frontend Build and Upload on the S3 bucket

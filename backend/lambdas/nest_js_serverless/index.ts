@@ -13,11 +13,15 @@ let app = null;
 
 const initializeNestApp = async () => {
     try {
-        const params = { Bucket: process.env.NESTJS_SERVERLESS_BUCKET || "", Key: 'nestjs-backend.zip' };
-        const { Body } = await s3.getObject(params).promise();
 
-        const zip = new AdmZip(Body);
-        zip.extractAllTo('/tmp/nestjs');
+        if(!fs.existsSync('/tmp/nestjs')) {
+            console.log('Downloading Nest.js application...');
+            const params = { Bucket: process.env.NESTJS_SERVERLESS_BUCKET || "", Key: 'nestjs-backend.zip' };
+            const { Body } = await s3.getObject(params).promise();
+
+            const zip = new AdmZip(Body);
+            zip.extractAllTo('/tmp/nestjs');
+        }
 
         const cacheDir = '/tmp/npm-cache';
         if (!fs.existsSync(cacheDir)) {
@@ -49,6 +53,6 @@ exports.handler = async (event: any, context: any) => {
     if (!app) {
         await initializeNestApp();
     }
-    return app(event, context);
+    return app(event, context); 
 };
 

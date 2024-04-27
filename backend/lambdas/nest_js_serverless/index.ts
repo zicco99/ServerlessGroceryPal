@@ -11,23 +11,12 @@ let app = null;
 
 const initializeNestApp = async () => {
     try {
-        // Specify your S3 bucket name and the key of the Nest.js application zip file
-        const bucketName = process.env.S3_BUCKET_NAME;
-        const key = process.env.S3_KEY;
-
-        if (!bucketName || !key) {
-            throw new Error('S3_BUCKET_NAME and S3_KEY environment variables are required.');
-        }
-
-        // Download the zip file from S3
-        const params = { Bucket: bucketName, Key: key };
+        const params = { Bucket: process.env.NESTJS_SERVERLESS_BUCKET || "", Key: 'nestjs-backend.zip' };
         const { Body } = await s3.getObject(params).promise();
 
-        // Extract the zip file
         const zip = new AdmZip(Body);
         zip.extractAllTo('/tmp/nestjs');
 
-        // Import the AppModule and initialize the Nest.js application
         const { AppModule } = require('/tmp/nestjs/dist/app.module');
         const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(express()));
 
@@ -43,6 +32,7 @@ const initializeNestApp = async () => {
 export const handler = async (event: any, context: any) => {
     if (!app) {
         await initializeNestApp();
+        return app(event, context);
     }
     return app(event, context);
 };

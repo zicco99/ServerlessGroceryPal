@@ -222,7 +222,7 @@ class BackendStack(NestedStack):
 
         api.root.add_resource("nest-js-serverless").add_proxy(
             any_method=True,
-            default_integration=apigateway.LambdaIntegration(lambda_integration),
+            default_integration=lambda_integration,
             # default_method_options=authorized_api_method_options
         )
 

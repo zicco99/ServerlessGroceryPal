@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "@nestjs/core": "^10.3.8",
+    "@nestjs/microservices": "^10.3.8",
+    "@nestjs/platform-express": "^10.3.8",
+    "@nestjs/websockets": "^10.3.8",
     "adm-zip": "^0.5.12",
     "aws-sdk": "^2.1608.0",
     "child_process": "^1.0.2",

@@ -1,7 +1,6 @@
 import { S3 } from 'aws-sdk';
 import AdmZip from 'adm-zip';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import serverlessExpress from '@vendia/serverless-express';
 import express from 'express';
@@ -41,7 +40,7 @@ const initializeNestApp = async () => {
     }
 };
 
-export const handler = async (event: any, context: Context) => {
+export const handler = async (event: any, context: any) => {
     if (!app) {
         await initializeNestApp();
     }

@@ -3,6 +3,7 @@ from aws_cdk import Duration, NestedStack, RemovalPolicy
 from aws_cdk import (
     aws_lambda as lambd,
     aws_lambda_python_alpha as lambd_experimental,
+     aws_lambda_nodejs as _lambda_nodejs,
     aws_apigateway as apigateway,
     aws_rds as rds,
     aws_ec2 as ec2,
@@ -176,20 +177,13 @@ class BackendStack(NestedStack):
 
         self.backend_bucket_name = backend_bucket.bucket_name
 
-        nodejs_layer = lambda_.LayerVersion(
-            self,
-            f"{base_name}-nodejs-layer",
-            code=lambda_.Code.from_asset("backend/layer/js/utils/nodejs"),
-            compatible_runtimes=[lambd.Runtime.NODEJS_18_X]
-        )
 
-        nest_js_serverless = lambda_.Function(
+        nest_js_serverless = _lambda_nodejs.NodejsFunction(
             self,
             f"{base_name}-nest-js-serverless",
-            code=lambda_.Code.from_asset("backend/lambdas/nest_js_serverless"),
+            entry="backend/lambdas/nest_js_serverless/index.ts",
             handler="index.handler",
             runtime=lambd.Runtime.NODEJS_18_X,
-            layers=[nodejs_layer],
             environment={
                 'DB_HOST': backend_db_proxy.endpoint,
                 'DB_USERNAME': backend_db_creds.secret_value_from_json('username').to_string(),

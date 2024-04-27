@@ -18,7 +18,7 @@ async function initializeNestApp() {
 
         console.log('Installing dependencies...');
         try {
-            const { stdout, stderr } = await execPromise('npm install --omit=dev', { cwd: '/tmp/nestjs' });
+            const { stdout, stderr } = await execPromise('npm install --omit=dev', { cwd: '/tmp/nestjs/backend/api' });
             console.log('Dependencies installed successfully!', stdout);
             console.error('Installation error:', stderr);
         } catch (error) {
@@ -26,7 +26,7 @@ async function initializeNestApp() {
             throw error;
         }
 
-        const { default: AppModule } = require('/tmp/nestjs/app.module');
+        const { default: AppModule } = require('/tmp/nestjs/backend/api/dist/app.module');
         nestApp = await NestFactory.create(AppModule);
         await nestApp.init();
     } catch (error) {

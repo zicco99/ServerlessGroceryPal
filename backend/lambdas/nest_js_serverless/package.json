@@ -7,7 +7,7 @@
     "@nestjs/platform-express": "^10.3.8",
     "@nestjs/platform-socket.io": "^10.3.8",
     "@nestjs/websockets": "^10.3.8",
-    "adm-zip": "^0.5.12",
+    "@nestjs/common":"10.3.8",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.4",
     "aws-sdk": "^2.1608.0",

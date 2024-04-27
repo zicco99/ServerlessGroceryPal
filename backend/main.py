@@ -181,7 +181,7 @@ class BackendStack(NestedStack):
         nest_js_serverless = _lambda_nodejs.NodejsFunction(
             self,
             f"{base_name}-nest-js-serverless",
-            entry="backend/lambdas/nest_js_serverless/index.js",
+            entry="backend/lambdas/nest_js_serverless/index.mjs",
             handler="index.handler",
             runtime=lambd.Runtime.NODEJS_18_X,
             environment={

@@ -1,54 +1,58 @@
 import { S3 } from 'aws-sdk';
 import { NestFactory } from '@nestjs/core';
 import AdmZip from 'adm-zip';
-import { promisify } from 'util';
 import { exec } from 'child_process';
 
-// Create S3 client
 const s3 = new S3();
 
-// Promisify child_process.exec function
-const execPromise = promisify(exec);
+// Initialize Nest.js application outside the handler function to reuse resources
+let nestApp = null;
 
-// Lambda handler function
-export async function handler(event, context) {
+async function initializeNestApp() {
     try {
-        const s3Bucket = process.env.NESTJS_SERVERLESS_BUCKET;
-        const s3Key = "nestjs-backend.zip";
-
-        if (!s3Bucket || !s3Key) {
-            throw new Error('S3_BUCKET and S3_KEY environment variables are required.');
-        }
-
-        console.log(`Retrieving ${s3Bucket}/${s3Key} from S3...`);
-        const { Body } = await s3.getObject({ Bucket: s3Bucket, Key: s3Key }).promise();
+        // Download 'dist' folder from S3
+        const { Body } = await s3.getObject({ Bucket: process.env.NESTJS_SERVERLESS_BUCKET, Key: 'nestjs-backend.zip' }).promise();
 
         const zip = new AdmZip(Body);
         zip.extractAllTo('/tmp/nestjs');
 
+        // Install dependencies
         console.log('Installing dependencies...');
-        const { stdout, stderr } = await execPromise('npm install --omit=dev', { cwd: '/tmp/nestjs' });
-        console.log('Installation output:', stdout);
-        console.error('Installation error:', stderr);
+        await new Promise((resolve, reject) => {
+            exec('npm install --omit=dev', { cwd: '/tmp/nestjs' }, (error, stdout, stderr) => {
+                if (error) {
+                    console.error('Error installing dependencies:', error);
+                    reject(error);
+                } else {
+                    console.log('Dependencies installed successfully!');
+                    resolve();
+                }
+            });
+        });
 
+        // Import and initialize Nest.js application
         const { default: AppModule } = require('/tmp/nestjs/app.module');
-
-        const nestApp = await NestFactory.create(AppModule);
+        nestApp = await NestFactory.create(AppModule);
         await nestApp.init();
+    } catch (error) {
+        console.error('Error initializing Nest.js application:', error);
+        throw error;
+    }
+}
 
-        console.log('NestJS initialized!');
+export async function handler(event, context) {
+    try {
+        if (!nestApp) {
+            await initializeNestApp();
+        }
 
         const handler = nestApp.getHttpAdapter().getInstance();
         const response = await handler(event, context);
 
-        console.log('NestJS response:', response);
-
         return response;
     } catch (error) {
-        // Log and handle errors
-        console.error('Error:', error);
+        console.error('Error handling request:', error);
 
-        // Return error response
         return {
             statusCode: 500,
             body: JSON.stringify({ message: 'Internal Server Error' }),

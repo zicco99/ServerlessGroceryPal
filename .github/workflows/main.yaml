@@ -105,15 +105,13 @@ jobs:
 
           npm install --prefix backend/api
 
-          ls -la backend/api
-
           npm run build --prefix backend/api
 
           sudo apt install zip
 
           zip -r nestjs-backend.zip backend/api/dist/*
 
-          aws s3 cp nestjs-backend.zip "s3://$bucket_name" --recursive
+          aws s3 cp ./nestjs-backend.zip "s3://$bucket_name" --recursive
 
 
       - name: Run Frontend Build and Upload on the S3 bucket

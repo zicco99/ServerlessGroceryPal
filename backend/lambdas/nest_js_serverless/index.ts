@@ -32,7 +32,6 @@ const initializeNestApp = async () => {
 export const handler = async (event: any, context: any) => {
     if (!app) {
         await initializeNestApp();
-        return app(event, context);
     }
     return app(event, context);
 };

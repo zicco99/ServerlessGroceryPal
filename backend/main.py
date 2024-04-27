@@ -162,7 +162,7 @@ class BackendStack(NestedStack):
         nest_js_serverless = _lambda_nodejs.NodejsFunction(
             self,
             f"{base_name}-nest-js-serverless",
-            entry="backend/lambdas/nest_js_serverless/index.mjs",
+            entry="backend/lambdas/nest_js_serverless/index.ts",
             handler="index.handler",
             project_root="backend/lambdas/nest_js_serverless",
             deps_lock_file_path="backend/lambdas/nest_js_serverless/package-lock.json",

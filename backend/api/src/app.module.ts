@@ -15,6 +15,7 @@ import { UsersModule } from './endpoints/users/users.module';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'development' ? '.env' : undefined,
     }),
+    TypeOrmModule.forFeature([User, Recipe, Feedback]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

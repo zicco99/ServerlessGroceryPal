@@ -31,7 +31,7 @@ const initializeNestApp = async () => {
         console.log('Nest.js application extracted successfully.');
 
         console.log('Attempting to import AppModule...');
-        const { AppModule } = require(nestjsPath); // Attempt to import AppModule
+        const { AppModule } = require(nestjsPath); 
         console.log('AppModule imported successfully.');
 
         const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(express()));

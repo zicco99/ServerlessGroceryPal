@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Feedback } from './db/models/feedback.entity';
@@ -40,7 +39,6 @@ import { UsersModule } from './endpoints/users/users.module';
 
     }),
     UsersModule,
-    WinstonModule,
   ],
   controllers: [AppController],
   providers: [AppService, EnvironmentService],

@@ -5,12 +5,10 @@ export class UpdateFailedException implements ExceptionInterface {
     object: string,
     callingFunction: string,
     parameters: Array<string>,
-    message?: string,
   ) {
     this.object = object;
     this.callingFunction = callingFunction;
     this.parameters = parameters;
-    this.message = message;
   }
 
   message = 'Update Failed';

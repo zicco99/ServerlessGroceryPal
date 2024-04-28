@@ -112,7 +112,7 @@ jobs:
           mv backend/api/package.json backend/api/dist/package.json
           mv backend/api/package-lock.json backend/api/dist/package-lock.json
 
-          npm install --omit=dev --prefix backend/api/dist
+          npm install --prefix backend/api/dist
 
           zip -r ./nestjs-backend.zip backend/api/dist 
 

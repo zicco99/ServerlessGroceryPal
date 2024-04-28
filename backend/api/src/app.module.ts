@@ -1,17 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { UserTable } from './db/models/user.model';
-import { UserSubjectTable } from './db/models/user-subject.model';
-import { UserConfigTable } from './db/models/user-config.model';
-import { SubjectTable } from './db/models/subject.model';
-import { HourLogTable } from './db/models/hour-log.model';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
-import { WeeklyLogTable } from './db/models/weekly-log.model';
 import { SubjectsModule } from './endpoints/subjects/subjects.module';
 import { HourLogsModule } from './endpoints/hour-logs/hour-logs.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { MinutesOverflowConstraint } from './validation/minutes-overflow.validator';
 
 @Module({
@@ -21,24 +15,17 @@ import { MinutesOverflowConstraint } from './validation/minutes-overflow.validat
       envFilePath: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
     }),
     WinstonModule,
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      database: process.env.DB_NAME,
-      port: parseInt(process.env.DB_PORT),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
       host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT, 10),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      autoLoadModels: true,
+      database: process.env.DB_NAME,
+      autoLoadEntities: true,
       synchronize: true,
-      models: [
-        UserTable,
-        UserSubjectTable,
-        UserConfigTable,
-        SubjectTable,
-        HourLogTable,
-        WeeklyLogTable,
-      ],
     }),
+    TypeOrmModule.forFeature([]), // Include your TypeORM entities here
     SubjectsModule,
     HourLogsModule
   ],

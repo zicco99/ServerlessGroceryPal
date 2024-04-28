@@ -125,11 +125,11 @@ class BackendStack(NestedStack):
 
         backend_db_proxy = rds.DatabaseProxy(
             self, 
-            f"{base_name}-db-proxy",
+            f"{base_name}-db-proxy-ext",
             proxy_target=rds.ProxyTarget.from_instance(backend_db),
             vpc=backend_vpc,
             security_groups=[rds_security_group],
-            db_proxy_name=f"{base_name}-db-proxy",
+            db_proxy_name=f"{base_name}-db-proxy-ext",
             debug_logging=False,
             secrets=[backend_db.secret],
             require_tls=True,

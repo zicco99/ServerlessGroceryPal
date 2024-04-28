@@ -2,13 +2,13 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.10.6",
     "@grpc/proto-loader": "^0.7.12",
-    "@nestjs/common": "^10.3.8",
-    "@nestjs/core": "^10.3.8",
-    "@nestjs/microservices": "^10.3.8",
-    "@nestjs/platform-express": "^10.3.8",
-    "@nestjs/platform-socket.io": "^10.3.8",
-    "@nestjs/websockets": "^10.3.8",
-    "@nestjs/typeorm": "10.0.2",
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/microservices": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.0.0",
+    "@nestjs/websockets": "^10.0.0",
+    "@nestjs/typeorm": "^10.0.2",
     "@vendia/serverless-express": "^4.12.6",
     "adm-zip": "^0.5.12",
     "amqp-connection-manager": "^4.1.14",
@@ -21,5 +21,5 @@
     "mqtt": "^5.5.4",
     "nats": "^2.23.0",
     "util": "^0.12.5"
-  }
+  }  
 }

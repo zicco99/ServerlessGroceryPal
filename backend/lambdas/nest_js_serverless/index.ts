@@ -4,7 +4,6 @@ import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import serverlessExpress from '@vendia/serverless-express';
 import express from 'express';
-import { execSync } from 'child_process';
 import fs from 'fs';
 
 const s3 = new S3();

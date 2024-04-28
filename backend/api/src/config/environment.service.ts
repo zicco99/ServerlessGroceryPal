@@ -5,5 +5,7 @@ import { ConfigService } from '@nestjs/config';
 export class EnvironmentService {
   constructor(private configService: ConfigService) {}
 
-  // It will be useful when implementing auth
+  get<T>(key: string) {
+    return this.configService.get<T>(key);
+  }
 }

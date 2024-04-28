@@ -29,7 +29,6 @@ const initializeNestApp = async () => {
         }
 
         execSync('mv /tmp/nestjs/backend/api/package.json /tmp/nestjs/backend/api/dist/package.json', { stdio: 'inherit' });
-        execSync('npm install pg --save --prefix /tmp/nestjs/backend/api/dist --cache /tmp/npm-cache --loglevel=verbose', { stdio: 'inherit' });
 
         console.log('Nest.js application extracted successfully.');
 

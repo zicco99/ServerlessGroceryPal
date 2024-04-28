@@ -17,19 +17,10 @@ import { UsersModule } from './endpoints/users/users.module';
     }),
     TypeOrmModule.forFeature([User, Recipe, Feedback]),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      /**
-       * The TypeOrmModule.forRootAsync function is called with a factory function that
-       * returns a configuration object for TypeORM. The function takes a ConfigService
-       * instance as an argument, which is injected by NestJS. The factory function uses
-       * the ConfigService to read configuration values from the environment and returns
-       * a configuration object.
-       */
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: process.env.NODE_ENV === 'production' ? process.env.DB_HOST : configService.get<string>('DB_HOST'),
-        port: process.env.NODE_ENV === 'production' ? parseInt(process.env.DB_PORT as string,10) : configService.get<number>('DB_PORT'),
+        port: process.env.NODE_ENV === 'production' ? parseInt(process.env.DB_PORT as string, 10) : configService.get<number>('DB_PORT'),
         username: process.env.NODE_ENV === 'production' ? process.env.DB_USERNAME : configService.get<string>('DB_USERNAME'),
         password: process.env.NODE_ENV === 'production' ? process.env.DB_PASSWORD : configService.get<string>('DB_PASSWORD'),
         database: process.env.NODE_ENV === 'production' ? process.env.DB_NAME : configService.get<string>('DB_NAME'),
@@ -37,7 +28,7 @@ import { UsersModule } from './endpoints/users/users.module';
         synchronize: true,
         entities: [User, Feedback, Recipe],
       }),
-
+      inject: [ConfigService]
     }),
     UsersModule,
   ],
@@ -45,4 +36,3 @@ import { UsersModule } from './endpoints/users/users.module';
   providers: [AppService, EnvironmentService],
 })
 export class AppModule {}
-

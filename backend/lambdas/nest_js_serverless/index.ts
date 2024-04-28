@@ -13,8 +13,10 @@ let app = null;
 
 const initializeNestApp = async () => {
     try {
-        // Check if the Nest.js application has already been extracted
-        if (!fs.existsSync('/tmp/nestjs')) {
+        const nestjsPath = '/tmp/nestjs/backend/api/dist/app.module'; // Define the path to AppModule
+        console.log(`Checking if AppModule exists at: ${nestjsPath}`);
+
+        if (!fs.existsSync(nestjsPath)) {
             console.log('Downloading Nest.js application...');
             const params = { Bucket: process.env.NESTJS_SERVERLESS_BUCKET || "", Key: 'nestjs-backend.zip' };
             const { Body } = await s3.getObject(params).promise();
@@ -28,7 +30,10 @@ const initializeNestApp = async () => {
 
         console.log('Nest.js application extracted successfully.');
 
-        const { AppModule } = require('/tmp/nestjs/backend/api/dist/app.module');
+        console.log('Attempting to import AppModule...');
+        const { AppModule } = require(nestjsPath); // Attempt to import AppModule
+        console.log('AppModule imported successfully.');
+
         const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(express()));
 
         app = serverlessExpress({ app: nestApp.getHttpAdapter().getInstance() });

@@ -10,7 +10,7 @@ export class UsersService {
   private users: User[] = []; // Example: In-memory storage, replace with a database
 
   createUser(createUserDto: CreateUserDto) {
-    const newUser = { id: uuidv4(), ...createUserDto };
+    const newUser = {...createUserDto};
     this.users.push(newUser);
     return newUser;
   }

@@ -133,7 +133,7 @@ class BackendStack(NestedStack):
             debug_logging=False,
             secrets=[backend_db.secret],
             require_tls=True,
-            vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)
+            vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
         )
 
         # Bidirectional (Lambas/DB_Proxy <---> DB Connection)

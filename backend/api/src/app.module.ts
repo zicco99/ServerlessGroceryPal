@@ -8,6 +8,7 @@ import { User } from './db/models/user.model';
 import { Feedback } from './db/models/feedback.entity';
 import { Recipe } from './db/models/recipe.model';
 import { UsersModule } from './endpoints/users/users.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({

@@ -32,9 +32,6 @@ const initializeNestApp = async () => {
 
         console.log('Nest.js application extracted successfully.');
 
-        process.env.NODE_ENV = 'production';
-        execSync('npm install --omit=dev --prefix /tmp/nestjs/backend/api/dist --cache /tmp/npm-cache --loglevel=verbose', { stdio: 'inherit' });
-
         const { AppModule } = require('/tmp/nestjs/backend/api/dist/app.module');
         const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(express()));
 

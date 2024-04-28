@@ -1,6 +1,4 @@
 import {
-  BelongsTo,
-  BelongsToMany,
   Column,
   DataType,
   HasMany,
@@ -8,7 +6,6 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { UserSubjectTable } from './user-subject.model';
-import { HourLogTable } from './hour-log.model';
 
 @Table({
   tableName: 'subjects',

@@ -1,4 +1,3 @@
-import { UsersModule } from './endpoints/users/users.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -40,7 +39,6 @@ import { MinutesOverflowConstraint } from './validation/minutes-overflow.validat
         WeeklyLogTable,
       ],
     }),
-    UsersModule,
     SubjectsModule,
     HourLogsModule
   ],

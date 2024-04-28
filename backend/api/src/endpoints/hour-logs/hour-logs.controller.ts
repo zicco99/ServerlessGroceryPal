@@ -19,7 +19,6 @@ import { DBExceptionFilter } from 'src/error_handling/db.exception.filter';
 import { WeeklyLogTable } from 'src/db/models/weekly-log.model';
 import { Sequelize } from 'sequelize-typescript';
 import { SubjectsService } from '../subjects/subjects.service';
-import { HourLogTable } from 'src/db/models/hour-log.model';
 
 @UseGuards(AuthGuard('jwt'))
 @UseFilters(DBExceptionFilter)

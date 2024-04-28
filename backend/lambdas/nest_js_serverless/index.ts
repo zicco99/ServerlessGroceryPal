@@ -23,7 +23,6 @@ const initializeNestApp = async () => {
             zip.extractAllTo('/tmp/nestjs');
         }
 
-        // Add node_modules to NODE_PATH
         process.env.NODE_PATH = '/tmp/nestjs/backend/api/dist/node_modules';
         require('module').Module._initPaths();
 

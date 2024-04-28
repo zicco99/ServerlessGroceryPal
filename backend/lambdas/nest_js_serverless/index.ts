@@ -27,9 +27,7 @@ const initializeNestApp = async () => {
         if (!fs.existsSync(cacheDir)) {
             fs.mkdirSync(cacheDir);
         }
-
-        execSync('mv /tmp/nestjs/backend/api/package.json /tmp/nestjs/backend/api/dist/package.json', { stdio: 'inherit' });
-
+        
         console.log('Nest.js application extracted successfully.');
 
         const { AppModule } = require('/tmp/nestjs/backend/api/dist/app.module');

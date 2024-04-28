@@ -43,7 +43,7 @@
     "nats": "^2.23.0",
     "util": "^0.12.5",
     "@nestjs/config": "^3.2.2",
-    "@nestjs/jwt": "10.0.0",
+    "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "^2.0.4",
     "@nestjs/passport": "10.0.3",
     "@types/bcrypt": "^5.0.2",

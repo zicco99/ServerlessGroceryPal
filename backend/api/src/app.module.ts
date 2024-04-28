@@ -13,19 +13,17 @@ import { WinstonModule } from 'nest-winston';
 import { WeeklyLogTable } from './db/models/weekly-log.model';
 import { SubjectsModule } from './endpoints/subjects/subjects.module';
 import { HourLogsModule } from './endpoints/hour-logs/hour-logs.module';
-import { AuthModule } from './auth/auth.module';
-import { PassportModule } from '@nestjs/passport';
 import { MinutesOverflowConstraint } from './validation/minutes-overflow.validator';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.development',
+      envFilePath: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
     }),
     WinstonModule,
     SequelizeModule.forRoot({
-      dialect: 'mysql',
+      dialect: 'postgres',
       database: process.env.DB_NAME,
       port: parseInt(process.env.DB_PORT),
       host: process.env.DB_HOST,
@@ -44,8 +42,7 @@ import { MinutesOverflowConstraint } from './validation/minutes-overflow.validat
     }),
     UsersModule,
     SubjectsModule,
-    HourLogsModule,
-    AuthModule,
+    HourLogsModule
   ],
   controllers: [AppController],
   providers: [AppService, MinutesOverflowConstraint],

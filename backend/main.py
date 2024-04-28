@@ -171,7 +171,7 @@ class BackendStack(NestedStack):
             security_groups=[lambda_security_group],
             environment={
                 'DB_HOST': backend_db_proxy.endpoint,
-                'DB_PORT': "5432,
+                'DB_PORT': "5432",
                 'DB_USERNAME': backend_db_creds.secret_value_from_json('username').to_string(),
                 'DB_PASSWORD': backend_db_creds.secret_value_from_json('password').to_string(),
                 'DB_NAME': f"{base_name}-db",

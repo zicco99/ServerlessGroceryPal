@@ -170,6 +170,7 @@ class BackendStack(NestedStack):
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={
+                'DB_DIALECT': 'postgres',
                 'DB_HOST': backend_db_proxy.endpoint,
                 'DB_PORT': "5432",
                 'DB_USERNAME': backend_db_creds.secret_value_from_json('username').to_string(),

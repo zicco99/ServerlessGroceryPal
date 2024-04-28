@@ -30,6 +30,8 @@ const initializeNestApp = async () => {
         
         console.log('Nest.js application extracted successfully.');
 
+        execSync('export NODE_');
+
         const { AppModule } = require('/tmp/nestjs/backend/api/dist/app.module');
         const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(express()));
 

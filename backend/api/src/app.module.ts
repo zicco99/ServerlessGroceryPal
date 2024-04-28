@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Feedback } from './db/models/feedback.entity';
@@ -15,7 +15,6 @@ import { UsersModule } from './endpoints/users/users.module';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'development' ? '.env' : undefined,
     }),
-    TypeOrmModule.forFeature([User, Recipe, Feedback]),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
@@ -27,7 +26,7 @@ import { UsersModule } from './endpoints/users/users.module';
         autoLoadEntities: true,
         synchronize: true,
         entities: [User, Feedback, Recipe],
-      }),
+      } as TypeOrmModuleOptions),
       inject: [ConfigService]
     }),
     UsersModule,

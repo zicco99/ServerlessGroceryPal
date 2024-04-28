@@ -7,6 +7,10 @@ import { HourLogsModule } from './endpoints/hour-logs/hour-logs.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MinutesOverflowConstraint } from './validation/minutes-overflow.validator';
+import { User } from './db/models/user.entity';
+import { Feedback } from './db/models/feedback.entity';
+import { Recipe } from './db/models/recipe.entity';
+import { UsersModule } from './endpoints/users/users.module';
 
 @Module({
   imports: [
@@ -25,9 +29,8 @@ import { MinutesOverflowConstraint } from './validation/minutes-overflow.validat
       autoLoadEntities: true,
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([]), // Include your TypeORM entities here
-    SubjectsModule,
-    HourLogsModule
+    TypeOrmModule.forFeature([User, Feedback, Recipe]),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, MinutesOverflowConstraint],

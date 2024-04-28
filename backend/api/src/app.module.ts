@@ -2,11 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
-import { SubjectsModule } from './endpoints/subjects/subjects.module';
-import { HourLogsModule } from './endpoints/hour-logs/hour-logs.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MinutesOverflowConstraint } from './validation/minutes-overflow.validator';
 import { User } from './db/models/user.entity';
 import { Feedback } from './db/models/feedback.entity';
 import { Recipe } from './db/models/recipe.entity';
@@ -22,7 +19,7 @@ import { UsersModule } from './endpoints/users/users.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT, 10),
+      port: parseInt(process.env.DB_PORT || '5432', 10),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
@@ -33,6 +30,6 @@ import { UsersModule } from './endpoints/users/users.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MinutesOverflowConstraint],
+  providers: [AppService],
 })
 export class AppModule {}

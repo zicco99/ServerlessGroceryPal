@@ -4,15 +4,15 @@ import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { User } from './db/models/user.entity';
+import { User } from './db/models/user.model';
 import { Feedback } from './db/models/feedback.entity';
-import { Recipe } from './db/models/recipe.entity';
+import { Recipe } from './db/models/recipe.model';
 import { UsersModule } from './endpoints/users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
+      envFilePath: process.env.NODE_ENV ? 'development' : '.env.vars',
     }),
     WinstonModule,
     TypeOrmModule.forRoot({

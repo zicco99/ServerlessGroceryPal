@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from './user.entity';
-import { Recipe } from './recipe.entity';
+import { User } from './user.model';
+import { Recipe } from './recipe.model';
 
 @Entity()
 export class Feedback {

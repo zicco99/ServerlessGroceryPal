@@ -161,7 +161,7 @@ class BackendStack(NestedStack):
             function_name=f"{base_name}-nest-js-serverless",
             runtime=lambd.Runtime.NODEJS_18_X,
             handler="main.handler",
-            code=lambd.Code.from_asset("backend/api", exclude=["node_modules/**"]),
+            code=lambd.Code.from_asset("backend/api"),
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={

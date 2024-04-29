@@ -2,7 +2,6 @@ from enum import Enum
 from aws_cdk import Duration, NestedStack, RemovalPolicy, Size
 from aws_cdk import (
     aws_lambda as lambd,
-    aws_lambda_python_alpha as lambd_experimental,
      aws_lambda_nodejs as _lambda_nodejs,
     aws_apigateway as apigateway,
     aws_rds as rds,
@@ -10,8 +9,6 @@ from aws_cdk import (
     aws_iam as iam,
     aws_secretsmanager as secretsmanager,
     aws_cognito as cognito,
-    aws_ecr as ecr,
-    aws_lambda as lambda_,
     aws_s3 as s3,
     Stage
 )
@@ -158,15 +155,13 @@ class BackendStack(NestedStack):
 
         self.backend_bucket_name = backend_bucket.bucket_name
 
-
-        nest_js_serverless = _lambda_nodejs.NodejsFunction(
+        nest_js_serverless = lambd.Function(
             self,
             f"{base_name}-nest-js-serverless",
-            entry="backend/lambdas/nest_js_serverless/index.ts",
-            handler="index.handler",
-            project_root="backend/lambdas/nest_js_serverless",
-            deps_lock_file_path="backend/lambdas/nest_js_serverless/package-lock.json",
+            function_name=f"{base_name}-nest-js-serverless",
             runtime=lambd.Runtime.NODEJS_18_X,
+            handler="main.handler",
+            code=lambd.Code.from_asset("backend/api", exclude=["node_modules/**"]),
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={
@@ -177,13 +172,13 @@ class BackendStack(NestedStack):
                 'DB_PASSWORD': backend_db_creds.secret_value_from_json('password').to_string(),
                 'DB_NAME': f"{base_name}-db",
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
-                "STAGE": params.stage,
             },
-            ephemeral_storage_size= Size.mebibytes(1024),
-            memory_size=1024+512,
             timeout=Duration.minutes(10),
-            tracing=lambd.Tracing.ACTIVE
+            #phemeral_storage_size= Size.mebibytes(1024),
+            #memory_size=1024+512,
         )
+
+
 
         backend_bucket.grant_read_write(nest_js_serverless)
 

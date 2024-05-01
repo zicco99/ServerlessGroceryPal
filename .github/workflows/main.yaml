@@ -67,7 +67,7 @@ jobs:
           cp package.json ../lambdas/nestjs_serverless
           cd ../lambdas/nestjs_serverless
           echo "This will uploaded on the lambda :"
-          apt-get install tree
+          sudo apt-get install tree
           tree .
           npm install
 

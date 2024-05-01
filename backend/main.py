@@ -155,13 +155,13 @@ class BackendStack(NestedStack):
 
         self.backend_bucket_name = backend_bucket.bucket_name
 
-        nest_js_serverless = lambd.Function(
+        nestjs_serverless = lambd.Function(
             self,
-            f"{base_name}-nest-js-serverless",
-            function_name=f"{base_name}-nest-js-serverless",
+            f"{base_name}-nestjs-serverless",
+            function_name=f"{base_name}-nestjs-serverless",
             runtime=lambd.Runtime.NODEJS_18_X,
             handler="lambda.handler",
-            code=lambd.Code.from_asset("backend/api"),
+            code=lambd.Code.from_asset("backend/lambdas/nestjs_serverless"),
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={
@@ -179,8 +179,7 @@ class BackendStack(NestedStack):
         )
 
 
-
-        backend_bucket.grant_read_write(nest_js_serverless)
+        backend_bucket.grant_read_write(nestjs_serverless)
 
         backend_api_cors = apigateway.CorsOptions(
             allow_origins=apigateway.Cors.ALL_ORIGINS,

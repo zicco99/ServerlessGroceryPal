@@ -1,14 +1,11 @@
-// Import necessary modules and libraries
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import serverlessExpress from '@vendia/serverless-express';
 import { Context } from 'aws-lambda';
 import express from 'express';
 
-// Import the AppModule
-import { AppModule } from './src/app.module';
+import { AppModule } from '../../api/src/app.module';
 
-// Define the bootstrap function
 let cachedServer: any;
 
 async function bootstrap() {

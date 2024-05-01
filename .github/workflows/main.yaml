@@ -62,17 +62,9 @@ jobs:
         run: |
           cd backend/api
           npm install
-          npm run build
+          npm run build-lambda
 
-          mkdir -p ../lambdas/nestjs_serverless/dist
-          mv dist/* ../lambdas/nestjs_serverless/dist
-          cp package.json ../lambdas/nestjs_serverless
-          cd ../lambdas/nestjs_serverless
-
-          echo "This will uploaded on the lambda :"
-          sudo apt-get install tree
-          tree .
-          npm install
+          mv dist ../lambdas/nestjs_serverless
 
 
       - name: Install CDK dependencies

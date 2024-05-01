@@ -212,7 +212,7 @@ class BackendStack(NestedStack):
         )
 
         lambda_integration = apigateway.LambdaIntegration(
-            nest_js_serverless,
+            nestjs_serverless,
             proxy=True,
             passthrough_behavior=apigateway.PassthroughBehavior.WHEN_NO_MATCH,
         )

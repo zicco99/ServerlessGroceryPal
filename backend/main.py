@@ -1,8 +1,7 @@
 from enum import Enum
-from aws_cdk import Duration, NestedStack, RemovalPolicy, Size
+from aws_cdk import Duration, NestedStack, RemovalPolicy
 from aws_cdk import (
     aws_lambda as lambd,
-    aws_lambda_nodejs as _lambda_nodejs,
     aws_apigateway as apigateway,
     aws_rds as rds,
     aws_ec2 as ec2,
@@ -161,7 +160,7 @@ class BackendStack(NestedStack):
             function_name=f"{base_name}-nestjs-serverless",
             runtime=lambd.Runtime.NODEJS_18_X,
             handler="lambda.handler",
-            code=lambd.Code.from_asset("backend/lambdas/nestjs_serverless"),
+            code=lambd.Code.from_asset("backend/lambdas/nestjs_serverless/**"),
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={

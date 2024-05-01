@@ -4,7 +4,7 @@ import serverlessExpress from '@vendia/serverless-express';
 import { Context } from 'aws-lambda';
 import express from 'express';
 
-import { AppModule } from 'dist/app.module';
+import { AppModule } from './dist/app.module';
 
 let cachedServer: any;
 
@@ -26,7 +26,7 @@ async function bootstrap() {
   return cachedServer;
 }
 
-export const handler = async (event: any, context: Context) => {
+export async function handler(event: any, context: Context) {
   const server = await bootstrap();
   return server(event, context);
-};
+}

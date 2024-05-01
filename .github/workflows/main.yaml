@@ -63,7 +63,7 @@ jobs:
           cd backend/api
           npm install
           npm run build # Build dist
-          mv dist/* ../lambdas/nestjs_serverless
+          mv dist/* ../lambdas/nestjs_serverless/dist
           cp package.json ../lambdas/nestjs_serverless
           cd ../lambdas/nestjs_serverless
           echo "This will uploaded on the lambda :"

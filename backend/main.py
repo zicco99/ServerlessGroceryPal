@@ -2,7 +2,7 @@ from enum import Enum
 from aws_cdk import Duration, NestedStack, RemovalPolicy, Size
 from aws_cdk import (
     aws_lambda as lambd,
-     aws_lambda_nodejs as _lambda_nodejs,
+    aws_lambda_nodejs as _lambda_nodejs,
     aws_apigateway as apigateway,
     aws_rds as rds,
     aws_ec2 as ec2,

@@ -1,12 +1,15 @@
+// Import necessary modules and libraries
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import serverlessExpress from '@vendia/serverless-express';
-import { Context, Handler } from 'aws-lambda';
+import { Context } from 'aws-lambda';
 import express from 'express';
 
+// Import the AppModule
 import { AppModule } from './src/app.module';
 
-let cachedServer: Handler;
+// Define the bootstrap function
+let cachedServer: any;
 
 async function bootstrap() {
   if (!cachedServer) {
@@ -26,9 +29,7 @@ async function bootstrap() {
   return cachedServer;
 }
 
-const handler = async (event: any, context: Context, callback: any) => {
+export const handler = async (event: any, context: Context) => {
   const server = await bootstrap();
-  return server(event, context, callback);
+  return server(event, context);
 };
-
-module.exports.handler = handler;

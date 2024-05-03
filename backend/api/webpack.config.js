@@ -1,3 +1,6 @@
+const { execSync } = require('child_process');
+const CopyPlugin = require('copy-webpack-plugin');
+
 module.exports = function (options, webpack) {
   const lazyImports = [
     'aws-sdk',
@@ -7,6 +10,10 @@ module.exports = function (options, webpack) {
     '@nestjs/websockets/socket-module',
     '@nestjs/microservices/microservices-module',
   ];
+
+  execSync('npx prisma generate', { stdio: 'inherit' });
+
+  lazyImports.push('prisma/client');
 
   return {
     ...options,
@@ -24,6 +31,16 @@ module.exports = function (options, webpack) {
           return lazyImports.includes(resource);
         },
       }),
+      // Copy Prisma client folder to output directory
+      new CopyPlugin({
+        patterns: [
+          {
+            from: 'node_modules/prisma/client', // Adjust the path as needed
+            to: 'prisma/client', // Adjust the destination path as needed
+          },
+        ],
+      }),
     ],
   };
 };
+

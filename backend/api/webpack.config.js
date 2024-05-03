@@ -1,7 +1,7 @@
-const { execSync } = require('child_process');
 const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
-module.exports = function (options, webpack) {
+module.exports = function (options) {
   const lazyImports = [
     'aws-sdk',
     'aws-lambda',
@@ -10,8 +10,6 @@ module.exports = function (options, webpack) {
     '@nestjs/websockets/socket-module',
     '@nestjs/microservices/microservices-module',
   ];
-
-  execSync('npx prisma generate', { stdio: 'inherit' });
 
   return {
     ...options,

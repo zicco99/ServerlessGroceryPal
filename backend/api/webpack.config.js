@@ -13,8 +13,6 @@ module.exports = function (options, webpack) {
 
   execSync('npx prisma generate', { stdio: 'inherit' });
 
-  lazyImports.push('prisma/client');
-
   return {
     ...options,
     entry: ['./lambda.ts'],
@@ -27,16 +25,14 @@ module.exports = function (options, webpack) {
       ...options.plugins,
       new webpack.IgnorePlugin({
         checkResource(resource) {
-          // Ignoring non-essential modules for Lambda deployment
           return lazyImports.includes(resource);
         },
       }),
-      // Copy Prisma client folder to output directory
       new CopyPlugin({
         patterns: [
           {
-            from: 'node_modules/prisma/client', // Adjust the path as needed
-            to: 'prisma/client', // Adjust the destination path as needed
+            from: 'prisma/client', 
+            to: 'prisma/client',
           },
         ],
       }),

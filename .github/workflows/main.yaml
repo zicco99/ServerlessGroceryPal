@@ -89,8 +89,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd backend/api
-          eval ${{ secrets.DB_URL }} prisma db pull
-          export DB_URL=${{ secrets.DB_URL }}
+          export DATABASE_URL=${{ secrets.DB_URL }}
           sudo npx prisma migrate deploy
 
       - name: Install dependencies and generate .env file

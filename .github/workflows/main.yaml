@@ -66,16 +66,19 @@ jobs:
 
           mv dist ../lambdas/nestjs_serverless
         
+<<<<<<<<<<<<<<  ✨ Codeium Command 🌟 >>>>>>>>>>>>>>>>
       - name: Migrate DB
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd backend/api
-          export DATABASE_URL=${{ secrets.DB_URL }}
-          echo "DATABASE_URL=$DATABASE_URL" >> .env
++          echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
+-          export DATABASE_URL=${{ secrets.DB_URL }}
+-          echo "DATABASE_URL=$DATABASE_URL" > .env
           npx prisma db pull
           npx prisma generate
           npx prisma db push
           npx prisma migrate deploy
+<<<<<<<  9cfd3ab6-5131-4b44-880c-cdba327aeb00  >>>>>>>
 
 
 

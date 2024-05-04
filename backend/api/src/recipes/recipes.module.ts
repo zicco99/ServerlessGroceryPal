@@ -6,7 +6,7 @@ import { RecipesService } from './recipes.service';
     imports: [],
     controllers: [RecipesController],
     providers: [RecipesService],
-    exports: [RecipesController, RecipesService], // Export controllers and services
+    exports: [RecipesService], // Export controllers and services
 })
 export class RecipesModule {}
 

@@ -1,5 +1,5 @@
 // prisma.service.ts
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { PrismaClient } from '../../prisma/client';
 
 @Injectable()
@@ -11,15 +11,10 @@ export class PrismaService {
   }
 
   createPrismaClient(): PrismaClient {
-    let dbUrl: string;
-
-    dbUrl = `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
-    
-
     return new PrismaClient({
       datasources: {
         db: {
-          url: dbUrl,
+          url: `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
         },
       },
     });

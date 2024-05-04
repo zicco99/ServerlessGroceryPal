@@ -70,8 +70,9 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd backend/api
+          npm install prisma
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
-          npx prisma db pull
+          npx prisma db pull --schema=./prisma/schema.prisma
           npx prisma generate
           npx prisma db push
           npx prisma migrate deploy

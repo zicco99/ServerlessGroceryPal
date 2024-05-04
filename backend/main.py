@@ -176,8 +176,7 @@ class BackendStack(NestedStack):
             #phemeral_storage_size= Size.mebibytes(1024),
             #memory_size=1024+512,
         )
-
-
+        
         backend_bucket.grant_read_write(nestjs_serverless)
 
         backend_api_cors = apigateway.CorsOptions(
@@ -541,7 +540,7 @@ class BackendStack(NestedStack):
                 # Add environment variables to the lambda env
                 for key, value in env.items():
                     lamdba.add_environment(key, value)
-
+        
         
 
 

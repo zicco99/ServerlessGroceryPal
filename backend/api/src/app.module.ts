@@ -6,7 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PrismaService } from './prisma/prisma.service';
 
 @Module({
-  imports: [RecipesModule, PrismaModule], // Importing RecipesModule and PrismaModule, we are enheriting from them the controller and the db service
+  imports: [RecipesModule, PrismaModule], // Importing RecipesModule and PrismaModule, we are enheriting from them the controller and the db ser
   controllers: [AppController],
   providers: [AppService, PrismaService], // This way we can use PrismaService within the entire app, as this module is the root module
 })

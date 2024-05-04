@@ -3,10 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class RecipesService {
-    db_client: any;
-
-  constructor(private readonly prismaService: PrismaService) {
-    this.db_client = this.prismaService.getPrismaClient();
+  constructor(private readonly db_client: PrismaService) {
   }
 
   async getAllRecipes() {

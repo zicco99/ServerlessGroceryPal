@@ -89,8 +89,7 @@ jobs:
         run: |
           cd backend/api
           npm install prisma
-          echo "DATABASE_URL=\"$DATABASE_URL\"" > .env > .env
-          export DATABASE_URL=${{ secrets.DB_URL }}
+          echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
           npx prisma migrate deploy --schema=./prisma/schema.prisma
 
       - name: Install dependencies and generate .env file

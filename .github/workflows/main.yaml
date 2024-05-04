@@ -85,12 +85,15 @@ jobs:
         run: |
           cdk deploy --app="cdk.out" --require-approval=never --all --outputs-file=./cdk_outputs.json
 
-      - name: Migrate DB
+      - name: Init DB with Prisma
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd backend/api
           export DATABASE_URL=${{ secrets.DB_URL }}
           echo $DATABASE_URL >> .env
+          npx prisma db pull
+          npx prisma generate
+          npx prisma db push
           npx prisma migrate deploy
 
       - name: Install dependencies and generate .env file

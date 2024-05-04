@@ -65,6 +65,18 @@ jobs:
           npm run build-lambda
 
           mv dist ../lambdas/nestjs_serverless
+        
+      - name: Migrate DB
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          cd backend/api
+          export DATABASE_URL=${{ secrets.DB_URL }}
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          npx prisma db pull
+          npx prisma generate
+          npx prisma db push
+          npx prisma migrate deploy
+
 
 
       - name: Install CDK dependencies

@@ -164,12 +164,8 @@ class BackendStack(NestedStack):
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={
-                'DB_DIALECT': 'postgres',
-                'DB_HOST': backend_db_proxy.endpoint,
-                'DB_PORT': "5432",
-                'DB_USERNAME': backend_db_creds.secret_value_from_json('username').to_string(),
-                'DB_PASSWORD': backend_db_creds.secret_value_from_json('password').to_string(),
-                'DB_NAME': f"{base_name}-db",
+                'REGION': self.region,
+                'DB_SECRET_ARN': backend_db_creds.secret_arn,
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
                 "DATABASE_URL": f"postgres://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{f'{base_name}-db'}"
             },

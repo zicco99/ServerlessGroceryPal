@@ -69,9 +69,7 @@ jobs:
       - name: Migrate DB
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          cd backend/api
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
-          export DATABASE_URL=${{ secrets.DB_URL }}
           npx prisma db pull
           npx prisma generate
           npx prisma db push

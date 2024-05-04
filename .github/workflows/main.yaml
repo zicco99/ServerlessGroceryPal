@@ -77,8 +77,6 @@ jobs:
           npx prisma db push
           npx prisma migrate deploy
 
-
-
       - name: Install CDK dependencies
         run: |
           npm install -g aws-cdk

@@ -10,7 +10,7 @@ import { PrismaService } from './prisma/prisma.service';
   controllers: [AppController],
   providers: [AppService, {
     provide: PrismaService,
-    useFactory: () => new PrismaService(`postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`),
+    useFactory: () => new PrismaService('custom-database-url'),
   },],
 })
 export class AppModule {}

@@ -10,7 +10,7 @@ export class PrismaService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: this.datasourceUrl || process.env.DATABASE_URL,
+          url: this.datasourceUrl,
         },
       },
     });
@@ -20,3 +20,4 @@ export class PrismaService {
     return this.prisma;
   }
 }
+

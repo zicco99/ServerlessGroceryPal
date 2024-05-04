@@ -8,6 +8,9 @@ import { PrismaService } from './prisma/prisma.service';
 @Module({
   imports: [RecipesModule, PrismaModule], // Importing RecipesModule and PrismaModule, we are enheriting from them the controller and the db ser
   controllers: [AppController],
-  providers: [AppService, PrismaService], // This way we can use PrismaService within the entire app, as this module is the root module
+  providers: [AppService, {
+    provide: PrismaService,
+    useFactory: () => new PrismaService(`postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`),
+  },],
 })
 export class AppModule {}

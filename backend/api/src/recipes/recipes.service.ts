@@ -3,20 +3,24 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class RecipesService {
-  constructor(private readonly prismaService: PrismaService) {}
+    db_client: any;
+
+  constructor(private readonly prismaService: PrismaService) {
+    this.db_client = this.prismaService.getPrismaClient();
+  }
 
   async getAllRecipes() {
-    return await this.prismaService.recipe.findMany();
+    return await this.db_client.recipe.findMany();
   }
 
   async getRecipeById(id: number) {
-    return await this.prismaService.recipe.findUnique({
+    return await this.db_client.recipe.findUnique({
       where: { id },
     });
   }
 
   async deleteRecipe(id: number) {
-    return await this.prismaService.recipe.delete({
+    return await this.db_client.recipe.delete({
       where: { id },
     });
   }

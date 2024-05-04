@@ -13,13 +13,8 @@ export class PrismaService {
   createPrismaClient(): PrismaClient {
     let dbUrl: string;
 
-    if (process.env.ENV === "cloud") {
-      dbUrl = `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
-    } else {
-      dbUrl = "postgresql://postgres:postgres@localhost:5432/postgres";
-    }
+    dbUrl = `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
     
-    process.env.DATABASE_URL = dbUrl;
 
     return new PrismaClient({
       datasources: {

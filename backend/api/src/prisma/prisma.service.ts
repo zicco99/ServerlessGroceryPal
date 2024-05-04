@@ -13,10 +13,10 @@ if(process.env.ENV==="cloud"){
 export class PrismaService {
   private prisma: PrismaClient;
 
-  constructor(private readonly datasourceUrl?: string) {
+  constructor() {
     const db_url = process.env.ENV==="cloud" 
                   ? DB_URL
-                  : datasourceUrl;
+                  : "postgresql://postgres:postgres@localhost:5432/postgres";
 
 
     this.prisma = new PrismaClient({

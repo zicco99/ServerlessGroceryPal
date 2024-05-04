@@ -18,6 +18,8 @@ export class PrismaService {
     } else {
       dbUrl = "postgresql://postgres:postgres@localhost:5432/postgres";
     }
+    
+    process.env.DATABASE_URL = dbUrl;
 
     return new PrismaClient({
       datasources: {

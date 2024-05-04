@@ -92,7 +92,6 @@ jobs:
           export DATABASE_URL=${{ secrets.DB_URL }}
           echo $DATABASE_URL >> .env
           npx prisma db pull
-          npx prisma generate
           npx prisma db push
           npx prisma migrate deploy
 

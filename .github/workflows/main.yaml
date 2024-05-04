@@ -86,11 +86,11 @@ jobs:
           cdk deploy --app="cdk.out" --require-approval=never --all --outputs-file=./cdk_outputs.json
 
       - name: Migrate DB
-          if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-          run: |
-            cd backend/api
-            export DB_URL=${{ secrets.DB_URL }}
-            sudo npx prisma migrate deploy
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          cd backend/api
+          export DB_URL=${{ secrets.DB_URL }}
+          sudo npx prisma migrate deploy
 
       - name: Install dependencies and generate .env file
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

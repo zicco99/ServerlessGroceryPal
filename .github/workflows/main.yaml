@@ -90,7 +90,7 @@ jobs:
         run: |
           cd backend/api
           export DATABASE_URL=${{ secrets.DB_URL }}
-          echo $DATABASE_URL > .env
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
           npx prisma db pull
           npx prisma generate
           npx prisma db push

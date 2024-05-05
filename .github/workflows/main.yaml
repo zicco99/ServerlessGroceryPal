@@ -68,7 +68,6 @@ jobs:
 
           # Generate Prisma Python Client
           pip install -r requirements.txt
-          export PRISMA_CLIENT_BINARY_TARGETS="native"
           npx prisma generate --schema=./prisma/schema.prisma --binary-targets=native
 
           # Move generated clients to layer

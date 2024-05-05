@@ -171,7 +171,7 @@ class BackendStack(NestedStack):
             },
             timeout=Duration.minutes(10),
             #phemeral_storage_size= Size.mebibytes(1024),
-            #memory_size=1024+512,
+            memory_size=512,
         )
 
         backend_bucket.grant_read_write(nestjs_serverless)

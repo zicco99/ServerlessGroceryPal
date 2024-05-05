@@ -3,12 +3,6 @@ const webpack = require('webpack');
 
 module.exports = function (options) {
   const lazyImports = [
-    'aws-sdk',
-    'aws-lambda',
-    '@nestjs/websockets',
-    '@nestjs/microservices',
-    '@nestjs/websockets/socket-module',
-    '@nestjs/microservices/microservices-module',
   ];
 
   return {

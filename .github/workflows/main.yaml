@@ -68,16 +68,14 @@ jobs:
           mkdir -p ./prisma/temp
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
-          # Define PY_CLIENT_CONF as a multi-line string
           PY_CLIENT_CONF=$(cat <<EOF
-          provider: "prisma-client-py"
-          interface: "asyncio"
-          recursive_type_depth: 5
+          provider = "prisma-client-py"
+          interface = "asyncio"
+          recursive_type_depth = 5
           EOF
           )
 
-          # Replace the block between "generate client {" and "}" with the content of PY_CLIENT_CONF
-          echo "$PY_CLIENT_CONF" | sed 's/\//\\\//g' | sed -e '/^generate client {/,/^}/{s/{[^}]*}/&'"$PY_CLIENT_CONF"'/}' ./prisma/temp/python_schema.prisma
+          sed -i '/^generator client {/,/^}/{s/.*/'"$PY_CLIENT_CONF"'/}' ./prisma/temp/python_schema.prisma
 
           npx prisma generate --schema=./prisma/temp/python_schema.prisma
 

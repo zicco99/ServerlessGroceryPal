@@ -79,7 +79,7 @@ jobs:
           # Use sed to replace the generator block
           sed -i "/^generator client {/r /dev/stdin" ./prisma/temp/python_schema.prisma <<< "$PY_CLIENT_CONF"
           
-          prisma generate --schema=./prisma/temp/python_schema.prisma
+          npx prisma generate --schema=./prisma/temp/python_schema.prisma
 
           # Move generated files to lambda layer
           mv ./prisma/temp/* ../layer/storage/main_db/prisma

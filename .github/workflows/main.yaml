@@ -69,9 +69,17 @@ jobs:
 
           mkdir -p ./prisma/temp
           # Generate Prisma Python Client
+
+          # Prepare to generate
           export PRISMA_CLIENT=prisma-client-python
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
-          npx prisma generate --schema=./prisma/temp/python_schema.prisma
+
+          # Generate and move
+          cd ./prisma/temp
+          npx prisma generate --schema= python_schema.prisma
+
+          # Clear up
+          cd ../..
           mv ./prisma/temp/* ../layer/storage/main_db/prisma
 
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder

@@ -58,12 +58,31 @@ jobs:
       - name: Updating the AWS-CDK
         run: sudo npm install -g aws-cdk@latest
 
+      - name: Generate Prisma Clients and distribute them
+        run: |
+          cd backend/api
+          npm install
+          
+          # Generate NestJS Client (it will be insert in webpack dist folder) [javascript client indeed]
+          npx prisma generate --schema=./prisma/schema.prisma
+
+          mkdir -p ../prisma/temp
+          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
+
+          # Change provider to generate python client
+          sed -i 's/provider\s*=\s*\"[^"]*\"/provider = \"prisma-client-py\"/g' ./prisma/temp/python_schema.prisma
+          npx prisma generate --schema=./prisma/temp/python_schema.prisma
+
+          # Move generated files to lambda layer
+          mv ./prisma/temp/* ../layer/storage/main_db/prisma
+          rm -r ./prisma/temp
+
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder
         run: |
           cd backend/api
           npm install
+          
           npm run build-lambda
-
           mv dist ../lambdas/nestjs_serverless
 
       - name: Install CDK dependencies
@@ -91,6 +110,7 @@ jobs:
           npm install prisma
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
           npx prisma migrate deploy --schema=./prisma/schema.prisma
+
 
       - name: Install dependencies and generate .env file
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

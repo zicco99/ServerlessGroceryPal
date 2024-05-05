@@ -75,7 +75,9 @@ jobs:
           EOF
           )
 
-          sed -i '/^generator client {/,/^}/{s/.*/'"$PY_CLIENT_CONF"'/}' ./prisma/temp/python_schema.prisma
+          sed -i '/^generator client {/,/}/s/.*/'"$PY_CLIENT_CONF"'/' ./prisma/temp/python_schema.prisma
+
+
 
           npx prisma generate --schema=./prisma/temp/python_schema.prisma
 

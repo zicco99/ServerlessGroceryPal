@@ -71,6 +71,7 @@ jobs:
           # Generate Prisma Python Client
 
           # Prepare to generate
+          pip install -U prisma-client
           export PRISMA_CLIENT=prisma-client-python
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 

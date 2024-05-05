@@ -73,10 +73,8 @@ jobs:
           PY_CLIENT_CONF: |
             generator client {
               provider = "prisma-client-py"
-              output = "./client"
-              engineType = "binary"
-              binaryTargets = ["native", "rhel-openssl-1.0.x"]
-              previewFeatures = ["fullTextSearch"]
+              interface = "asyncio"
+              recursive_type_depth = 5
             }
 
           # Use sed to replace the generator block

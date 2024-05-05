@@ -76,7 +76,7 @@ jobs:
           pip install prisma
           pip install prisma-client
           pip install pydantic
-          export PRISMA_CLIENT=prisma-client-python
+          export PRISMA_CLIENT=prisma-client-py
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
           # Generate and move

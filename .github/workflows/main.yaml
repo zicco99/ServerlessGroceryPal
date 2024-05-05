@@ -62,10 +62,9 @@ jobs:
         run: |
           cd backend/api
           npm install
-          
-          # Generate NestJS Client (javascript client)
           npx prisma generate --schema=./prisma/schema.prisma
 
+          # Generate Prisma Python Client
           mkdir -p ./prisma/temp
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
@@ -78,12 +77,10 @@ jobs:
 
           sed -i "/^generate client {/,/^}/{s/{[^}]*}/$PY_CLIENT_CONF/" ./prisma/temp/python_schema.prisma
 
-
           npx prisma generate --schema=./prisma/temp/python_schema.prisma
 
           # Move generated files to lambda layer
           mv ./prisma/temp/* ../layer/storage/main_db/prisma
-
 
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder
         run: |

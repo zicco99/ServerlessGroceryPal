@@ -6,7 +6,9 @@ datasource db {
 generator client {
   provider = env("PRISMA_CLIENT")
   output = "./client"
-  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+  engineType = "binary"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  previewFeatures = ["fullTextSearch"]
 }
 
 

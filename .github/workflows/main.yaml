@@ -75,7 +75,8 @@ jobs:
           EOF
           )
 
-          sed -i '/^generator client {/,/}/s/.*/'"$PY_CLIENT_CONF"'/' ./prisma/temp/python_schema.prisma
+          sed -i -e '/^generator client {/,/}/ {/}/!d; /^generator client {/!d}' -e '/}/r /dev/stdin' -e 'd' ./prisma/temp/python_schema.prisma <<<"$PY_CLIENT_CONF"
+
 
 
 

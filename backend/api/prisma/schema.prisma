@@ -3,12 +3,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = env("PRISMA_CLIENT")
+generator js_client {
+  provider = "prisma-client-js"
   output = "./client"
   engineType = "binary"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
   previewFeatures = ["fullTextSearch"]
+}
+
+generator py_client {
+  provider = "prisma-client-py"
+  interface = "asyncio"
+  recursive_type_depth = 5
 }
 
 

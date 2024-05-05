@@ -58,42 +58,22 @@ jobs:
       - name: Updating the AWS-CDK
         run: sudo npm install -g aws-cdk@latest
 
-<<<<<<<<<<<<<<  ✨ Codeium Command 🌟 >>>>>>>>>>>>>>>>
       - name: Generate Prisma Clients and distribute them
         run: |
           cd backend/api
           npm install
 
--          npm install -g prisma@latest
--
           # Generate Prisma JavaScript Client
--          export PRISMA_CLIENT=prisma-client-js
           npx prisma generate --schema=./prisma/schema.prisma
 
--          mkdir -p ./prisma/temp
           # Generate Prisma Python Client
-+          pip install -r requirements.txt
--
--          # Prepare to generate
--          pip install prisma
--          pip install prisma-client
--          pip install pydantic==1.10.15
--          export PRISMA_CLIENT=prisma-client-py
+          pip install -r requirements.txt
           export PRISMA_CLIENT_BINARY_TARGETS="native"
-+          npx prisma generate --schema=./prisma/schema.prisma --binary-targets=native
--          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
+          npx prisma generate --schema=./prisma/schema.prisma --binary-targets=native
 
-+          # Move generated clients to layer
-+          mkdir -p layer/storage/main_db/prisma
-+          mv ./prisma/*.py ./prisma/client.py ./layer/storage/main_db/prisma
--          # Generate and move
--          cd ./prisma/temp
--          prisma generate --schema=python_schema.prisma
--
--          # Clear up
--          cd ../..
--          mv ./prisma/temp/* ../layer/storage/main_db/prisma
-<<<<<<<  453a6820-b716-4cca-a138-b88941267923  >>>>>>>
+          # Move generated clients to layer
+          mkdir -p layer/storage/main_db/prisma
+          mv ./prisma/*.py ./prisma/client.py ./layer/storage/main_db/prisma
 
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder
         run: |

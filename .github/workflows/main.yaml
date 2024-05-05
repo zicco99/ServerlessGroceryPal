@@ -77,7 +77,7 @@ jobs:
 
           # Generate and move
           cd ./prisma/temp
-          npx prisma generate --schema= python_schema.prisma
+          prisma generate --schema=python_schema.prisma
 
           # Clear up
           cd ../..

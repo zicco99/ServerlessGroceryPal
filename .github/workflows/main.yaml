@@ -71,6 +71,7 @@ jobs:
           # Generate Prisma Python Client
 
           # Prepare to generate
+          pip install -U prisma
           pip install -U prisma-client
           pip install -U pydantic==1.10.15
           export PRISMA_CLIENT=prisma-client-python

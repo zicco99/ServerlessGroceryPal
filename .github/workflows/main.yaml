@@ -61,7 +61,6 @@ jobs:
       - name: Generate Prisma Clients and distribute them
         run: |
           cd backend/api
-          bash -c '
           npm install
           
           # Generate NestJS Client (javascript client)

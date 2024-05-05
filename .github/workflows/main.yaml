@@ -69,14 +69,13 @@ jobs:
           mkdir -p ./prisma/temp
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
-          PY_CLIENT_CONF=|
-            $(cat <<EOF
+          PY_CLIENT_CONF=PY_CLIENT_CONF=$(cat <<EOF
             provider = "prisma-client-py"
             interface = "asyncio"
             recursive_type_depth = 5
-            EOF
-            )
-
+          EOF
+          )
+          
           sed -i "/^generate client {/,/^}/{s/{[^}]*}/$PY_CLIENT_CONF/}" ./prisma/temp/python_schema.prisma
 
 

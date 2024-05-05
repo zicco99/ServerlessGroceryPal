@@ -77,7 +77,7 @@ jobs:
           EOF
           )
 
-          sed -i -e "/generator client {/r /dev/stdin" -e "//d" "$schema_file" <<< "$PY_CLIENT_CONF"
+          sed -i -e "/generator client {/r /dev/stdin" -e "//d" "./prisma/temp/python_schema.prisma" <<< "$PY_CLIENT_CONF" 
           npx prisma generate --schema=./prisma/temp/python_schema.prisma
 
           # Move generated files to lambda layer

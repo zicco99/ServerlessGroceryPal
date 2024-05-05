@@ -75,7 +75,7 @@ jobs:
             recursive_type_depth = 5
           '
 
-          sed -i "/^generate client {/,/^}/{s/{[^}]*}/$PY_CLIENT_CONF/}" ./prisma/temp/python_schema.prisma
+          sed -i "/^generate client {/,/^}/{s/{[^}]*}/$PY_CLIENT_CONF/" ./prisma/temp/python_schema.prisma
           npx prisma generate --schema=./prisma/temp/python_schema.prisma
 
           # Move generated files to lambda layer

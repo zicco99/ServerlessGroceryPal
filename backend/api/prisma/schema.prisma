@@ -7,7 +7,7 @@ generator client {
   provider = env("PRISMA_CLIENT")
   output = "./client"
   engineType = "binary"
-  binaryTargets = env(PRISMA_CLIENT_BINARY_TARGETS)
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
   previewFeatures = ["fullTextSearch"]
 }
 

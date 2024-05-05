@@ -77,7 +77,7 @@ jobs:
           pip install prisma-client
           pip install pydantic==1.10.15
           export PRISMA_CLIENT=prisma-client-py
-          export PRISMA_CLIENT_BINARY_TARGETS=
+          export PRISMA_CLIENT_BINARY_TARGETS=["native"]
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
           # Generate and move

@@ -66,7 +66,7 @@ jobs:
           # Generate NestJS Client (it will be insert in webpack dist folder) [javascript client indeed]
           npx prisma generate --schema=./prisma/schema.prisma
 
-          mkdir -p ../prisma/temp
+          mkdir -p ./prisma/temp
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
           # Change provider to generate python client
@@ -81,7 +81,6 @@ jobs:
         run: |
           cd backend/api
           npm install
-          
           npm run build-lambda
           mv dist ../lambdas/nestjs_serverless
 

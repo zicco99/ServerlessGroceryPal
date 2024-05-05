@@ -3,7 +3,7 @@ import { RecipesService } from './recipes.service';
 import { Recipe } from 'prisma/client';
 
 @Injectable()
-@Controller('/recipes')
+@Controller('recipes')
 export class RecipesController {
     constructor(private readonly recipesService: RecipesService) {}
 
@@ -13,13 +13,13 @@ export class RecipesController {
     }
   
     @Get(':id')
-    async getRecipeById(@Param('id') id: number): Promise<Recipe> {
-      return this.recipesService.getRecipeById(id);
+    async getRecipeById(@Param('id') id: string): Promise<Recipe> {
+      return this.recipesService.getRecipeById(parseInt(id));
     }
   
     @Delete(':id')
-    async deleteRecipe(@Param('id') id: number): Promise<void> {
-      this.recipesService.deleteRecipe(id);
+    async deleteRecipe(@Param('id') id: string): Promise<void> {
+      await this.recipesService.deleteRecipe(parseInt(id));
       return
     }
 

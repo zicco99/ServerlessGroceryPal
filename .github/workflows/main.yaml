@@ -90,7 +90,7 @@ jobs:
           cd backend/api
           npm install prisma
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
-          prisma migrate deploy --schema=./prisma/schema.prisma
+          npx prisma migrate deploy --schema=./prisma/schema.prisma
 
       - name: Install dependencies and generate .env file
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

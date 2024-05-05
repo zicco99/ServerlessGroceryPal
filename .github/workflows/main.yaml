@@ -66,7 +66,6 @@ jobs:
           # Generate Prisma JavaScript Client
           export PRISMA_CLIENT=prisma-client-js
           npx prisma generate --schema=./prisma/schema.prisma
-          mv ./prisma/node_modules ../layer/storage/main_db/prisma
 
           mkdir -p ./prisma/temp
           # Generate Prisma Python Client

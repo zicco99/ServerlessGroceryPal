@@ -69,22 +69,14 @@ jobs:
           mkdir -p ./prisma/temp
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
-           # Define the new generator block content
-          PY_CLIENT_CONF: |
-            generator client {
-              provider = "prisma-client-py"
-              interface = "asyncio"
-              recursive_type_depth = 5
-            }
+          export PY_CLIENT_CONF='generator client {
+                  provider = "prisma-client-py"
+                  interface = "asyncio"
+                  recursive_type_depth = 5
+                }'
 
           # Use sed to replace the generator block
           sed -i '/^generator client {/,/^}/{/^generator client {/c\'"$PY_CLIENT_CONF" ./prisma/temp/python_schema.prisma
-
-
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip install prisma
-
           prisma generate --schema=./prisma/temp/python_schema.prisma
 
           # Move generated files to lambda layer

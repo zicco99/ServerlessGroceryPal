@@ -62,7 +62,9 @@ jobs:
         run: |
           cd backend/api
           npm install
+
           npm install prisma@latest
+          npm install prisma-client@latest
 
           # Generate Prisma JavaScript Client
           export PRISMA_CLIENT=prisma-client-js

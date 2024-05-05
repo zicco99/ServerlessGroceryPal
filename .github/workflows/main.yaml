@@ -71,7 +71,11 @@ jobs:
 
           # Change provider to generate python client
           sed -i 's/provider\s*=\s*\"[^"]*\"/provider = \"prisma-client-py\"/g' ./prisma/temp/python_schema.prisma
+          
+          python3 -m venv .venv
+          source .venv/bin/activate
           pip install prisma
+
           prisma generate --schema=./prisma/temp/python_schema.prisma
 
           # Move generated files to lambda layer

@@ -64,7 +64,6 @@ jobs:
           npm install
 
           npm install -g prisma@latest
-          npm install -g prisma-client@latest
 
           # Generate Prisma JavaScript Client
           export PRISMA_CLIENT=prisma-client-js

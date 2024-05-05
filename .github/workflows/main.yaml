@@ -69,15 +69,13 @@ jobs:
           mkdir -p ./prisma/temp
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
-          PY_CLIENT_CONF='\n
-            generator client {
-              provider = "prisma-client-py"
-              interface = "asyncio"
-              recursive_type_depth = 5
-            }
+          PY_CLIENT_CONF='
+            provider = "prisma-client-py"
+            interface = "asyncio"
+            recursive_type_depth = 5
           '
 
-          sed -i "/^generate client {/,/^}/{/^generate client {/c\\$PY_CLIENT_CONF" config.txt
+          sed -i "/^generate client {/,/^}/{s/{[^}]*}/$PY_CLIENT_CONF/}" ./prisma/temp/python_schema.prisma
           npx prisma generate --schema=./prisma/temp/python_schema.prisma
 
           # Move generated files to lambda layer

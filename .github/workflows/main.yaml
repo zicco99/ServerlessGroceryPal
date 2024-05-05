@@ -64,6 +64,7 @@ jobs:
           npm install
 
           npm install -g prisma@latest
+          npm install -g prisma-client@latest
 
           # Generate Prisma JavaScript Client
           export PRISMA_CLIENT=prisma-client-js
@@ -75,7 +76,7 @@ jobs:
           # Prepare to generate
           pip install prisma
           pip install prisma-client
-          pip install pydantic
+          pip install pydantic==1.10.15
           export PRISMA_CLIENT=prisma-client-py
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 

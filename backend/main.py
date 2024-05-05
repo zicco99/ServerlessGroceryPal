@@ -174,7 +174,6 @@ class BackendStack(NestedStack):
             #memory_size=1024+512,
         )
 
-
         backend_bucket.grant_read_write(nestjs_serverless)
 
         backend_api_cors = apigateway.CorsOptions(
@@ -527,6 +526,7 @@ class BackendStack(NestedStack):
             #db_bootstrap: [Permission.RW_PERM_SCRAP_DB],
             #syncronizer: [Permission.RW_PERM_SCRAP_DB],
             #recipes: [Permission.RW_PERM_SCRAP_DB]
+            nestjs_serverless: [Permission.RW_PERM_SCRAP_DB],
         }
 
         for lamdba, perms in lambda_perms_association.items():

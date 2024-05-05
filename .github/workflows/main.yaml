@@ -69,9 +69,11 @@ jobs:
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
           PY_CLIENT_CONF=$(cat <<EOF
+          generate client {
           provider = "prisma-client-py"
           interface = "asyncio"
           recursive_type_depth = 5
+          }
           EOF
           )
 

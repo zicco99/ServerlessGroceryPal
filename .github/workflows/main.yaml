@@ -63,16 +63,27 @@ jobs:
           cd backend/api
           npm install
 
+          npm install -g prisma@latest
+
           # Generate Prisma JavaScript Client
-          npx prisma generate --schema=./prisma/schema.prisma
+          prisma generate --schema ./prisma/schema.prisma --generator client-js
 
+          mkdir -p ./prisma/temp
           # Generate Prisma Python Client
-          pip install -r requirements.txt
-          npx prisma generate --schema=./prisma/schema.prisma --binary-targets=native
 
-          # Move generated clients to layer
-          mkdir -p layer/storage/main_db/prisma
-          mv ./prisma/*.py ./prisma/client.py ./layer/storage/main_db/prisma
+          # Prepare to generate
+          pip install prisma
+          pip install prisma-client
+          pip install pydantic==1.10.15
+          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
+
+          # Generate and move
+          cd ./prisma/temp
+          prisma generate --schema=python_schema.prisma --generator client-py
+
+          # Clear up
+          cd ../..
+          mv ./prisma/temp/* ../layer/storage/main_db/prisma
 
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder
         run: |

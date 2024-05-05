@@ -59,39 +59,39 @@ jobs:
         run: sudo npm install -g aws-cdk@latest
 
       - name: Generate Prisma Clients and distribute them
-      run: |
-        cd backend/api
-        npm install
-        
-        # Generate NestJS Client (javascript client)
-        npx prisma generate --schema=./prisma/schema.prisma
+        run: |
+          cd backend/api
+          npm install
+          
+          # Generate NestJS Client (javascript client)
+          npx prisma generate --schema=./prisma/schema.prisma
 
-        mkdir -p ./prisma/temp
-        cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
+          mkdir -p ./prisma/temp
+          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
-        # Define the new generator block content
-        PY_CLIENT_CONF=$(cat <<EOF
-        generator client {
-          provider = "prisma-client-py"
-          output = "./client"
-          engineType = "binary"
-          binaryTargets = ["native", "rhel-openssl-1.0.x"]
-          previewFeatures = ["fullTextSearch"]
-        }
-        EOF
-        )
+          # Define the new generator block content
+          PY_CLIENT_CONF=$(cat <<EOF
+          generator client {
+            provider = "prisma-client-py"
+            output = "./client"
+            engineType = "binary"
+            binaryTargets = ["native", "rhel-openssl-1.0.x"]
+            previewFeatures = ["fullTextSearch"]
+          }
+          EOF
+          )
 
-        # Use sed to replace the generator block
-        echo "$PY_CLIENT_CONF" | sed -e '/^generator client {/,/^}/c\' -e "$(cat)" ./prisma/temp/python_schema.prisma
+          # Use sed to replace the generator block
+          echo "$PY_CLIENT_CONF" | sed -e '/^generator client {/,/^}/c\' -e "$(cat)" ./prisma/temp/python_schema.prisma
 
-        python3 -m venv .venv
-        source .venv/bin/activate
-        pip install prisma
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install prisma
 
-        prisma generate --schema=./prisma/temp/python_schema.prisma
+          prisma generate --schema=./prisma/temp/python_schema.prisma
 
-        # Move generated files to lambda layer
-        mv ./prisma/temp/* ../layer/storage/main_db/prisma
+          # Move generated files to lambda layer
+          mv ./prisma/temp/* ../layer/storage/main_db/prisma
 
 
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder

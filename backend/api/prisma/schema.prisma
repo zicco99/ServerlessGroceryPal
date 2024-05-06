@@ -25,6 +25,7 @@ generator dbml_schema {
 
 
 model User {
+  isEm
   id         Int          @id @default(autoincrement())
   name       String
   email      String

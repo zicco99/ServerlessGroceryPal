@@ -68,7 +68,7 @@ jobs:
           # Generate Prisma JavaScript Client
           npx prisma generate --schema ./prisma/schema.prisma --generator js_client
         
-      - name: Generate Prisma Python Client
+      - name: Generate ORM Datamodels
         run: |
           cd backend/api
           mkdir -p ./prisma/temp
@@ -80,6 +80,8 @@ jobs:
           prisma py fetch
           pip install prisma-client
           pip install "pydantic<2"
+
+          pip install sql
 
           # Generate and move
           npx prisma generate --schema=python_schema.prisma --generator py_client --no-engine

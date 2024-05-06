@@ -23,5 +23,6 @@ model Post {
   updated_at DateTime @updatedAt
   title      String
   published  Boolean
-  desc       String?
+  desc       String
+  isEmbedded Boolean
 }

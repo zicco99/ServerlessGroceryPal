@@ -58,7 +58,7 @@ jobs:
       - name: Updating the AWS-CDK
         run: sudo npm install -g aws-cdk@latest
 
-      - name: Generate Prisma Clients and distribute them
+      - name: Generate Prisma JS Client
         run: |
           cd backend/api
           npm install
@@ -67,23 +67,28 @@ jobs:
 
           # Generate Prisma JavaScript Client
           npx prisma generate --schema ./prisma/schema.prisma --generator js_client
+        
+      - name: Generate Prisma Python Client
+        run: |
+          cd backend/api
+          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 
           mkdir -p ./prisma/temp
-          # Generate Prisma Python Client
+          cd ./prisma/temp
 
           # Prepare to generate
           pip install prisma-client
           pip install "pydantic<2"
 
-          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
-
           # Generate and move
-          cd ./prisma/temp
           prisma generate --schema=python_schema.prisma --generator py_client --no-engine
 
-          # Clear up
+          # Move client to python layer
           cd ../..
-          mv ./prisma/temp/* ../layer/storage/main_db/prisma
+          mv ./* ../layer/storage/main_db/prisma
+
+          # Cleanup
+          rm -r ./prisma/temp
 
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder
         run: |

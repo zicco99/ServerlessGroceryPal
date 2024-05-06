@@ -73,15 +73,15 @@ jobs:
           cd backend/api
           mkdir -p ./prisma/temp
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
-          
+
           cd ./prisma/temp
 
           # Prepare to generate
-          pip install prisma-client
+          pip install prisma-client@latest
           pip install "pydantic<2"
 
           # Generate and move
-          prisma generate --schema=python_schema.prisma --generator py_client --no-engine
+          npx prisma generate --schema=python_schema.prisma --generator py_client --no-engine
 
           # Move client to python layer
           cd ../..

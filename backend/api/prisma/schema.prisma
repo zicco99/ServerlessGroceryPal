@@ -19,13 +19,12 @@ generator py_client {
 
 
 model User {
-  id         Int          @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   name       String
-  email      String
+  email      String  @unique
   profilePic String?
-  fridges    UserFridge[]
+  fridges    UserFridge[] @@embedded
   feedbacks  Feedback[]
-  isEmbedded Boolean?
 }
 
 model Feedback {
@@ -37,18 +36,16 @@ model Feedback {
   isChosen Boolean
   rating   Int
   notes    String?
-  isEmbedded Boolean?
 }
 
 model Recipe {
   id                Int                @id @default(autoincrement())
-  title             String
+  title             String             @unique
   category          String
   imageUrl          String?
-  recipeIngredients RecipeIngredient[]
-  steps             Step[]
+  recipeIngredients RecipeIngredient[] @@embedded
+  steps             Step[] @@embedded
   feedbacks         Feedback[]
-  isEmbedded Boolean?
 }
 
 model Step {
@@ -58,7 +55,6 @@ model Step {
   nStep      Int
   imageUrl   String?
   explaining String
-  isEmbedded Boolean?
 }
 
 model RecipeIngredient {
@@ -69,23 +65,20 @@ model RecipeIngredient {
   ingredientId   Int
   amountText     String
   amount         Float
-  Product        Product?   @relation(fields: [productBarcode], references: [barcode])
+  product        Product?   @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int?
-  isEmbedded Boolean?
 }
 
 model Ingredient {
   id                Int                 @id @default(autoincrement())
-  name              String
+  name              String              @unique
   unit              String?
   products          Product[]
-  recipeIngredients RecipeIngredient[]
-  IngredientProduct IngredientProduct[]
-  isEmbedded Boolean?
+  recipeIngredients RecipeIngredient[] @@embedded
 }
 
 model Product {
-  barcode           Int                 @id
+  barcode           Int                 @id @unique
   fridge            Fridge?             @relation(fields: [fridgeId], references: [id])
   fridgeId          Int?
   ingredient        Ingredient          @relation(fields: [ingredientId], references: [id])
@@ -100,19 +93,15 @@ model Product {
   meal              Boolean
   allergens         String
   quantity          Int
-  fridges           FridgeProduct[]
-  recipeIngredients RecipeIngredient[]
-  IngredientProduct IngredientProduct[]
-  isEmbedded Boolean?
+  fridges           FridgeProduct[] @@embedded
+  recipeIngredients RecipeIngredient[] @@embedded
 }
 
 model Fridge {
   id       Int             @id @default(autoincrement())
-  name     String
-  products FridgeProduct[]
+  name     String          @unique
+  products FridgeProduct[] @@embedded
   users    UserFridge[]
-  Product  Product[]
-  isEmbedded Boolean?
 }
 
 model UserFridge {
@@ -123,7 +112,6 @@ model UserFridge {
   fridgeId Int
   isAdmin  Boolean
   isOwner  Boolean
-  isEmbedded Boolean?
 }
 
 model FridgeProduct {
@@ -133,7 +121,6 @@ model FridgeProduct {
   product        Product @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int
   quantity       Int
-  isEmbedded Boolean?
 }
 
 model IngredientProduct {
@@ -142,7 +129,8 @@ model IngredientProduct {
   product        Product    @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int
   quantity       Int
-  isEmbedded Boolean?
 
   @@id([ingredientId, productBarcode])
 }
+
+

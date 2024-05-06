@@ -62,3 +62,5 @@ frontend/react-app/.vite
 # Ignore stack output
 cdk.out/
 *.lock
+
+

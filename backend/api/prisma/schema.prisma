@@ -23,7 +23,7 @@ model User {
   name       String
   email      String  @unique
   profilePic String?
-  fridges    UserFridge[] @@embedded
+  fridges    UserFridge[]
   feedbacks  Feedback[]
 }
 
@@ -43,8 +43,8 @@ model Recipe {
   title             String             @unique
   category          String
   imageUrl          String?
-  recipeIngredients RecipeIngredient[] @@embedded
-  steps             Step[] @@embedded
+  recipeIngredients RecipeIngredient[]
+  steps             Step[]
   feedbacks         Feedback[]
 }
 
@@ -74,7 +74,7 @@ model Ingredient {
   name              String              @unique
   unit              String?
   products          Product[]
-  recipeIngredients RecipeIngredient[] @@embedded
+  recipeIngredients RecipeIngredient[]
 }
 
 model Product {
@@ -93,14 +93,14 @@ model Product {
   meal              Boolean
   allergens         String
   quantity          Int
-  fridges           FridgeProduct[] @@embedded
-  recipeIngredients RecipeIngredient[] @@embedded
+  fridges           FridgeProduct[]
+  recipeIngredients RecipeIngredient[]
 }
 
 model Fridge {
   id       Int             @id @default(autoincrement())
   name     String          @unique
-  products FridgeProduct[] @@embedded
+  products FridgeProduct[]
   users    UserFridge[]
 }
 
@@ -132,5 +132,3 @@ model IngredientProduct {
 
   @@id([ingredientId, productBarcode])
 }
-
-

@@ -19,7 +19,7 @@ generator py_client {
 
 
 model User {
-  id         Int          @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
   email      String
   profilePic String?
@@ -43,9 +43,9 @@ model Recipe {
   title             String
   category          String
   imageUrl          String?
+  feedbacks         Feedback[]
   recipeIngredients RecipeIngredient[]
   steps             Step[]
-  feedbacks         Feedback[]
 }
 
 model Step {
@@ -65,24 +65,20 @@ model RecipeIngredient {
   ingredientId   Int
   amountText     String
   amount         Float
-  Product        Product?   @relation(fields: [productBarcode], references: [barcode])
+  product        Product?   @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int?
 }
 
 model Ingredient {
-  id                Int                 @id @default(autoincrement())
-  name              String
+  id                Int      @id @default(autoincrement())
+  name              String   @unique
   unit              String?
-  products          Product[]
   recipeIngredients RecipeIngredient[]
-  IngredientProduct IngredientProduct[]
 }
 
 model Product {
   barcode           Int                 @id
-  fridge            Fridge?             @relation(fields: [fridgeId], references: [id])
   fridgeId          Int?
-  ingredient        Ingredient          @relation(fields: [ingredientId], references: [id])
   ingredientId      Int
   name              String
   brand             String
@@ -96,7 +92,6 @@ model Product {
   quantity          Int
   fridges           FridgeProduct[]
   recipeIngredients RecipeIngredient[]
-  IngredientProduct IngredientProduct[]
 }
 
 model Fridge {
@@ -104,7 +99,6 @@ model Fridge {
   name     String
   products FridgeProduct[]
   users    UserFridge[]
-  Product  Product[]
 }
 
 model UserFridge {
@@ -126,12 +120,3 @@ model FridgeProduct {
   quantity       Int
 }
 
-model IngredientProduct {
-  ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId   Int
-  product        Product    @relation(fields: [productBarcode], references: [barcode])
-  productBarcode Int
-  quantity       Int
-
-  @@id([ingredientId, productBarcode])
-}

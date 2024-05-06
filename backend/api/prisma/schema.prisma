@@ -25,6 +25,7 @@ model User {
   profilePic String?
   fridges    UserFridge[]
   feedbacks  Feedback[]
+  isEmbedded Boolean?
 }
 
 model Feedback {
@@ -36,6 +37,7 @@ model Feedback {
   isChosen Boolean
   rating   Int
   notes    String?
+  isEmbedded Boolean?
 }
 
 model Recipe {
@@ -46,6 +48,7 @@ model Recipe {
   recipeIngredients RecipeIngredient[]
   steps             Step[]
   feedbacks         Feedback[]
+  isEmbedded Boolean?
 }
 
 model Step {
@@ -55,6 +58,7 @@ model Step {
   nStep      Int
   imageUrl   String?
   explaining String
+  isEmbedded Boolean?
 }
 
 model RecipeIngredient {
@@ -67,6 +71,7 @@ model RecipeIngredient {
   amount         Float
   Product        Product?   @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int?
+  isEmbedded Boolean?
 }
 
 model Ingredient {
@@ -76,6 +81,7 @@ model Ingredient {
   products          Product[]
   recipeIngredients RecipeIngredient[]
   IngredientProduct IngredientProduct[]
+  isEmbedded Boolean?
 }
 
 model Product {
@@ -97,6 +103,7 @@ model Product {
   fridges           FridgeProduct[]
   recipeIngredients RecipeIngredient[]
   IngredientProduct IngredientProduct[]
+  isEmbedded Boolean?
 }
 
 model Fridge {
@@ -105,6 +112,7 @@ model Fridge {
   products FridgeProduct[]
   users    UserFridge[]
   Product  Product[]
+  isEmbedded Boolean?
 }
 
 model UserFridge {
@@ -115,6 +123,7 @@ model UserFridge {
   fridgeId Int
   isAdmin  Boolean
   isOwner  Boolean
+  isEmbedded Boolean?
 }
 
 model FridgeProduct {
@@ -124,6 +133,7 @@ model FridgeProduct {
   product        Product @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int
   quantity       Int
+  isEmbedded Boolean?
 }
 
 model IngredientProduct {
@@ -132,6 +142,7 @@ model IngredientProduct {
   product        Product    @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int
   quantity       Int
+  isEmbedded Boolean?
 
   @@id([ingredientId, productBarcode])
 }

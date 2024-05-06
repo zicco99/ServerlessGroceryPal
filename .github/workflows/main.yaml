@@ -77,7 +77,7 @@ jobs:
           cd ./prisma/temp
 
           # Prepare to generate
-          pip install prisma-client@latest
+          pip install prisma-client
           pip install "pydantic<2"
 
           # Generate and move

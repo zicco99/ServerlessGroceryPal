@@ -58,16 +58,6 @@ jobs:
       - name: Updating the AWS-CDK
         run: sudo npm install -g aws-cdk@latest
 
-      - name: Generate Prisma JS Client
-        run: |
-          cd backend/api
-          npm install
-
-          npm install -g prisma@latest
-
-          # Generate Prisma JavaScript Client
-          npx prisma generate --schema ./prisma/schema.prisma
-
       - name: Compile NestJS BackendAPI and move it to lambda's relative folder
         run: |
           cd backend/api

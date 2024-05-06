@@ -71,9 +71,9 @@ jobs:
       - name: Generate Prisma Python Client
         run: |
           cd backend/api
-          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
-
           mkdir -p ./prisma/temp
+          cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
+          
           cd ./prisma/temp
 
           # Prepare to generate

@@ -4,119 +4,24 @@ datasource db {
 }
 
 generator js_client {
-  provider = "prisma-client-js"
-  output = "./client"
-  engineType = "binary"
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  provider        = "prisma-client-js"
+  output          = "./client"
+  engineType      = "binary"
+  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
   previewFeatures = ["fullTextSearch"]
 }
 
 generator py_client {
-  provider = "prisma-client-py"
-  interface = "asyncio"
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
   recursive_type_depth = 5
 }
 
-
-model User {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String
-  profilePic String?
-  fridges    UserFridge[]
-  feedbacks  Feedback[]
+model Post {
+  id         String   @id @default(cuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  title      String
+  published  Boolean
+  desc       String?
 }
-
-model Feedback {
-  id       Int     @id @default(autoincrement())
-  user     User    @relation(fields: [userId], references: [id])
-  userId   Int
-  recipe   Recipe  @relation(fields: [recipeId], references: [id])
-  recipeId Int
-  isChosen Boolean
-  rating   Int
-  notes    String?
-}
-
-model Recipe {
-  id                Int                @id @default(autoincrement())
-  title             String
-  category          String
-  imageUrl          String?
-  feedbacks         Feedback[]
-  recipeIngredients RecipeIngredient[]
-  steps             Step[]
-}
-
-model Step {
-  id         Int     @id @default(autoincrement())
-  recipe     Recipe  @relation(fields: [recipeId], references: [id])
-  recipeId   Int
-  nStep      Int
-  imageUrl   String?
-  explaining String
-}
-
-model RecipeIngredient {
-  id             Int        @id @default(autoincrement())
-  recipe         Recipe     @relation(fields: [recipeId], references: [id])
-  recipeId       Int
-  ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId   Int
-  amountText     String
-  amount         Float
-  product        Product?   @relation(fields: [productBarcode], references: [barcode])
-  productBarcode Int?
-}
-
-model Ingredient {
-  id                Int      @id @default(autoincrement())
-  name              String   @unique
-  unit              String?
-  recipeIngredients RecipeIngredient[]
-}
-
-model Product {
-  barcode           Int                 @id
-  fridgeId          Int?
-  ingredientId      Int
-  name              String
-  brand             String
-  labels            Boolean
-  ecoScore          Int
-  novaScore         Int
-  bigImageUrl       String
-  miniImageUrl      String
-  meal              Boolean
-  allergens         String
-  quantity          Int
-  fridges           FridgeProduct[]
-  recipeIngredients RecipeIngredient[]
-}
-
-model Fridge {
-  id       Int             @id @default(autoincrement())
-  name     String
-  products FridgeProduct[]
-  users    UserFridge[]
-}
-
-model UserFridge {
-  id       Int     @id @default(autoincrement())
-  user     User    @relation(fields: [userId], references: [id])
-  userId   Int
-  fridge   Fridge  @relation(fields: [fridgeId], references: [id])
-  fridgeId Int
-  isAdmin  Boolean
-  isOwner  Boolean
-}
-
-model FridgeProduct {
-  id             Int     @id @default(autoincrement())
-  fridge         Fridge  @relation(fields: [fridgeId], references: [id])
-  fridgeId       Int
-  product        Product @relation(fields: [productBarcode], references: [barcode])
-  productBarcode Int
-  quantity       Int
-}
-

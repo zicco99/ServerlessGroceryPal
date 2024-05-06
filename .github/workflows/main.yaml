@@ -73,6 +73,7 @@ jobs:
 
           # Prepare to generate
           pip install prisma-client
+          pip install "pydantic<2"
 
           cp ./prisma/schema.prisma ./prisma/temp/python_schema.prisma
 

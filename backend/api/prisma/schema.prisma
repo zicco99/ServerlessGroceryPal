@@ -19,9 +19,9 @@ generator py_client {
 
 
 model User {
-  id         Int     @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   name       String
-  email      String  @unique
+  email      String
   profilePic String?
   fridges    UserFridge[]
   feedbacks  Feedback[]
@@ -40,7 +40,7 @@ model Feedback {
 
 model Recipe {
   id                Int                @id @default(autoincrement())
-  title             String             @unique
+  title             String
   category          String
   imageUrl          String?
   recipeIngredients RecipeIngredient[]
@@ -65,20 +65,21 @@ model RecipeIngredient {
   ingredientId   Int
   amountText     String
   amount         Float
-  product        Product?   @relation(fields: [productBarcode], references: [barcode])
+  Product        Product?   @relation(fields: [productBarcode], references: [barcode])
   productBarcode Int?
 }
 
 model Ingredient {
   id                Int                 @id @default(autoincrement())
-  name              String              @unique
+  name              String
   unit              String?
   products          Product[]
   recipeIngredients RecipeIngredient[]
+  IngredientProduct IngredientProduct[]
 }
 
 model Product {
-  barcode           Int                 @id @unique
+  barcode           Int                 @id
   fridge            Fridge?             @relation(fields: [fridgeId], references: [id])
   fridgeId          Int?
   ingredient        Ingredient          @relation(fields: [ingredientId], references: [id])
@@ -95,13 +96,15 @@ model Product {
   quantity          Int
   fridges           FridgeProduct[]
   recipeIngredients RecipeIngredient[]
+  IngredientProduct IngredientProduct[]
 }
 
 model Fridge {
   id       Int             @id @default(autoincrement())
-  name     String          @unique
+  name     String
   products FridgeProduct[]
   users    UserFridge[]
+  Product  Product[]
 }
 
 model UserFridge {

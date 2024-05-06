@@ -80,7 +80,7 @@ jobs:
 
           # Generate and move
           cd ./prisma/temp
-          prisma generate --schema=python_schema.prisma --generator py_client
+          prisma generate --schema=python_schema.prisma --generator py_client --no-engine
 
           # Clear up
           cd ../..

@@ -1,16 +1,9 @@
-name: AWS CDK action
+name: AWS CDK Action
 
-'on':
+on:
   push:
     branches:
       - main
-  pull_request:
-
-    null
-permissions:
-  id-token: write
-  contents: read
-  pull-requests: write
 
 jobs:
   deploy:
@@ -55,33 +48,30 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Updating the AWS-CDK
+      - name: Update AWS CDK
         run: sudo npm install -g aws-cdk@latest
 
-      - name: Compile NestJS BackendAPI and move it to lambda's relative folder
+      - name: Compile and move NestJS Backend API to lambda's relative folder
         run: |
           cd backend/api
-          npm install
+          npm ci
           npm run build-lambda
           mv dist ../lambdas/nestjs_serverless
 
-      - name: Install CDK dependencies
+      - name: Install CDK dependencies and Python requirements
         run: |
           npm install -g aws-cdk
-          python3 -m pip install -r requirements.txt  # Make sure to adjust based on your project structure
+          python3 -m pip install -r requirements.txt
 
-      - name: Bootstrap CDK app
-        run: cdk bootstrap
-
-      - name: Synthesize CDK app
+      - name: Bootstrap and synthesize CDK app
         run: |
-          mkdir -p cdk.out  # Create the output directory if it doesn't exist
+          mkdir -p cdk.out
+          cdk bootstrap
           cdk synth --app="python3 app.py" --output=cdk.out
 
       - name: Deploy to AWS
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          cdk deploy --app="cdk.out" --require-approval=never --all --outputs-file=./cdk_outputs.json
+        run: cdk deploy --app="cdk.out" --require-approval=never --all --outputs-file=./cdk_outputs.json
 
       - name: Deploy DB
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -91,22 +81,17 @@ jobs:
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
           npx prisma migrate deploy --schema=./prisma/schema.prisma
 
-
       - name: Install dependencies and generate .env file
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          # Use the captured output in your subsequent steps
           frontend_directory="$(pwd)/frontend/react-app"
-          npm install --prefix "$frontend_directory" -g npm@10.4.0
-          npm install --prefix "$frontend_directory"
+          npm ci --prefix "$frontend_directory"
           env_file_path="$frontend_directory/.env"
           > "$env_file_path"
-          # they have to be PUBLIC or browser wont be able to access the env variables
-          # basically for each output add a _ between lower and upper case letters to then convert to uppercase and add REACT_PUBLIC_ prefix -> in the end we have a .env file
           jq -r '.AppStack | to_entries | .[] | "VITE_\(.key | ascii_upcase | gsub("([a-z])([A-Z])"; "\\1_\\2"))=\(.value)"' cdk_outputs.json >> "$env_file_path"
           cat "$env_file_path"
 
-      - name: Run Frontend Build and Upload on the S3 bucket
+      - name: Run Frontend Build and Upload to S3 bucket
         run: |
           frontend_directory="$(pwd)/frontend/react-app"
           CI=false && npm run build --prefix "$frontend_directory"

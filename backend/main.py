@@ -256,6 +256,13 @@ class BackendStack(NestedStack):
             # default_method_options=authorized_api_method_options
         )
 
+        api.root.add_resource("sync").add_proxy(
+            any_method=True,
+            default_integration=apigateway.LambdaIntegration(
+                synchronizer
+            )
+        )
+
 
         # ------------------------------------------#
         #                   LAMBDAS                 #

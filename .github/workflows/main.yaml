@@ -58,6 +58,15 @@ jobs:
           npm run build-lambda
           mv dist ../lambdas/nestjs_serverless
 
+      - name: Transpile TypeScript Lambdas to JS
+        run: |
+          cd lambdas/typescript
+          npm install typescript -g
+          for directory in */; do
+            cd "$directory"
+            npm run build-lambda
+          done
+
       - name: Install CDK dependencies and Python requirements
         run: |
           npm install -g aws-cdk

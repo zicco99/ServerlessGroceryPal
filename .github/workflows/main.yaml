@@ -58,9 +58,9 @@ jobs:
           npm run build-lambda
           mv dist ../lambdas/nestjs_serverless
 
-      - name: Transpile TypeScript Lambdas to JS
+      - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
-          cd lambdas/typescript
+          cd backend/lambdas/typescript
           npm install typescript -g
           for directory in */; do
             cd "$directory"

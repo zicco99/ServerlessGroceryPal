@@ -174,6 +174,39 @@ class BackendStack(NestedStack):
             memory_size=512,
         )
 
+        synchronizer = lambd.Function(
+            self,
+            f"{base_name}-synchronizer",
+            function_name=f"{base_name}-synchronizer",
+            runtime=lambd.Runtime.NODEJS_18_X,
+            handler="main.handler",
+            code=lambd.Code.from_asset("backend/lambdas/typescript/syncronizer"),
+            vpc=backend_vpc,
+            security_groups=[lambda_security_group],
+            environment={
+                'REGION': self.region,
+                'DB_SECRET_ARN': backend_db_creds.secret_arn,
+                "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
+                "DATABASE_URL": f"postgres://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{f'{base_name}-db'}"
+            },
+            timeout=Duration.minutes(10),
+            #phemeral_storage_size= Size.mebibytes(1024),
+            memory_size=512,
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         backend_bucket.grant_read_write(nestjs_serverless)
 
         backend_api_cors = apigateway.CorsOptions(

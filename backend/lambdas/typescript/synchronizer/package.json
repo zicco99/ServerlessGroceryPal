@@ -1,0 +1,16 @@
+{
+  "name": "synchronizer",
+  "version": "1.0.0",
+  "description": "This lambda will manage syncronization of recipes and products from relative sources",
+  "main": "index.js",
+  "scripts": {
+    "build-lambda": "tsc"
+  },
+  "dependencies": {
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1615.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.137"
+  }
+}

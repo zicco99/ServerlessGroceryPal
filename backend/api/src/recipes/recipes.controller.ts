@@ -10,6 +10,8 @@ export class RecipesController {
     @Get()
     async getAllRecipes(): Promise<Recipe[]> {
       return this.recipesService.getAllRecipes();
+
+      
     }
   
     @Get(':id')

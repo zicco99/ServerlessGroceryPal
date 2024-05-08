@@ -180,7 +180,7 @@ class BackendStack(NestedStack):
             function_name=f"{base_name}-synchronizer",
             runtime=lambd.Runtime.NODEJS_18_X,
             handler="main.handler",
-            code=lambd.Code.from_asset("backend/lambdas/typescript/syncronizer"),
+            code=lambd.Code.from_asset("backend/lambdas/typescript/synchronizer/dist"),
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={

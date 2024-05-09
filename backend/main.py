@@ -194,18 +194,7 @@ class BackendStack(NestedStack):
             memory_size=512,
         )
 
-
-
-
-
-
-
-
-
-
-
-
-
+        
 
         backend_bucket.grant_read_write(nestjs_serverless)
 
@@ -258,7 +247,7 @@ class BackendStack(NestedStack):
 
         api.root.add_resource("sync").add_method(
             "POST",
-            default_integration=apigateway.LambdaIntegration(
+            integration=apigateway.LambdaIntegration(
                 synchronizer
             )
         )

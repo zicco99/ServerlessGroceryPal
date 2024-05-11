@@ -34,21 +34,17 @@ module.exports = function (options) {
         ],
       })
     ],
+    optimization: {
+        runtimeChunk: true,
+        splitChunks: {
+            chunks: 'all'
+        }
+    },
     module: {
         rules: [
-          {
-            test: /\.ts$/,
-            use: [
-              {
-                loader: 'ts-loader',
-              },
-            ],
-          },
-        ],
-      resolve: {
-        extensions: ['.ts', '.js'],
-      }
-    },
+            ...options.module.rules
+        ]
+    }
   };
 };
 

@@ -1,5 +1,5 @@
 import * as webpack from 'webpack';
-import * as CopyPlugin from 'copy-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 import path from 'path';
 
 module.exports = function (options: webpack.Configuration): webpack.Configuration {
@@ -33,20 +33,32 @@ module.exports = function (options: webpack.Configuration): webpack.Configuratio
                         to: 'prisma/client',
                     },
                 ],
-                options: {},
-            }),
-            new webpack.LoaderOptionsPlugin({
-                includePaths: [
-                  path.resolve('./node_modules')
-                ]
-          })
+            })
         ],
         optimization: {
             runtimeChunk: true,
             splitChunks: {
                 chunks: 'all'
             }
-        
+        },
+        resolve: {
+            // Add '.ts' as a resolvable extension.
+            extensions: ['.ts', '.js']
+        },
+        module: {
+            rules: [
+                // TypeScript files
+                {
+                    test: /\.ts$/,
+                    use: 'ts-loader',
+                    exclude: /node_modules/
+                },
+                // CSS files
+                {
+                    test: /\.css$/,
+                    use: ['style-loader', 'css-loader']
+                }
+            ]
         }
     };
 };

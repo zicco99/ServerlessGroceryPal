@@ -1,14 +1,8 @@
 import path from 'path';
-import { sync } from 'glob';
 import nodeExternals from 'webpack-node-externals';
 
-const entryArray = sync('./src/**/index.ts');
-
 module.exports = {
-    entry: entryArray.reduce((acc, item) => {
-        const name = path.dirname(item.replace('./src/', '')).replace('/index', '');
-        return { ...acc, [name]: item };
-    }, {}),
+    entry: './src/main.ts',
     target: 'node',
     externals: [nodeExternals()],
     module: {

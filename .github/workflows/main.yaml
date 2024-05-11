@@ -62,11 +62,7 @@ jobs:
 
       - name: Inject prisma client into Typescript Lambdas before transpiling
         run: |
-          ts_lambdas_using_db=(
-            synchronizer
-          )
-
-          for dir in "${ts_lambdas_using_db[@]}"; do
+          for dir in ${{ env.ts_lambdas_using_db }}; do
             mkdir -p "./backend/lambdas/typescript/$dir/prisma"
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/src/prisma/"
           done
@@ -74,9 +70,9 @@ jobs:
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
           cd backend/lambdas/typescript
-          for directory in */; do
-            echo "Transpiling $directory to JS"
-            cd "$directory"
+          for dir in */; do
+            echo "Transpiling $dir to JS"
+            cd "$dir"
             npm install --save typescript
             npm run build-lambda
           done
@@ -87,7 +83,6 @@ jobs:
           for dir in ${{ env.ts_lambdas_using_db }}; do
             mkdir -p "./backend/lambdas/typescript/$dir/dist/prisma/"
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/dist/prisma/"
-             ${{ env.ts_lambdas_using_db }}
           done
 
 

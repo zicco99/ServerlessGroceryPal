@@ -1,18 +1,17 @@
-const IgnorePlugin = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
-// Serverless webpack config that will bundle the Lambda function
-
-export default function (options) {
+module.exports = function (options) {
   const lazyImports = [
     '@nestjs/websockets',
     '@nestjs/microservices',
     '@nestjs/websockets/socket-module',
-    '@nestjs/microservices/microservices-module'
+    '@nestjs/microservices/microservices-module',
   ];
 
   return {
     ...options,
-    entry: ['./main.ts'],
+    entry: ['./lambda.ts'],
     externals: [],
     output: {
       ...options.output,
@@ -20,11 +19,19 @@ export default function (options) {
     },
     plugins: [
       ...options.plugins,
-      new IgnorePlugin({
+      new webpack.IgnorePlugin({
         checkResource(resource) {
           return lazyImports.includes(resource);
         },
-      })
+      }),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: 'src/prisma/client', 
+            to: 'src/prisma/client',
+          },
+        ],
+      }),
     ],
   };
 };

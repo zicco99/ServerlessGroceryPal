@@ -2,9 +2,9 @@
   "name": "synchronizer",
   "version": "1.0.0",
   "description": "This lambda will manage syncronization of recipes and products from relative sources",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
-    "build-lambda": "tsc"
+    "build-lambda": "webpack --mode=production"
   },
   "dependencies": {
     "aws-lambda": "^1.0.7",

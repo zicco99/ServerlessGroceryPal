@@ -1,34 +1,36 @@
-import path from "path";
-import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
+const path = require('path');
+const glob = require('glob');
+const nodeExternals = require('webpack-node-externals');
 
-export default {
-  mode: "production",
-  entry: "./src/index.ts",
-  resolve: {
-    extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
-  },
-  output: {
-    libraryTarget: "commonjs",
-    path: path.join(__dirname, "dist"),
-    filename: "index.js",
-  },
-  target: "node",
-  module: {
-    rules: [
-      {
-        test: /\.(ts|js)x?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "cache-loader",
-            options: {
-              cacheDirectory: path.resolve(".webpackCache"),
+const entryArray = glob.sync('./src/**/index.ts');
+
+module.exports = {
+    entry: entryArray.reduce((acc, item) => {
+        const name = path.dirname(item.replace('./src/', '')).replace('/index', '');
+        return { ...acc, [name]: item };
+    }, {}),
+    target: 'node',
+    externals: [nodeExternals()],
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+                exclude: /node_modules/,
+                options: {
+                    configFile: path.resolve(__dirname, 'tsconfig.json'),
+                },
             },
-          },
-          "babel-loader",
         ],
-      },
-    ],
-  },
-  plugins: [new ForkTsCheckerWebpackPlugin()],
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
+    },
+    output: {
+        filename: '[name]/index.js',
+        path: path.resolve(__dirname, 'build'),
+        devtoolModuleFilenameTemplate: '[absolute-resource-path]',
+        libraryTarget: 'commonjs2',
+    },
+    devtool: 'source-map',
 };

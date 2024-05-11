@@ -1,19 +1,21 @@
 {
+  "include": [
+    "./src/**/*.ts"
+  ],
   "compilerOptions": {
-    "module": "es2015",
-    "target": "es2015",
-    "outDir": "./dist",
+    "target": "es2017",
+    "module": "commonjs",
     "strict": true,
-    "types": ["node"],
-    "resolveJsonModule": true,
-    "moduleResolution": "node",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [
+      "node",
+      "jest"
+    ],
     "esModuleInterop": true,
-    "lib": ["ES2020.Promise"]
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts"]
+    "inlineSourceMap": true,
+    "resolveJsonModule": true
+  }
 }

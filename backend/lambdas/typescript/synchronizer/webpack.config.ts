@@ -1,51 +1,30 @@
-const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path');
 const webpack = require('webpack');
 
-module.exports = function (options) {
-  const lazyImports = [
-    'aws-lambda',
-    'aws-sdk',
-    'axios',
-    'cheerio',
-    'prisma',
-  ];
-
-  return {
-    ...options,
-    entry: ['./src/lambda.ts'],
-    externals: [],
+module.exports = {
+    entry: './src/lambda.ts', // Update entry point to lambda.ts
     output: {
-      ...options.output,
-      libraryTarget: 'commonjs2',
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+        library: '[name]',
+        libraryTarget: 'commonjs2',
     },
-    plugins: [
-      ...(options.plugins || []), 
-      new webpack.IgnorePlugin({
-        checkResource(resource: string) {
-          return lazyImports.includes(resource);
-        },
-      }),
-      new CopyPlugin({
-        patterns: [
-          {
-            from: 'src/prisma/client', 
-            to: 'prisma/client',
-          },
-        ],
-      })
-    ],
-    optimization: {
-        runtimeChunk: true,
-        splitChunks: {
-            chunks: 'all'
-        }
-    },
-    module:{
+    target: 'node',
+    devtool: 'source-map',
+    module: {
         rules: [
-          { test: /\.css$/, use: 'css-loader' },
-          { test: /\.ts$/, use: 'ts-loader' }
-        ]
-    }
-  };
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
+    },
+    // Work around "Error: Can't resolve 'pg-native'"
+    plugins: [
+        new webpack.IgnorePlugin(/^pg-native$/)
+    ],
 };
-

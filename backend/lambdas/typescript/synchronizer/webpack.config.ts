@@ -41,9 +41,16 @@ module.exports = function (options) {
         }
     },
     module: {
-        defaultRules: [
-            '...',
-        ],
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: [
+                  {
+                    loader: 'ts-loader'
+                  }
+                ]
+            }
+        ]
     }
   };
 };

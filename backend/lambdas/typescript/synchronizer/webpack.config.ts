@@ -19,7 +19,6 @@ module.exports = function (options) {
       libraryTarget: 'commonjs2',
     },
     plugins: [
-      ...options.plugins,
       new webpack.IgnorePlugin({
         checkResource(resource) {
           return lazyImports.includes(resource);

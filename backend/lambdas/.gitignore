@@ -1,3 +1,4 @@
 # Ignore dist and node_module of each typescript lambda
 **/dist
 **/node_modules
+**/src/prisma/client

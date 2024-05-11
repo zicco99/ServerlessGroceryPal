@@ -57,6 +57,17 @@ jobs:
           npm ci
           npm run build-lambda
           mv dist ../lambdas/nestjs_serverless
+      
+      - name: Inject prisma client into Typescript Lambdas that use DB
+        run: |
+          db_lambdas_dirs=(
+            nestjs_serverless
+            recipes
+          )
+
+          for dir in "${db_lambdas_dirs[@]}"; do
+            cp -r ./backend/api/prisma/. "./backend/lambdas/typescript/$dir/prisma/"
+          done
 
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |

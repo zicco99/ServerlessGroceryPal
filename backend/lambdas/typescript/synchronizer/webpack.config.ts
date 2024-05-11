@@ -32,12 +32,23 @@ module.exports = function (options) {
             to: 'prisma/client',
           },
         ],
-      }),
-      new webpack.LoaderOptionsPlugin({
-        options: {
-            WEBPACK_BUILD: JSON.stringify('production')
-        }
-      }),
+      })
     ],
+    module: {
+        rules: [
+          {
+            test: /\.ts$/,
+            use: [
+              {
+                loader: 'ts-loader',
+              },
+            ],
+          },
+        ],
+      resolve: {
+        extensions: ['.ts', '.js'],
+      }
+    },
   };
 };
+

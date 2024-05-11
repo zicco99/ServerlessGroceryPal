@@ -40,16 +40,10 @@ module.exports = function (options) {
             chunks: 'all'
         }
     },
-    module: {
+    module:{
         rules: [
-            {
-                test: /\.tsx?$/,
-                use: [
-                  {
-                    loader: 'ts-loader'
-                  }
-                ]
-            }
+          { test: /\.css$/, use: 'css-loader' },
+          { test: /\.ts$/, use: 'ts-loader' }
         ]
     }
   };

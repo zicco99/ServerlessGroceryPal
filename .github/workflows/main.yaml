@@ -68,6 +68,7 @@ jobs:
             mkdir -p "./backend/lambdas/typescript/$dir/prisma"
             cp -r ./backend/api/prisma/. "./backend/lambdas/typescript/$dir/prisma/"
           done
+          
         shell: bash
         timeout-minutes: 10
         continue-on-error: false

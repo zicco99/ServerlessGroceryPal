@@ -12,7 +12,7 @@ module.exports = function (options) {
 
   return {
     ...options,
-    entry: ['./lambda.ts'],
+    entry: ['./src/lambda.ts'],
     externals: [],
     output: {
       ...options.output,
@@ -28,7 +28,7 @@ module.exports = function (options) {
       new CopyPlugin({
         patterns: [
           {
-            from: 'prisma/client', 
+            from: 'src/prisma/client', 
             to: 'prisma/client',
           },
         ],

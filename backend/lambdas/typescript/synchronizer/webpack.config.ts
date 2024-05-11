@@ -19,9 +19,9 @@ module.exports = function (options) {
       libraryTarget: 'commonjs2',
     },
     plugins: [
-      ...(options.plugins || []), // Ensure options.plugins is an array
+      ...(options.plugins || []), 
       new webpack.IgnorePlugin({
-        checkResource(resource) {
+        checkResource(resource: string) {
           return lazyImports.includes(resource);
         },
       }),
@@ -35,17 +35,8 @@ module.exports = function (options) {
       }),
       new webpack.LoaderOptionsPlugin({
         options: {
-          swcLoader: {
-            jsc: {
-              parser: {
-                syntax: 'typescript',
-              },
-            },
-          },
-        },
-      }),
-      new webpack.DefinePlugin({
-        'WEBPACK_BUILD': JSON.stringify('production'),
+            WEBPACK_BUILD: JSON.stringify('production')
+        }
       }),
     ],
   };

@@ -1,8 +1,8 @@
 import path from 'path';
-import glob from 'glob';
+import { sync } from 'glob';
 import nodeExternals from 'webpack-node-externals';
 
-const entryArray = glob.sync('./src/**/index.ts');
+const entryArray = sync('./src/**/index.ts');
 
 module.exports = {
     entry: entryArray.reduce((acc, item) => {
@@ -34,3 +34,4 @@ module.exports = {
     },
     devtool: 'source-map',
 };
+

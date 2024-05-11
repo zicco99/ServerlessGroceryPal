@@ -5,7 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "test": "jest",
-    "build-lambda": "webpack --mode=development",
+    "watch": "webpack --mode=development",
+    "build": "webpack --mode=production",
     "lint": "tslint --project tsconfig.json"
   },
   "dependencies": {

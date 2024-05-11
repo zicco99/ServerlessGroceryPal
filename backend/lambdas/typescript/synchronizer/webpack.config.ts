@@ -33,6 +33,17 @@ module.exports = function (options) {
           },
         ],
       }),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          swcLoader: {
+            jsc: {
+              parser: {
+                syntax: 'typescript',
+              },
+            },
+          },
+        },
+      }),
     ],
   };
 };

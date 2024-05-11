@@ -28,8 +28,8 @@ module.exports = function (options) {
       new CopyPlugin({
         patterns: [
           {
-            from: 'src/prisma/client', 
-            to: 'src/prisma/client',
+            from: 'prisma/client', 
+            to: 'prisma/client',
           },
         ],
       }),

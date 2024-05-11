@@ -1,40 +1,34 @@
-import { Configuration } from 'webpack';
-import CopyPlugin from 'copy-webpack-plugin';
-import path from 'path';
+import path from "path";
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 
-const webpackConfig: Configuration = {
-    entry: './src/lambda.ts',
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: '[name].js',
-        library: '[name]',
-        libraryTarget: 'commonjs2',
-    },
-    target: 'node',
-    devtool: 'source-map',
-    externals: [],
-    plugins: [
-        new CopyPlugin({
-            patterns: [
-                {
-                    from: 'src/prisma/client',
-                    to: 'prisma/client',
-                },
-            ],
-        }),
-    ],
-    module: {
-        rules: [
-            {
-                test: /\.ts$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
+export default {
+  mode: "production",
+  entry: "./src/index.ts",
+  resolve: {
+    extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
+  },
+  output: {
+    libraryTarget: "commonjs",
+    path: path.join(__dirname, "dist"),
+    filename: "index.js",
+  },
+  target: "node",
+  module: {
+    rules: [
+      {
+        test: /\.(ts|js)x?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: "cache-loader",
+            options: {
+              cacheDirectory: path.resolve(".webpackCache"),
             },
+          },
+          "babel-loader",
         ],
-    },
-    resolve: {
-        extensions: ['.ts', '.js'],
-    },
+      },
+    ],
+  },
+  plugins: [new ForkTsCheckerWebpackPlugin()],
 };
-
-export default webpackConfig;

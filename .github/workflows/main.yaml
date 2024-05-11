@@ -66,6 +66,7 @@ jobs:
           )
 
           for dir in "${db_lambdas_dirs[@]}"; do
+            mkdir -p "./backend/lambdas/typescript/$dir/prisma"
             cp -r ./backend/api/prisma/. "./backend/lambdas/typescript/$dir/prisma/"
           done
 

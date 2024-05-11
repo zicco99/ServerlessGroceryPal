@@ -14,6 +14,8 @@ jobs:
       NODE_VERSION: '20'
       PYTHON_VERSION: '3.10'
 
+      ts_lambdas_using_db: "synchronizer,"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -58,6 +60,17 @@ jobs:
           npm run build-lambda
           mv dist ../lambdas/nestjs_serverless
 
+      - name: Inject prisma client into Typescript Lambdas before transpiling
+        run: |
+          ts_lambdas_using_db=(
+            synchronizer
+          )
+
+          for dir in "${ts_lambdas_using_db[@]}"; do
+            mkdir -p "./backend/lambdas/typescript/$dir/prisma"
+            cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/src/prisma/"
+          done
+
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
           cd backend/lambdas/typescript
@@ -69,16 +82,14 @@ jobs:
           done
 
       
-      - name: Inject prisma client into Typescript Lambdas that use DB
+      - name: Inject prisma client into distribution Typescript Lambdas
         run: |
-          ts_lambdas_using_db=(
-            synchronizer
-          )
-
-          for dir in "${ts_lambdas_using_db[@]}"; do
+          for dir in ${{ env.ts_lambdas_using_db }}; do
             mkdir -p "./backend/lambdas/typescript/$dir/dist/prisma/"
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/dist/prisma/"
+             ${{ env.ts_lambdas_using_db }}
           done
+
 
       - name: Install CDK dependencies and Python requirements
         run: |

@@ -1,7 +1,7 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
-module.exports = function (options: { plugins: any; output: any; }) {
+module.exports = function (options) {
   const lazyImports = [
     'aws-lambda',
     'aws-sdk',
@@ -11,7 +11,7 @@ module.exports = function (options: { plugins: any; output: any; }) {
   ];
 
   return {
-    ...options.plugins,
+    ...options,
     entry: ['./src/lambda.ts'],
     externals: [],
     output: {
@@ -19,7 +19,7 @@ module.exports = function (options: { plugins: any; output: any; }) {
       libraryTarget: 'commonjs2',
     },
     plugins: [
-      ...options.plugins,
+      ...(options.plugins || []), // Ensure options.plugins is an array
       new webpack.IgnorePlugin({
         checkResource(resource) {
           return lazyImports.includes(resource);
@@ -36,3 +36,4 @@ module.exports = function (options: { plugins: any; output: any; }) {
     ],
   };
 };
+

@@ -41,9 +41,9 @@ module.exports = function (options) {
         }
     },
     module: {
-        rules: [
-            ...options.module.rules
-        ]
+        defaultRules: [
+            '...',
+        ],
     }
   };
 };

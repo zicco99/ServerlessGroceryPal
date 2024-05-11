@@ -3,7 +3,7 @@ import nodeExternals from 'webpack-node-externals';
 
 module.exports = {
     mode: 'production',
-    entry: './src/main.ts',
+    entry: 'src/main.ts',
     target: 'node',
     externals: [nodeExternals()],
     module: {

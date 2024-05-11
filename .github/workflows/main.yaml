@@ -73,9 +73,9 @@ jobs:
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
           cd backend/lambdas/typescript
-          npm install typescript -g
           for directory in */; do
             cd "$directory"
+            npm install --save typescript
             npm run build-lambda
           done
 

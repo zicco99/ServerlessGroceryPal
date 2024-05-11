@@ -1,7 +1,4 @@
 import { Callback, Context, Handler } from 'aws-lambda';
-import axios from 'axios';
-import cheerio from 'cheerio';
-
 /*
 
 

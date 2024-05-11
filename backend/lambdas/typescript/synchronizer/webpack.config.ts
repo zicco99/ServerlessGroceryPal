@@ -1,6 +1,6 @@
-const path = require('path');
-const glob = require('glob');
-const nodeExternals = require('webpack-node-externals');
+import path from 'path';
+import glob from 'glob';
+import nodeExternals from 'webpack-node-externals';
 
 const entryArray = glob.sync('./src/**/index.ts');
 

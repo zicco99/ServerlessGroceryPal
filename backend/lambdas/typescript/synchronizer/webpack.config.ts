@@ -32,6 +32,7 @@ module.exports = function (options: webpack.Configuration): webpack.Configuratio
                         to: 'prisma/client',
                     },
                 ],
+                options: {},
             })
         ],
         optimization: {
@@ -39,12 +40,6 @@ module.exports = function (options: webpack.Configuration): webpack.Configuratio
             splitChunks: {
                 chunks: 'all'
             }
-        },
-        module: {
-            rules: [
-                { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-                { test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }
-            ]
         }
     };
 };

@@ -44,6 +44,9 @@ module.exports = function (options) {
           },
         },
       }),
+      new webpack.DefinePlugin({
+        'WEBPACK_BUILD': JSON.stringify('production'),
+      }),
     ],
   };
 };

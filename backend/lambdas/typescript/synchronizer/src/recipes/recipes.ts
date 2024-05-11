@@ -2,6 +2,7 @@ import { Callback, Context, Handler } from 'aws-lambda';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
+/*
 
 
 const lambda = new AWS.Lambda();
@@ -106,3 +107,5 @@ async function invokeNextPage(currentPage: number, totalPages: number): Promise<
 }
 
 export { scrapeRecipes };
+
+*/

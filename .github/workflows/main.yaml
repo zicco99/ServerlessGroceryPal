@@ -61,8 +61,7 @@ jobs:
       - name: Inject prisma client into Typescript Lambdas that use DB
         run: |
           db_lambdas_dirs=(
-            nestjs_serverless
-            recipes
+            synchronizer
           )
 
           for dir in "${db_lambdas_dirs[@]}"; do
@@ -74,6 +73,7 @@ jobs:
         run: |
           cd backend/lambdas/typescript
           for directory in */; do
+            echo "Transpiling $directory to JS"
             cd "$directory"
             npm install --save typescript
             npm run build-lambda

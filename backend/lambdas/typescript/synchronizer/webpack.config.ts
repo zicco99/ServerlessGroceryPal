@@ -1,5 +1,6 @@
 import * as webpack from 'webpack';
 import * as CopyPlugin from 'copy-webpack-plugin';
+import path from 'path';
 
 module.exports = function (options: webpack.Configuration): webpack.Configuration {
     const lazyImports = [
@@ -33,13 +34,19 @@ module.exports = function (options: webpack.Configuration): webpack.Configuratio
                     },
                 ],
                 options: {},
-            })
+            }),
+            new webpack.LoaderOptionsPlugin({
+                includePaths: [
+                  path.resolve('./node_modules')
+                ]
+          })
         ],
         optimization: {
             runtimeChunk: true,
             splitChunks: {
                 chunks: 'all'
             }
+        
         }
     };
 };

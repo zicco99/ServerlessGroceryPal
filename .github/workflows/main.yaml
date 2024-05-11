@@ -74,6 +74,7 @@ jobs:
             echo "Transpiling $dir to JS"
             cd "$dir"
             npm install --save typescript
+            node --loader ts-node/esm node_modules/webpack-cli/bin/cli.js --config webpack.config.ts
             npm run build-lambda
           done
 

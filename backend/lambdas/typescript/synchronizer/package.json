@@ -15,7 +15,7 @@
     "@types/aws-lambda": "^8.10.137",
     "chai": "4.2.0",
     "clean-webpack-plugin": "^4.0.0",
-    "copy-webpack-plugin": "^4.6.0",
+    "copy-webpack-plugin": "^6.4.0",
     "fork-ts-checker-webpack-plugin": "^4.1.6",
     "mocha": "8.2.1",
     "nvm": "0.0.4",

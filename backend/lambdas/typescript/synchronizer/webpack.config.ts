@@ -1,6 +1,5 @@
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import CopyPlugin from 'copy-webpack-plugin';
 import path from 'path';
 
 module.exports = {
@@ -35,13 +34,5 @@ module.exports = {
     plugins: [
         new ForkTsCheckerWebpackPlugin(),
         new CleanWebpackPlugin(),
-        new CopyPlugin({
-            patterns: [
-                {
-                    from: 'prisma',
-                    to: 'prisma',
-                }
-            ] as CopyPlugin.Pattern[],
-        }),
     ],
 };

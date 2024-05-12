@@ -4,6 +4,7 @@
     "module": "commonjs",
     "strict": true,
     "baseUrl": "./",
+    "rootDirs": ["./", "./src"],
     "typeRoots": [
       "node_modules/@types"
     ],

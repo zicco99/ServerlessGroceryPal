@@ -3,7 +3,7 @@ import nodeExternals from 'webpack-node-externals';
 
 module.exports = {
     mode: 'production',
-    entry: 'src/lambda.ts',
+    entry: './src/lambda.ts',
     target: 'node',
     externals: [nodeExternals()],
     module: {

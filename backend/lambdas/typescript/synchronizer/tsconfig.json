@@ -15,7 +15,8 @@
   },
   "include": [
     "./src/**/*.ts",
-    "./prisma/**/*.ts", "lambda.ts",
+    "./prisma/**/*.ts", 
+    "lambda.ts",
   ],
   "exclude": [
     "node_modules"

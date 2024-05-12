@@ -1,18 +1,17 @@
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
-const CopyPlugin = require("copy-webpack-plugin");
-
+import CopyPlugin from 'copy-webpack-plugin';
 
 module.exports = {
     mode: 'production',
-    entry: './lambda.ts',
+    entry: './dist/lambda.js', // Assuming the TypeScript files are compiled to JavaScript in the `dist` directory
     target: 'node',
     externals: [nodeExternals()],
     plugins: [
         new CopyPlugin({
             patterns: [
                 {
-                    from: 'prisma/client', 
+                    from: './prisma/client', 
                     to: 'prisma/client',
                 },
             ],
@@ -20,10 +19,7 @@ module.exports = {
     ],
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
-        modules:[  
-                    'node_modules', 
-                    path.resolve(__dirname, 'prisma')
-                ],
+        modules: [path.resolve(__dirname, 'node_modules')], // Adjust as needed
     },
     module: {
         rules: [
@@ -46,11 +42,10 @@ module.exports = {
         ],
     },
     output: {
-        filename: '[name]/index.js',
-        path: path.resolve(__dirname, 'build'),
+        filename: 'index.js', // Adjust as needed
+        path: path.resolve(__dirname, 'dist', 'build'),
         devtoolModuleFilenameTemplate: '[absolute-resource-path]',
         libraryTarget: 'commonjs2',
     },
     devtool: 'source-map',
 };
-

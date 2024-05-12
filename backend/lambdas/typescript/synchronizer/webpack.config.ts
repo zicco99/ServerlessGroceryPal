@@ -37,12 +37,9 @@ module.exports = {
         new CleanWebpackPlugin(),
         new CopyPlugin({
             patterns: [
-                { 
-                    from: 'prisma/client', 
-                    to: 'prisma/client'
-                },
+                { from: 'prisma/client', to: 'prisma/client' },
             ],
-        })
+        } as CopyPlugin.Options),
 
     ],
 };

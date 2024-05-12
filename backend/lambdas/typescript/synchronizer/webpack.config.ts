@@ -4,7 +4,7 @@ import CopyPlugin from 'copy-webpack-plugin';
 
 module.exports = {
     mode: 'production',
-    entry: './lambda.js', // Assuming the TypeScript files are compiled to JavaScript in the `dist` directory
+    entry: './lambda.ts',
     target: 'node',
     externals: [nodeExternals()],
     plugins: [
@@ -42,7 +42,7 @@ module.exports = {
         ],
     },
     output: {
-        filename: 'index.js', // Adjust as needed
+        filename: 'main.js',
         path: path.resolve(__dirname, 'dist', 'build'),
         devtoolModuleFilenameTemplate: '[absolute-resource-path]',
         libraryTarget: 'commonjs2',

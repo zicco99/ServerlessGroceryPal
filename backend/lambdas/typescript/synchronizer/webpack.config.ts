@@ -8,6 +8,10 @@ module.exports = {
     entry: './src/lambda.ts',
     target: 'node',
     externals: [nodeExternals()],
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
+        modules: ['node_modules', 'prisma'], 
+      },
     module: {
         rules: [
             {

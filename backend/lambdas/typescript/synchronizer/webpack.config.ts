@@ -39,7 +39,6 @@ module.exports = {
             patterns: [
                 { from: 'prisma/client', to: 'prisma/client' },
             ],
-        } as CopyPlugin.Options),
-
+        }),
     ],
 };

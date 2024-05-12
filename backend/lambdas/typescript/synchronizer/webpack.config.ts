@@ -5,7 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     mode: 'production',
-    entry: './src/lambda.ts',
+    entry: './lambda.ts',
     target: 'node',
     externals: [nodeExternals()],
     plugins: [

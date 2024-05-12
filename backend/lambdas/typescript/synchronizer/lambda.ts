@@ -1,5 +1,5 @@
 import { Callback, Context, Handler } from 'aws-lambda';
-import { PrismaClient } from '../prisma/client';
+import { PrismaClient } from './prisma/client';
 
 let db_client : PrismaClient | null = null;
 

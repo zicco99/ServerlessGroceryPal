@@ -1,6 +1,6 @@
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
-import CopyPlugin from "copy-webpack-plugin";
+const CopyPlugin = require("copy-webpack-plugin");
 
 
 module.exports = {
@@ -8,16 +8,6 @@ module.exports = {
     entry: './src/lambda.ts',
     target: 'node',
     externals: [nodeExternals()],
-    plugin : [
-        new CopyPlugin({
-            patterns: [
-                {
-                    from: 'prisma/client', 
-                    to: 'prisma/client',
-                },
-            ],
-        })
-    ],
     module: {
         rules: [
             {

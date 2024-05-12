@@ -1,11 +1,23 @@
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
+import CopyPlugin from "copy-webpack-plugin";
+
 
 module.exports = {
     mode: 'production',
     entry: './src/lambda.ts',
     target: 'node',
     externals: [nodeExternals()],
+    plugin : [
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: 'prisma/client', 
+                    to: 'prisma/client',
+                },
+            ],
+        })
+    ],
     module: {
         rules: [
             {

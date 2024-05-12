@@ -1,7 +1,7 @@
 {
   "include": [
     "./src/**/*.ts"
-  ],
+, "lambda.ts"  ],
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",

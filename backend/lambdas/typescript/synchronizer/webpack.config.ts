@@ -8,6 +8,16 @@ module.exports = {
     entry: './src/lambda.ts',
     target: 'node',
     externals: [nodeExternals()],
+    plugins: [
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: 'prisma/client', 
+                    to: 'prisma/client',
+                },
+            ],
+        })
+    ],
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
         modules:[  

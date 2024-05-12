@@ -79,15 +79,6 @@ jobs:
             npm run build-lambda
           done
 
-      - name: Inject prisma client into distribution Typescript Lambdas
-        run: |
-          for dir in ${{ env.ts_lambdas_using_db }}; do
-            mkdir -p "./backend/lambdas/typescript/$dir/prisma"
-            cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/src/prisma/"
-            ls -la "./backend/lambdas/typescript/$dir/src/prisma/"
-          done
-
-
       - name: Install CDK dependencies and Python requirements
         run: |
           npm install -g aws-cdk

@@ -18,6 +18,14 @@ module.exports = {
                     configFile: path.resolve(__dirname, 'tsconfig.json'),
                 },
             },
+            {
+                test: /\.js$/,
+                loader: 'babel-loader',
+                exclude: /node_modules/,
+                options: {
+                    presets: ['@babel/preset-env'],
+                },
+            },
         ],
     },
     resolve: {

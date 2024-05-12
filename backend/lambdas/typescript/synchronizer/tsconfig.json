@@ -1,25 +1,20 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2020",
     "module": "commonjs",
-    "strict": true,
-    "baseUrl": ".",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "lib": ["es2020"],
     "esModuleInterop": true,
-    "inlineSourceMap": true,
-    "resolveJsonModule": true,
-    "outDir": "./dist",
-    "rootDir": "."
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": false,
+    "sourceMap": true,
+    "typeRoots": ["./node_modules/@types"],
+    "outDir": "dist"
   },
-  "include": [
-    "./src/**/*.ts",
-    "./prisma/**/*.ts", 
-    "lambda.ts",
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "prisma/**/*.ts"],
+  "exclude": ["node_modules"]
 }
-

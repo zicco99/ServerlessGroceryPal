@@ -1,7 +1,7 @@
 import { Callback, Context, Handler } from 'aws-lambda';
 import { PrismaClient } from './prisma/client';
 
-let db_client : PrismaClient | null = null;
+let db_client: PrismaClient | null = null;
 
 export const handler: Handler = async (
   event: any,
@@ -13,7 +13,7 @@ export const handler: Handler = async (
     await db_client.$connect();
   }
   console.log('Received event:', JSON.stringify(event, null, 4));
-  console.log(event)
+  console.log(event);
 
 
   

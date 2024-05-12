@@ -82,7 +82,14 @@ jobs:
       - name: Inject prisma client into distribution Typescript Lambdas
         run: |
           for dir in ${{ env.ts_lambdas_using_db }}; do
-            mkdir -p "./backend/lambdas/typescript/$dir/prisma/"
+            mkdir -p "./backend/lambdas/typescript/$dir/prisma"
+            cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/prisma/"
+          done
+
+      - name: Inject prisma client into distribution Typescript Lambdas
+        run: |
+          for dir in ${{ env.ts_lambdas_using_db }}; do
+            mkdir -p "./backend/lambdas/typescript/$dir/prisma"
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/prisma/"
           done
 

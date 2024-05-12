@@ -3,8 +3,7 @@
     "target": "es2017",
     "module": "commonjs",
     "strict": true,
-    "baseUrl": "./",
-    "rootDirs": ["./", "./src"],
+    "baseUrl": ".",
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -12,11 +11,10 @@
     "inlineSourceMap": true,
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "."
   },
   "include": [
-    "./src/**/*.ts",
-    "./prisma/**/*.ts"
+    "./**/*.ts"
   ],
   "exclude": [
     "node_modules"

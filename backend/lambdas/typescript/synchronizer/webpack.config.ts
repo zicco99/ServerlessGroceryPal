@@ -4,7 +4,7 @@ import CopyPlugin from 'copy-webpack-plugin';
 import path from 'path';
 
 module.exports = {
-    target: "node18",
+    target: "node",
     mode: 'development',
     context: __dirname,
     entry: './lambda.ts',
@@ -16,7 +16,7 @@ module.exports = {
     output: {
         libraryTarget: 'commonjs2',
         path: path.join(__dirname, '.webpack'),
-        filename: '[name].js',
+        filename: 'main.js',
     },
     module: {
         noParse: /node_modules/,

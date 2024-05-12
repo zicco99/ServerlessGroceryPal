@@ -10,8 +10,11 @@ module.exports = {
     externals: [nodeExternals()],
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
-        modules: ['node_modules', 'prisma', 'src'],
-      },
+        modules:[  
+                    'node_modules', 
+                    path.resolve(__dirname, 'prisma')
+                ],
+    },
     module: {
         rules: [
             {

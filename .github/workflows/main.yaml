@@ -66,7 +66,7 @@ jobs:
             mkdir -p "./backend/lambdas/typescript/$dir/prisma"
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/prisma/"
             echo "Folder structure for $dir Lambda:"
-            tree -L 2 "./backend/lambdas/typescript/$dir/prisma/"
+            tree -L 2 "./backend/lambdas/typescript/$dir/"
           done
 
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)

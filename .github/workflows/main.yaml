@@ -63,8 +63,7 @@ jobs:
       - name: Inject prisma client into Typescript Lambdas before transpiling
         run: |
           for dir in ${{ env.ts_lambdas_using_db }}; do
-            mkdir -p "./backend/lambdas/typescript/$dir/prisma"
-            cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/prisma/"
+            cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/"
             echo "Folder structure for $dir Lambda:"
             tree -L 2 "./backend/lambdas/typescript/$dir/"
           done

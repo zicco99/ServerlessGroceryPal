@@ -1,7 +1,4 @@
 {
-  "include": [
-    "./src/**/*.ts"
-, "lambda.ts"  ],
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
@@ -10,11 +7,17 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    "types": [
-    ],
     "esModuleInterop": true,
     "inlineSourceMap": true,
-    "resolveJsonModule": true
-  }
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
 

@@ -1,8 +1,9 @@
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import CopyPlugin from 'copy-webpack-plugin';
-import nodeExternals from 'webpack-node-externals';
-import path from 'path';
+const path = require('path');
+const nodeExternals = require('webpack-node-externals');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+
 
 module.exports = {
     target: "node",

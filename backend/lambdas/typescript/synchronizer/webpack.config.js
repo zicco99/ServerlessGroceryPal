@@ -25,7 +25,7 @@ module.exports = {
         noParse: /node_modules/,
         rules: [
             {
-                test: /\.(ts|js)x?$/,
+                test: /\.ts$/,
                 use: {
                     loader: 'ts-loader',
                     options: {

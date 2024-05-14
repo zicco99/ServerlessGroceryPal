@@ -10,7 +10,7 @@ module.exports = {
     mode: 'production',
     context: __dirname,
     entry: './lambda.ts',
-    externals: ["@aws-sdk/*", nodeExternals()],
+    externals: ["aws-sdk", nodeExternals()],
     devtool: 'inline-source-map',
     resolve: {
         modules: ['node_modules'],

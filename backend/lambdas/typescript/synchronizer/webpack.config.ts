@@ -23,13 +23,17 @@ module.exports = {
         noParse: /node_modules/,
         rules: [
             {
-                test: /\.(ts|js)x?$/,
-                exclude: /node_modules/,
-                loader: 'esbuild-loader',
-                options: {
-                    loader: 'tsx',
-                    target: 'es2015',
+                {
+                    test: /\.(ts|js)x?$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: true,
+                        },
+                    },
                 },
+                
             },
         ],
     },

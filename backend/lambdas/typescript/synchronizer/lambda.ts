@@ -1,8 +1,9 @@
 import { Handler, Context, Callback } from 'aws-lambda';
 import { PrismaClient, Recipe } from './prisma/client';
-import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { Lambda } from 'aws-sdk';
+
+const axios = require('axios');
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
 let db_client: PrismaClient | null = null;

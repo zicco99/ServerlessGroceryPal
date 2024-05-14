@@ -13,7 +13,7 @@ module.exports = {
     devtool: 'inline-source-map',
     resolve: {
         modules: ['node_modules'],
-        extensions: [ '.tsx', '.ts', '.js', '.json' ],
+        extensions: [ "js", "mjs", "cjs", "jsx", "ts", "tsx", "json", "node"],
     },
     output: {
         libraryTarget: 'commonjs2',

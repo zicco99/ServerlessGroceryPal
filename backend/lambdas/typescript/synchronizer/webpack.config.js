@@ -6,7 +6,7 @@ import path from 'path';
 
 module.exports = {
     target: "node",
-    mode: 'development',
+    mode: 'production',
     context: __dirname,
     entry: './lambda.ts',
     externals: ['aws-sdk', nodeExternals()],

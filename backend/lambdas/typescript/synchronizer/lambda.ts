@@ -10,7 +10,7 @@ let db_client: PrismaClient | null = null;
 
 const scrapRecipe = async (url: string): Promise<void> => {
     try {
-        const response = await axios.get(url);
+        console.log('Scraping recipe:', url);
         // Scraping logic for recipe details
     } catch (error) {
         console.error('Error scraping recipe:', error);

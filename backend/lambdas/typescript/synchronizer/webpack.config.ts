@@ -11,7 +11,8 @@ module.exports = {
     externals: ['_http_common', 'encoding'],
     devtool: 'inline-source-map',
     resolve: {
-        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+        modules: ['node_modules'],
+        extensions: [ '.tsx', '.ts', '.js', '.json' ],
     },
     output: {
         libraryTarget: 'commonjs2',

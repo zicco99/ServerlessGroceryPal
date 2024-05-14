@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "webpack --mode=production"
+    "build": "webpack --config webpack.config.js --mode production"
   },
   "dependencies": {
     "@prisma/client": "^2.30.3",

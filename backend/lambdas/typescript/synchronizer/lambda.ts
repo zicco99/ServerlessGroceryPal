@@ -1,9 +1,13 @@
 import { Handler, Context, Callback } from 'aws-lambda';
 import { PrismaClient, Recipe } from './prisma/client';
 
-const Aws = require('aws-sdk');
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda"; 
+import { fromUtf8 } from "@aws-sdk/util-utf8-browser";
+import { InvokeCommandInput } from "@aws-sdk/client-lambda";
+
 const axios = require('axios');
 const cheerio = require('cheerio');
+
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
 let db_client: PrismaClient | null = null;
@@ -40,13 +44,13 @@ const handler: Handler = async (
 
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
             await Promise.all([...Array(numberOfPages).keys()].map(async (i) => {
-                const lambdaClient = new Aws.Lambda();
-                const params = {
+                const lambdaClient = new LambdaClient({});
+                const params: InvokeCommandInput = {
                     FunctionName: context.functionName,
-                    InvocationType: 'Event',
-                    Payload: JSON.stringify({ 'n_page': i + 1 }),
+                    Payload: fromUtf8(JSON.stringify({ 'n_page': i + 1 })),
                 };
-                await lambdaClient.invoke(params).promise();
+                const command = new InvokeCommand(params);
+                await lambdaClient.send(command);
             }));
         } else {
             // Scraping logic done by each recursive invocation
@@ -82,3 +86,4 @@ const handler: Handler = async (
 };
 
 export { handler };
+

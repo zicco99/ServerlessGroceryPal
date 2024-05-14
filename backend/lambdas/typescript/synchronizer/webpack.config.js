@@ -37,7 +37,15 @@ module.exports = {
                     path.resolve(__dirname, '.webpack.config.js'),
                 ]
                 
-            }   
+            },
+            {
+                test: /\.node$/,
+                use: "node-loader",
+            },
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+            },
         ],
     },
     plugins: [

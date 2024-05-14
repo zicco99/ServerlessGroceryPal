@@ -1,7 +1,7 @@
 import { Handler, Context, Callback } from 'aws-lambda';
 import { PrismaClient, Recipe } from './prisma/client';
 
-const Aws = require('@aws-sdk');
+const Aws = require('aws-sdk');
 const axios = require('axios');
 const cheerio = require('cheerio');
 

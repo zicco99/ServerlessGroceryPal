@@ -71,6 +71,7 @@ jobs:
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
           cd backend/lambdas/typescript
+          AGENT_USE_NODE20=true
           for dir in */; do
             echo "Transpiling $dir to JS"
             cd "$dir"

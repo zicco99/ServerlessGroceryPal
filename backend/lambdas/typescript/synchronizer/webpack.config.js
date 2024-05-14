@@ -33,7 +33,7 @@ module.exports = {
                 },
                 exclude: [
                     path.resolve(__dirname, 'node_modules'),
-                    path.resolve(__dirname, '.webpack.config.ts'),
+                    path.resolve(__dirname, '.webpack.config.js'),
                 ]
                 
             }   

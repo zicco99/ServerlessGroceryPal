@@ -29,18 +29,10 @@ module.exports = function (options) {
           {
             from: 'prisma/client', 
             to: 'prisma/client',
-          }
+          },
         ],
       }),
     ],
-    resolve: {
-      ...options.resolve,
-      alias: {
-        ...options.resolve.alias,
-        axios: require.resolve('axios'),
-      },
-    },
   };
 };
-
 

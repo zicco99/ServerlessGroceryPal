@@ -51,4 +51,11 @@ module.exports = {
             ],
         }),
     ],
+    resolve: {
+        ...options.resolve,
+        alias: {
+          ...options.resolve.alias,
+          axios: require.resolve('axios'),
+        },
+      },
 };

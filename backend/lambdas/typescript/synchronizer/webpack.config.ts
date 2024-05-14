@@ -31,9 +31,7 @@ module.exports = {
                         transpileOnly: true,
                     },
                 },
-            },
-            
-                
+            }   
         ],
     },
     plugins: [

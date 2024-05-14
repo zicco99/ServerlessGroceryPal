@@ -1,7 +1,7 @@
 import { Handler, Context, Callback } from 'aws-lambda';
 import { PrismaClient, Recipe } from './prisma/client';
-import { Lambda } from 'aws-sdk';
 
+const AWS = require("aws-sdk");
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -40,7 +40,7 @@ const handler: Handler = async (
 
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
             await Promise.all([...Array(numberOfPages).keys()].map(async (i) => {
-                const lambdaClient = new Lambda();
+                const lambdaClient = new AWS.Lambda();
                 const params = {
                     FunctionName: context.functionName,
                     InvocationType: 'Event',

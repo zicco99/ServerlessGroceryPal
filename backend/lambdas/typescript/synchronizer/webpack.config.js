@@ -61,7 +61,7 @@ module.exports = {
         }),
         new webpack.ProvidePlugin({
             axios: 'axios',
-            cheerio: 'cheerio',
+            cheerio: 'cheerio'
         }),
     ],
 };

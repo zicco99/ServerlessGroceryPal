@@ -23,18 +23,16 @@ module.exports = {
         noParse: /node_modules/,
         rules: [
             {
-                {
-                    test: /\.(ts|js)x?$/,
-                    exclude: /node_modules/,
-                    use: {
-                        loader: 'ts-loader',
-                        options: {
-                            transpileOnly: true,
-                        },
+                test: /\.(ts|js)x?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
                     },
                 },
-                
             },
+                
         ],
     },
     plugins: [

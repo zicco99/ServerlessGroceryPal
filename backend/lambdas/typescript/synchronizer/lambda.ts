@@ -4,6 +4,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { time } from 'console';
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
 let db_client: PrismaClient | null = null;
@@ -20,16 +21,19 @@ const scrapRecipe = async (url: string): Promise<void> => {
 const parallelizeScraping = async (context: Context, n_page?: number): Promise<void> => {
     try {
         if (!n_page) {
+            console.log('Parsing total number of pages...');
             // Fetch total number of pages
             const response = await axios.get(BASE_URL);
             const htmlContent = response.data;
-            const $ = cheerio.load(htmlContent); // Define $ as CheerioAPI
+            const $ = cheerio.load(htmlContent);
 
             const totalPagesText = $('div.disabled.total-pages').text().trim();
             const numberOfPages = parseInt(totalPagesText);
 
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
+            console.log("to then parallelize a numer of readers = n. of pages = ", numberOfPages);
             const promises = Array.from({ length: numberOfPages - 1 }, async (undefined, i) => {
+                await new Promise(resolve => setTimeout(resolve, Math.random() * 10000));
                 const params = {
                     FunctionName: context.functionName,
                     Payload: JSON.stringify({ 'n_page': i + 1 }),
@@ -39,7 +43,9 @@ const parallelizeScraping = async (context: Context, n_page?: number): Promise<v
             });
 
             await Promise.all(promises);
+
         } else {
+            console.log('Scraping page:', n_page);
             // Scraping logic done by each recursive invocation
             const response = await axios.get(`${BASE_URL}${n_page}`);
             const $ = cheerio.load(response.data); // Define $ as CheerioAPI

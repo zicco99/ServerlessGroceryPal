@@ -76,6 +76,7 @@ jobs:
             cd "$dir"
             npm install --save typescript
             npm run build-lambda
+            mv cd backend/lambdas/typescript/node_modules ./node_modules
           done
 
       - name: Install CDK dependencies and Python requirements

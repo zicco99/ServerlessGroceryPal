@@ -40,7 +40,7 @@ const scrapRecipe = async (url: string): Promise<void> => {
 const parallelizeScraping = async (context: Context, task?: Task): Promise<void> => {
     try {
         if (!task) {
-            console.log('Parsing total number of pages...');
+            console.log("Splitting work between multiple invocations:");
             // Fetch total number of pages
             const response = await axios.get(BASE_URL);
             const htmlContent = response.data;
@@ -51,6 +51,7 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
 
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
             console.log("to then parallelize a numer of readers = n. of pages = ", numberOfPages);
+
             const tasks = Array.from({ length: Math.ceil(numberOfPages / PAGES_PER_INVOCATION) }, (_, i) => {
                 return Task;
             });
@@ -86,6 +87,7 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
         //-----------------------
 
         else { // Single execution
+            console.log("[START] Task: [start_page, step] = ", task.start_page, task.step);
             await new Promise(resolve => setTimeout(resolve, Math.random() * 5000 + 5000));
 
             //Create array from task.start_page to task.start_page + step
@@ -109,6 +111,7 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                     await scrapRecipe(link);
                 }));
             }
+            console.log(`[END] Task: [start_page, step] = [${task.start_page}, ${task.step}] `);
         }
     } catch (error) {
         console.error('Error:', error);

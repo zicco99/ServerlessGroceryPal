@@ -1,21 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "preserveConstEnums": true,
+    "strictNullChecks": true,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "sourceRoot": "/",
+    "target": "es2017",
+    "outDir": ".build",
     "module": "commonjs",
-    "lib": ["es2020", "dom"],
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": false,
-    "sourceMap": true,
-    "typeRoots": ["./node_modules/@types"],
-    "outDir": "dist"
+    "lib": ["es2017"],
+    "rootDir": "./src",
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "prisma/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts", "prisma/**/*.ts"]
 }

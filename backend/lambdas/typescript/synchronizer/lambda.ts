@@ -42,6 +42,7 @@ const scrapRecipe = async (url: string): Promise<void> => {
 
 const parallelizeScraping = async (context: Context, task?: Task): Promise<void> => {
     try {
+        console.log(task)
         if (!task) {
             console.log("Splitting work between multiple invocations:");
             // Fetch total number of pages

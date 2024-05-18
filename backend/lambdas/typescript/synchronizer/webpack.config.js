@@ -5,7 +5,6 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const webpack = require('webpack');
 
 module.exports = {
     target: 'node',
@@ -13,6 +12,9 @@ module.exports = {
     context: __dirname,
     entry: './lambda.ts',
     stats: 'minimal',
+    externals: [nodeExternals({
+        allowlist: ['cheerio', 'axios']
+    })],
     resolve: {
         extensions: ['.ts', '.js', '.json'],
         plugins: [
@@ -20,20 +22,8 @@ module.exports = {
                 configFile: './tsconfig.json'
             })
         ],
-        modules: ['node_modules'],
-        fallback: {
-            "stream": require.resolve("stream-browserify"),
-            "diagnostics_channel": require.resolve("diagnostics_channel"),
-            "process": require.resolve("process/browser"),
-            "path": require.resolve("path-browserify")
-        }
+        modules: ['node_modules']
     },
-    externals: [nodeExternals({
-        allowlist: [
-            'cheerio',
-            'axios'
-        ]
-    })],
     devtool: false,
     output: {
         libraryTarget: 'commonjs2',
@@ -44,19 +34,7 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            ['@babel/preset-env', { targets: { node: 'current' } }],
-                            '@babel/preset-typescript'
-                        ],
-                        plugins: [
-                            '@babel/plugin-proposal-class-properties',
-                            '@babel/plugin-proposal-object-rest-spread'
-                        ]
-                    }
-                },
+                loader: 'ts-loader',
                 exclude: /node_modules/
             }
         ]

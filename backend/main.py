@@ -174,6 +174,8 @@ class BackendStack(NestedStack):
             memory_size=512,
         )
 
+        '''
+
         synchronizer = lambd.Function(
             self,
             f"{base_name}-synchronizer",
@@ -189,11 +191,11 @@ class BackendStack(NestedStack):
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
                 "DATABASE_URL": f"postgres://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{f'{base_name}-db'}"
             },
-            timeout=Duration.minutes(10),
+            timeout=Duration.minutes(15),
             #phemeral_storage_size= Size.mebibytes(1024),
-            memory_size=512,
+
         )
-        
+
         synchronizer_grant = iam.PolicyStatement(
             actions=['lambda:InvokeFunction'],
             resources=[synchronizer.function_arn]
@@ -204,6 +206,9 @@ class BackendStack(NestedStack):
             statements=[synchronizer_grant]
         )
         synchronizer.role.attach_inline_policy(synchronizer_policy)
+        
+        '''
+
 
         backend_bucket.grant_read_write(nestjs_serverless)
 
@@ -254,12 +259,16 @@ class BackendStack(NestedStack):
             # default_method_options=authorized_api_method_options
         )
 
+        '''
+
         api.root.add_resource("sync").add_method(
             "POST",
             integration=apigateway.LambdaIntegration(
                 synchronizer
             )
         )
+
+        '''
 
 
         # ------------------------------------------#

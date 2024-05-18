@@ -152,3 +152,5 @@ const handler: Handler = async (
 
 export { handler };
 
+//To close all lambdas :  aws lambda put-function-concurrency --function-name backend-microservice-staging-synchronizer --reserved-concurrent-executions 0
+

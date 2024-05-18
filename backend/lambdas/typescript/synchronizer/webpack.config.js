@@ -10,7 +10,7 @@ module.exports = {
     context: __dirname,
     entry: './lambda.ts',
     externals: ["aws-sdk", nodeExternals({
-        allowlist: ['axios']
+        allowlist:['axios', 'cheerio']
     })],
     devtool: 'inline-source-map',
     resolve: {

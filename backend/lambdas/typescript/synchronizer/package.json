@@ -12,12 +12,15 @@
     "axios": "^1.6.8",
     "cheerio": "^1.0.0-rc.12",
     "ts-node": "^10.9.2",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.137",
+    "@types/copy-webpack-plugin": "^10.1.0",
     "@types/jquery": "^3.5.30",
     "@types/node": "^20.12.12",
+    "@types/webpack-bundle-analyzer": "^4.7.0",
     "@types/webpack-node-externals": "^3.0.4",
     "chai": "4.2.0",
     "clean-webpack-plugin": "^4.0.0",

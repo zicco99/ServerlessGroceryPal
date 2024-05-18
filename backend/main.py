@@ -193,8 +193,6 @@ class BackendStack(NestedStack):
             },
             timeout=Duration.minutes(15),
             #phemeral_storage_size= Size.mebibytes(1024),
-            reserved_concurrent_executions=5
-
         )
 
         synchronizer_grant = iam.PolicyStatement(

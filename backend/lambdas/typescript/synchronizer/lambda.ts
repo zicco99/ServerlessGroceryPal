@@ -6,7 +6,7 @@ import cheerio from 'cheerio';
 import { LambdaClient, InvokeCommand, InvokeCommandInput } from '@aws-sdk/client-lambda';
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
-const PAGES_PER_INVOCATION = 100;
+const PAGES_PER_INVOCATION = 1000;
 const INVOCATION_RATE_MAX = 10000;
 const INVOCATION_RATE_MIN = 5000;
 const PAGE_TASK_RATE_MAX = 5000;

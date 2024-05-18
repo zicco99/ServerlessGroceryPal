@@ -12,8 +12,8 @@ module.exports = {
     context: __dirname,
     entry: './lambda.ts',
     stats: 'minimal',
-    externals: [nodeExternals({
-        allowlist: ['cheerio', 'axios', 'form-data']
+    externals: ['aws-cdk',nodeExternals({
+        allowlist: ['cheerio', 'axios', 'form-data','combined-stream'],
     })],
     resolve: {
         extensions: ['.ts', '.js', '.json'],

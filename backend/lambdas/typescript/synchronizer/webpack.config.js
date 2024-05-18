@@ -3,39 +3,53 @@ const nodeExternals = require('webpack-node-externals');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-    target: "node",
+    target: 'node',
     mode: 'production',
     context: __dirname,
     entry: './lambda.ts',
-    externals: ["aws-sdk", nodeExternals({
-        modulesDir: path.resolve(__dirname, 'node_modules'),
+    stats: 'minimal',
+    resolve: {
+        extensions: ['.ts', '.js', '.json'],
+        plugins: [
+            new TsconfigPathsPlugin({
+                configFile: './tsconfig.json'
+            })
+        ],
+        modules: ['node_modules']
+    },
+    externals: [nodeExternals({
         allowlist: [
             'cheerio',
-            'axios',
+            'axios'
         ],
     })],
-    devtool: 'inline-source-map',
-    resolve: {
-        modules: ['node_modules'],
-        extensions: [ "js", "mjs", "cjs", "jsx", "ts", "tsx", "json", "node"],
-    },
+    devtool: false,
     output: {
         libraryTarget: 'commonjs2',
         path: path.join(__dirname, 'dist'),
-        filename: 'main.js',
+        filename: 'main.js'
     },
     module: {
-        noParse: /node_modules/,
         rules: [
             {
-                // Include ts, tsx, js, and jsx files.
-                test: /\.(ts|js)x?$/,
-                exclude: /node_modules/,
-                use: ['babel-loader']
-              }
-        ],
+                test: /\.ts$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            }
+        ]
+    },
+    optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin({
+            terserOptions: {
+                keep_fnames: true // Necessary to keep function names for AWS Lambda
+            }
+        })],
+        usedExports: true // Enable tree shaking
     },
     plugins: [
         new ForkTsCheckerWebpackPlugin(),
@@ -44,9 +58,9 @@ module.exports = {
             patterns: [
                 {
                     from: 'prisma',
-                    to: 'prisma',
+                    to: 'prisma'
                 }
-            ],
-        }), 
-    ],
+            ]
+        })
+    ]
 };

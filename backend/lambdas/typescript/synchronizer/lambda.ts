@@ -71,6 +71,7 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                     const params: InvokeCommandInput = {
                         FunctionName: context.functionName,
                         Payload: JSON.stringify(task),
+                        InvocationType: 'Event', // Async invocation
                     };
                     const command = new InvokeCommand(params);
                     return lambdaClient.send(command);

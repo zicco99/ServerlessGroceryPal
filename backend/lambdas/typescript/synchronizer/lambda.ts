@@ -60,10 +60,14 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                 return Task;
             });
 
+            console.log("tasks = ", tasks);
+
             //Naive shuffle mechanism
             for (let i = tasks.length*tasks.length; i > 0; i--) {
                 tasks.sort(() => Math.random() - 0.5);
             }
+
+            console.log("tasks = ", tasks);
         
             const promises = tasks.map(task => {
                 return (async () => {
@@ -78,6 +82,8 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                     return lambdaClient.send(command);
                 })();
             });
+
+            console.log("promises = ", promises);
         
             try {
                 await Promise.all(promises);

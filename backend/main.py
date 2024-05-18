@@ -194,6 +194,8 @@ class BackendStack(NestedStack):
             memory_size=512,
         )
 
+        synchronizer.grant_invoke(synchronizer)
+
         
 
         backend_bucket.grant_read_write(nestjs_serverless)

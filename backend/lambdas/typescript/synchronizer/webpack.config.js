@@ -13,7 +13,7 @@ module.exports = {
     entry: './lambda.ts',
     stats: 'minimal',
     externals: [nodeExternals({
-        allowlist: ['cheerio', 'axios']
+        allowlist: ['cheerio', 'axios', 'form-data']
     })],
     resolve: {
         extensions: ['.ts', '.js', '.json'],

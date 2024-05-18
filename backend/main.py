@@ -193,10 +193,17 @@ class BackendStack(NestedStack):
             #phemeral_storage_size= Size.mebibytes(1024),
             memory_size=512,
         )
-
-        synchronizer.grant_invoke(synchronizer)
-
         
+        synchronizer_grant = iam.PolicyStatement(
+            actions=['lambda:InvokeFunction'],
+            resources=[synchronizer.function_arn]
+        )
+        synchronizer_policy = iam.Policy(
+            self,
+            f"{base_name}-synchronizer-policy",
+            statements=[synchronizer_grant]
+        )
+        synchronizer.role.attach_inline_policy(synchronizer_policy)
 
         backend_bucket.grant_read_write(nestjs_serverless)
 

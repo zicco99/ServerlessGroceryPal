@@ -3,7 +3,6 @@ import { PrismaClient, Recipe } from './prisma/client';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-// @ts-ignore
 import { LambdaClient, InvokeCommand, InvokeCommandInput } from '@aws-sdk/client-lambda';
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';

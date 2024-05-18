@@ -27,7 +27,7 @@ const parallelizeScraping = async (context: Context, n_page?: number): Promise<v
             const htmlContent = response.data;
             const $ = cheerio.load(htmlContent);
 
-            const totalPagesText = $('div.disabled.total-pages').text().trim();
+            const totalPagesText = $('span.disabled.total-pages').text().trim();
             const numberOfPages = parseInt(totalPagesText);
 
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously

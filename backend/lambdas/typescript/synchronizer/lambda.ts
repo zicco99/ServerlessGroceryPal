@@ -4,7 +4,6 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 
 import { LambdaClient, InvokeCommand, InvokeCommandInput } from '@aws-sdk/client-lambda';
-import { time } from 'console';
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
 const PAGES_PER_INVOCATION = 100;
@@ -71,7 +70,7 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                     const params: InvokeCommandInput = {
                         FunctionName: context.functionName,
                         Payload: JSON.stringify(task),
-                        InvocationType: 'Event', // Async invocation
+                        InvocationType: 'Event', // Async invocation 
                     };
                     const command = new InvokeCommand(params);
                     return lambdaClient.send(command);
@@ -135,10 +134,6 @@ const handler: Handler = async (
         await parallelizeScraping(context,event.task);
     } catch (error) {
         console.error('Error:', error);
-    } finally {
-        if (db_client) {
-            await db_client.$disconnect();
-        }
     }
 
     const response = {

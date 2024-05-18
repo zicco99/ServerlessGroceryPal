@@ -193,7 +193,7 @@ class BackendStack(NestedStack):
             },
             timeout=Duration.minutes(15),
             #phemeral_storage_size= Size.mebibytes(1024),
-            reserved_concurrent_executions=500, # Max 1000 concurrent lambdas per account is the limit
+            reserved_concurrent_executions=30,
 
         )
 

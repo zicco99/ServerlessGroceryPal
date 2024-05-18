@@ -3,12 +3,27 @@ import { PrismaClient } from './prisma/client';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { LambdaClient, InvokeCommand, InvokeCommandInput } from '@aws-sdk/client-lambda';
 import { time } from 'console';
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
+const PAGES_PER_INVOCATION = 100;
+
 let db_client: PrismaClient | null = null;
 const lambdaClient = new LambdaClient({});
+
+
+class Task {
+    start_page: number;
+    step: number;
+
+    constructor(start_page: number, step: number) {
+        this.start_page = start_page;
+        this.step = step;
+    }
+}
+
+
 
 const scrapRecipe = async (url: string): Promise<void> => {
     try {
@@ -18,9 +33,13 @@ const scrapRecipe = async (url: string): Promise<void> => {
         console.error('Error scraping recipe:', error);
     }
 };
-const parallelizeScraping = async (context: Context, n_page?: number): Promise<void> => {
+
+
+
+
+const parallelizeScraping = async (context: Context, task?: Task): Promise<void> => {
     try {
-        if (!n_page) {
+        if (!task) {
             console.log('Parsing total number of pages...');
             // Fetch total number of pages
             const response = await axios.get(BASE_URL);
@@ -32,22 +51,50 @@ const parallelizeScraping = async (context: Context, n_page?: number): Promise<v
 
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
             console.log("to then parallelize a numer of readers = n. of pages = ", numberOfPages);
-            const promises = Array.from({ length: numberOfPages - 1 }, async (undefined, i) => {
-                await new Promise(resolve => setTimeout(resolve, Math.random() * 10000));
-                const params = {
-                    FunctionName: context.functionName,
-                    Payload: JSON.stringify({ 'n_page': i + 1 }),
-                };
-                const command = new InvokeCommand(params);
-                return lambdaClient.send(command);
+            const tasks = Array.from({ length: Math.ceil(numberOfPages / PAGES_PER_INVOCATION) }, (_, i) => {
+                return Task;
             });
 
-            await Promise.all(promises);
+            // Shuffle blocks of pages
+            function shuffleArray<T>(array: T[]): void {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+                }
+            }
+        
+            shuffleArray(tasks);
+        
+            const promises = tasks.map(task => {
+                return (async () => {
+                    const params: InvokeCommandInput = {
+                        FunctionName: context.functionName,
+                        Payload: JSON.stringify(task),
+                    };
+                    const command = new InvokeCommand(params);
+                    return lambdaClient.send(command);
+                })();
+            });
+        
+            try {
+                await Promise.all(promises);
+            } catch (error) {
+                console.error('Error invoking Lambda:', error);
+            }
 
-        } else {
-            console.log('Scraping page:', n_page);
+        } 
+        //-----------------------
+
+        else { // Single execution
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 5000 + 5000));
+
+            //Create array from task.start_page to task.start_page + step
+            const pages = Array.from({ length: task.step }, (_, i) => i + task.start_page);
+
+            //Shuffle
+            console.log('Scraping page:', task.);
             // Scraping logic done by each recursive invocation
-            const response = await axios.get(`${BASE_URL}${n_page}`);
+            const response = await axios.get(`${BASE_URL}${task}`);
             const $ = cheerio.load(response.data); // Define $ as CheerioAPI
             const recipeLinks: string[] = [];
             $('.gz-title a').each((index: number, element: any) => { // Use CheerioElement here
@@ -68,7 +115,7 @@ const parallelizeScraping = async (context: Context, n_page?: number): Promise<v
 
 
 const handler: Handler = async (
-    event: { n_page?: number },
+    event: { task?: Task },
     context: Context,
     callback: Callback,
 ): Promise<void> => {
@@ -78,7 +125,7 @@ const handler: Handler = async (
     }
 
     try {
-        await parallelizeScraping(context,event.n_page);
+        await parallelizeScraping(context,event.task);
     } catch (error) {
         console.error('Error:', error);
     } finally {

@@ -3,7 +3,6 @@ const nodeExternals = require('webpack-node-externals');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
     target: "node",
@@ -61,7 +60,6 @@ module.exports = {
                     to: 'prisma',
                 }
             ],
-        }),
-        new BundleAnalyzerPlugin(), 
+        }), 
     ],
 };

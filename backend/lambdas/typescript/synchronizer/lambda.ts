@@ -32,12 +32,11 @@ const handler: Handler = async (
         if (!event.n_page) {
             // Fetch total number of pages
             const response = await axios.get(BASE_URL);
-            const htmlContent: string = response.data;
+            const htmlContent = response.data;
             const $ = cheerio.load(htmlContent);
-        
-            const numberOfPages: number = parseInt($('div.disabled.total-pages').text());
-        
-            console.log('Number of pages:', numberOfPages);
+
+            const totalPagesText = $('div.disabled.total-pages').text().trim();
+            const numberOfPages = parseInt(totalPagesText);
 
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
             await Promise.all([...Array(numberOfPages).keys()].map(async (i) => {

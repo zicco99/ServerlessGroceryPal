@@ -37,28 +37,26 @@ module.exports = {
     devtool: false,
     output: {
         libraryTarget: 'commonjs2',
-        path: path.join(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'dist'), // Using path.resolve for clarity
         filename: 'main.js'
     },
     module: {
         rules: [
             {
                 test: /\.ts$/,
-                use: [
-                    {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: [
-                                ['@babel/preset-env', { targets: { node: 'current' } }],
-                                '@babel/preset-typescript'
-                            ],
-                            plugins: [
-                                '@babel/plugin-proposal-class-properties',
-                                '@babel/plugin-proposal-object-rest-spread'
-                            ]
-                        }
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['@babel/preset-env', { targets: { node: 'current' } }],
+                            '@babel/preset-typescript'
+                        ],
+                        plugins: [
+                            '@babel/plugin-proposal-class-properties',
+                            '@babel/plugin-proposal-object-rest-spread'
+                        ]
                     }
-                ],
+                },
                 exclude: /node_modules/
             }
         ]
@@ -87,9 +85,5 @@ module.exports = {
                 }
             ]
         }),
-        new webpack.ProvidePlugin({
-            process: 'process/browser',
-            Buffer: ['buffer', 'Buffer']
-        })
     ]
 };

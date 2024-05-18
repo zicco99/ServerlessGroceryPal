@@ -91,21 +91,24 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
             //Create array from task.start_page to task.start_page + step
             const pages = Array.from({ length: task.step }, (_, i) => i + task.start_page);
 
-            //Shuffle
-            console.log('Scraping page:', task.);
-            // Scraping logic done by each recursive invocation
-            const response = await axios.get(`${BASE_URL}${task}`);
-            const $ = cheerio.load(response.data); // Define $ as CheerioAPI
-            const recipeLinks: string[] = [];
-            $('.gz-title a').each((index: number, element: any) => { // Use CheerioElement here
-                const recipeLink = $(element).attr('href');
-                if (recipeLink) {
-                    recipeLinks.push(recipeLink);
-                }
-            });
-            await Promise.all(recipeLinks.map(async (link) => {
-                await scrapRecipe(link);
-            }));
+            //Shuffle array one line
+            pages.sort(() => Math.random() - 0.5);
+
+            for (const p of pages) {
+                console.log('Scraping page:', p);
+                const response = await axios.get(`${BASE_URL}${p}`);
+                const $ = cheerio.load(response.data); // Define $ as CheerioAPI
+                const recipeLinks: string[] = [];
+                $('.gz-title a').each((index: number, element: any) => { // Use CheerioElement here
+                    const recipeLink = $(element).attr('href');
+                    if (recipeLink) {
+                        recipeLinks.push(recipeLink);
+                    }
+                });
+                await Promise.all(recipeLinks.map(async (link) => {
+                    await scrapRecipe(link);
+                }));
+            }
         }
     } catch (error) {
         console.error('Error:', error);

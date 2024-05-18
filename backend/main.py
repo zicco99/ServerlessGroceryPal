@@ -193,7 +193,7 @@ class BackendStack(NestedStack):
             },
             timeout=Duration.minutes(15),
             #phemeral_storage_size= Size.mebibytes(1024),
-            reserved_concurrent_executions=9,
+            reserved_concurrent_executions=10,
 
         )
 

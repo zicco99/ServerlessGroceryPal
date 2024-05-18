@@ -17,6 +17,9 @@ module.exports = function (options) {
       ...options.output,
       libraryTarget: 'commonjs2',
     },
+    resolve: {
+      extentions : [ "js", "mjs", "cjs", "jsx", "ts", "tsx", "json", "node"],
+    },
     plugins: [
       ...options.plugins,
       new webpack.IgnorePlugin({

@@ -30,38 +30,11 @@ module.exports = {
         noParse: /node_modules/,
         rules: [
             {
-                test: /\.ts$/,
-                use: {
-                    loader: 'ts-loader',
-                    options: {
-                        transpileOnly: true,
-                    },
-                },
-                exclude: [
-                    path.resolve(__dirname, 'node_modules'),
-                    path.resolve(__dirname, '.webpack.config.js'),
-                ]
-                
-            },
-            {
-                test: /\.mjs$/,
-                include: /node_modules/,
-                type: 'javascript/auto'
-            },
-            {
-                test: /\.js$/,
+                // Include ts, tsx, js, and jsx files.
+                test: /\.(ts|js)x?$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env'],
-                    },
-                },
-            },
-            {
-                test: /\.node$/,
-                use: "node-loader",
-            },
+                use: ['babel-loader']
+              }
         ],
     },
     plugins: [

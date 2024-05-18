@@ -7,6 +7,10 @@ import { LambdaClient, InvokeCommand, InvokeCommandInput } from '@aws-sdk/client
 
 const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
 const PAGES_PER_INVOCATION = 100;
+const INVOCATION_RATE_MAX = 10000;
+const INVOCATION_RATE_MIN = 5000;
+const PAGE_TASK_RATE_MAX = 5000;
+const PAGE_TASK_RATE_MIN = 3000;
 
 let db_client: PrismaClient | null = null;
 const lambdaClient = new LambdaClient({});
@@ -55,18 +59,15 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                 return Task;
             });
 
-            // Shuffle blocks of pages
-            function shuffleArray<T>(array: T[]): void {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-                }
+            //Naive shuffle mechanism
+            for (let i = tasks.length*tasks.length; i > 0; i--) {
+                tasks.sort(() => Math.random() - 0.5);
             }
-        
-            shuffleArray(tasks);
         
             const promises = tasks.map(task => {
                 return (async () => {
+                    //Wait between invocations to reuse parallel lambdas
+                    await new Promise(resolve => setTimeout(resolve, (Math.random() * (INVOCATION_RATE_MAX - INVOCATION_RATE_MIN)) + INVOCATION_RATE_MIN));
                     const params: InvokeCommandInput = {
                         FunctionName: context.functionName,
                         Payload: JSON.stringify(task),
@@ -88,13 +89,15 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
 
         else { // Single execution
             console.log("[START] Task: [start_page, step] = ", task.start_page, task.step);
-            await new Promise(resolve => setTimeout(resolve, Math.random() * 5000 + 5000));
+            await new Promise(resolve => setTimeout(resolve, (Math.random() * (PAGE_TASK_RATE_MAX - PAGE_TASK_RATE_MIN)) + PAGE_TASK_RATE_MIN));
 
             //Create array from task.start_page to task.start_page + step
             const pages = Array.from({ length: task.step }, (_, i) => i + task.start_page);
 
             //Shuffle array one line
-            pages.sort(() => Math.random() - 0.5);
+            for (let i = pages.length*pages.length; i > 0; i--) {
+                pages.sort(() => Math.random() - 0.5);
+            }
 
             for (const p of pages) {
                 console.log('Scraping page:', p);

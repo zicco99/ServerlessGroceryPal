@@ -12,16 +12,7 @@ module.exports = {
     context: __dirname,
     entry: './lambda.ts',
     stats: 'minimal',
-    externals: ['aws-cdk',nodeExternals({
-        allowlist: [
-            'cheerio',
-            'axios', 
-            'form-data',
-            'combined-stream',
-            'delayed-stream',
-            'mime-types'
-        ],
-    })],
+    externals: ['aws-cdk'],
     resolve: {
         extensions: ['.ts', '.js', '.json'],
         plugins: [

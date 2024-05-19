@@ -30,91 +30,81 @@ const scrapRecipe = async (url: string): Promise<void> => {
 
 
 
+const executeScrapingTask = async ( task: Task) : Promise<void> => {
+    console.log("[TASK EXECUTION] ProcessingTask: ", task);
+    await new Promise(resolve => setTimeout(resolve, (Math.random() * (PAGE_TASK_RATE_MAX - PAGE_TASK_RATE_MIN)) + PAGE_TASK_RATE_MIN));
 
-const parallelizeScraping = async (context: Context, task?: Task): Promise<void> => {
-    try {
-        console.log(task)
-        if (!task) {
-            console.log("Splitting work between multiple invocations:");
-            // Fetch total number of pages
-            const response = await axios.get(BASE_URL);
-            const htmlContent = response.data;
-            const $ = cheerio.load(htmlContent);
+    //Create array from task.start_page to task.start_page + step
+    const pages = Array.from({ length: task.step }, (_, i) => i + task.startPage);
 
-            const totalPagesText = $('span.disabled.total-pages').text().trim();
-            const numberOfPages = parseInt(totalPagesText);
-
-            // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
-            console.log("to then parallelize a numer of readers = n. of pages = ", numberOfPages);
-
-            const tasks: Task[] = Array.from({ length: Math.ceil(numberOfPages / PAGES_PER_INVOCATION) }, (_, i) => {
-                const startPage = i * PAGES_PER_INVOCATION + 1;
-                const endPage = (i + 1) * PAGES_PER_INVOCATION + 1;
-                return new Task(startPage, endPage - startPage);
-            });
-        
-            tasks.forEach(async (task) => { //Still iterative
-
-                console.log("[ROOT] Managing Task: ", task);
-
-                task.shufflePageChunk()
-
-                console.log("[ROOT] Shuffled Task: ", task);
-
-                // Wait between invocations to reuse parallel lambdas
-                const delay = Math.random() * (INVOCATION_RATE_MAX - INVOCATION_RATE_MIN) + INVOCATION_RATE_MIN;
-                await new Promise(resolve => setTimeout(resolve, delay));
-            
-                const params : InvokeCommandInput = {
-                    FunctionName: context.functionName,
-                    Payload: JSON.stringify(task),
-                    InvocationType: 'Event', // Async recursive invocation
-                };
-            
-                const command = new InvokeCommand(params);
-                lambdaClient.send(command).catch(error => {
-                    console.error('Error invoking lambda function:', error);
-                });
-
-                console.log("[ROOT] Task correctly invoked:", task);
-            });
-        } 
-        //-----------------------
-
-        else { // Single execution
-            console.log("[TASK EXECUTION] ProcessingTask: ", task);
-
-            await new Promise(resolve => setTimeout(resolve, (Math.random() * (PAGE_TASK_RATE_MAX - PAGE_TASK_RATE_MIN)) + PAGE_TASK_RATE_MIN));
-
-            //Create array from task.start_page to task.start_page + step
-            const pages = Array.from({ length: task.step }, (_, i) => i + task.startPage);
-
-            for (const p of pages) {
-                console.log('[TASK EXECUTION] Scraping page: ', p);
-                const response = await axios.get(`${BASE_URL}${p}`);
-                const $ = cheerio.load(response.data);
-                const recipeLinks: string[] = [];
-                $('.gz-title a').each((index: number, element: any) => { // Use CheerioElement here
-                    const recipeLink = $(element).attr('href');
-                    if (recipeLink) {
-                        recipeLinks.push(recipeLink);
-                    }
-                });
-                await Promise.all(recipeLinks.map(async (link) => {
-                    await scrapRecipe(link);
-                }));
+    for (const p of pages) {
+        console.log('[TASK EXECUTION] Scraping page: ', p);
+        const response = await axios.get(`${BASE_URL}${p}`);
+        const $ = cheerio.load(response.data);
+        const recipeLinks: string[] = [];
+        $('.gz-title a').each((index: number, element: any) => { // Use CheerioElement here
+            const recipeLink = $(element).attr('href');
+            if (recipeLink) {
+                recipeLinks.push(recipeLink);
             }
-            console.log(`[TASK EXECUTION] Completed Task: ${task}`);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        throw error; // rethrow the error to be caught by the handler
+        });
+        await Promise.all(recipeLinks.map(async (link) => {
+            await scrapRecipe(link);
+        }));
     }
-};
+    console.log(`[TASK EXECUTION] Completed Task: ${task}`);
+}
+
+const parallelize = async (context: Context): Promise<void> => {
+    console.log("Splitting work between multiple invocations:");
+
+    // Fetch total number of pages
+    const response = await axios.get(BASE_URL);
+    const htmlContent = response.data;
+    const $ = cheerio.load(htmlContent);
+
+    const totalPagesText = $('span.disabled.total-pages').text().trim();
+    const numberOfPages = parseInt(totalPagesText);
+
+    // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
+    console.log("to then parallelize a numer of readers = n. of pages = ", numberOfPages);
+
+    const tasks: Task[] = Array.from({ length: Math.ceil(numberOfPages / PAGES_PER_INVOCATION) }, (_, i) => {
+        const startPage = i * PAGES_PER_INVOCATION + 1;
+        const endPage = (i + 1) * PAGES_PER_INVOCATION + 1;
+        return new Task(startPage, endPage - startPage);
+    });
+
+    tasks.forEach(async (task) => { //Still iterative
+
+        console.log("[ROOT] Managing Task: ", task);
+
+        task.shufflePageChunk()
+
+        console.log("[ROOT] Shuffled Task: ", task);
+
+        // Wait between invocations to reuse parallel lambdas
+        const delay = Math.random() * (INVOCATION_RATE_MAX - INVOCATION_RATE_MIN) + INVOCATION_RATE_MIN;
+        await new Promise(resolve => setTimeout(resolve, delay));
+    
+        const params : InvokeCommandInput = {
+            FunctionName: context.functionName,
+            Payload: JSON.stringify(task),
+            InvocationType: 'Event', // Async recursive invocation
+        };
+    
+        const command = new InvokeCommand(params);
+        lambdaClient.send(command).catch(error => {
+            console.error('Error invoking lambda function:', error);
+        });
+
+        console.log("[ROOT] Task correctly invoked:", task);
+    });
+}
 
 
 const handler: Handler = async (
-    event: { task?: Task },
+    event: any,
     context: Context,
     callback: Callback,
 ): Promise<void> => {
@@ -126,9 +116,15 @@ const handler: Handler = async (
     }
 
     try {
-        await parallelizeScraping(context,event.task);
+        if (!event.task) { // Parallel execution
+            parallelize(context)
+        } 
+        else { // Single execution
+            await executeScrapingTask(event.task);
+        }
     } catch (error) {
         console.error('Error:', error);
+        throw error; // rethrow the error to be caught by the handler
     }
 
     const response = {

@@ -108,33 +108,37 @@ const handler: Handler = async (
     context: Context,
     callback: Callback,
 ): Promise<void> => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
-
-    if (!db_client) {
-        db_client = new PrismaClient();
-        await db_client.$connect();
-    }
-
     try {
-        if (!event.task) { // Parallel execution
-            parallelize(context)
+
+        console.log('Received event:', JSON.stringify(event, null, 2));
+        if (!db_client) {
+            db_client = new PrismaClient();
+            await db_client.$connect();
+        }
+
+        let task: Task | undefined = undefined;
+        if(event.startPage && event.step) {
+            task = new Task(event.startPage, event.step);
+        }
+
+        if (task) { // Parallel execution
+            parallelize(context);
+            const response = {
+                statusCode: 200,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: 'Synchronization completed!' }),
+            };
+            callback(null, response);
         } 
         else { // Single execution
-            await executeScrapingTask(event.task);
+            await executeScrapingTask(event);
         }
     } catch (error) {
         console.error('Error:', error);
-        throw error; // rethrow the error to be caught by the handler
+        throw error;
     }
-
-    const response = {
-        statusCode: 200,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: 'Synchronization completed!' }),
-    };
-    callback(null, response);
 };
 
 export { handler };

@@ -47,22 +47,19 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
             // Invoke Lambda functions in parallel to scrape multiple pages simultaneously
             console.log("to then parallelize a numer of readers = n. of pages = ", numberOfPages);
 
-            const tasks = Array.from({ length: Math.ceil(numberOfPages / PAGES_PER_INVOCATION) }, (_, i) => {
-                return Task;
+            const tasks: Task[] = Array.from({ length: Math.ceil(numberOfPages / PAGES_PER_INVOCATION) }, (_, i) => {
+                const startPage = i * PAGES_PER_INVOCATION + 1;
+                const endPage = (i + 1) * PAGES_PER_INVOCATION + 1;
+                return new Task(startPage, endPage - startPage);
             });
-
-            console.log("tasks = ", tasks);
-
-            //Naive shuffle mechanism
-            for (let i = 0; i < tasks.length; i++) {
-                tasks.sort(() => Math.random() - 0.5);
-            }
-
-            console.log("tasks = ", tasks);
         
             tasks.forEach(async (task) => { //Still iterative
 
-                console.log("[ROOT] Task: ", task);
+                console.log("[ROOT] Managing Task: ", task);
+
+                task.shufflePageChunk()
+
+                console.log("[ROOT] Shuffled Task: ", task);
 
                 // Wait between invocations to reuse parallel lambdas
                 const delay = Math.random() * (INVOCATION_RATE_MAX - INVOCATION_RATE_MIN) + INVOCATION_RATE_MIN;
@@ -85,22 +82,17 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
         //-----------------------
 
         else { // Single execution
-            console.log("[START] ProcessingTask: ", task);
+            console.log("[TASK EXECUTION] ProcessingTask: ", task);
 
             await new Promise(resolve => setTimeout(resolve, (Math.random() * (PAGE_TASK_RATE_MAX - PAGE_TASK_RATE_MIN)) + PAGE_TASK_RATE_MIN));
 
             //Create array from task.start_page to task.start_page + step
             const pages = Array.from({ length: task.step }, (_, i) => i + task.startPage);
 
-            // A task is a list of pages to scrape, then shuffle it before giving to the once that process it
-            for (let i = 0; i < pages.length; i++) {
-                pages.sort(() => Math.random() - 0.5);
-            }
-
             for (const p of pages) {
-                console.log('Scraping page:', p);
+                console.log('[TASK EXECUTION] Scraping page: ', p);
                 const response = await axios.get(`${BASE_URL}${p}`);
-                const $ = cheerio.load(response.data); // Define $ as CheerioAPI
+                const $ = cheerio.load(response.data);
                 const recipeLinks: string[] = [];
                 $('.gz-title a').each((index: number, element: any) => { // Use CheerioElement here
                     const recipeLink = $(element).attr('href');
@@ -112,7 +104,7 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                     await scrapRecipe(link);
                 }));
             }
-            console.log(`[END] ProcessingTask: ${task}`);
+            console.log(`[TASK EXECUTION] Completed Task: ${task}`);
         }
     } catch (error) {
         console.error('Error:', error);

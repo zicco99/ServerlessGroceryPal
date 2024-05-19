@@ -15,20 +15,24 @@ const PAGE_TASK_RATE_MIN = 3000;
 let db_client: PrismaClient | null = null;
 const lambdaClient = new LambdaClient({});
 
-import {Task} from './src/recipes/utils/scrap_task';
+import {Task} from './src/utils/task';
+import { fetchRecipeData, saveRecipeOnDB} from './src/scrap/recipes';
 
 const lambda_id = Math.random().toString(16).slice(2)
 
 const scrapRecipe = async (url: string): Promise<void> => {
     try {
         console.log('Scraping recipe:', url);
-        // Scraping logic for recipe details
+        const recipeData = await fetchRecipeData(url);
+        if (recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
+            saveRecipeOnDB(recipeData).then(console.log);
+        } else {
+            throw new Error('Recipe data is not complete')
+        }
     } catch (error) {
         console.error('Error scraping recipe:', error);
     }
 };
-
-
 
 const executeScrapingTask = async ( task: Task) : Promise<void> => {
     console.log("[TASK EXECUTION] ProcessingTask: ", task);
@@ -143,6 +147,3 @@ const handler: Handler = async (
 };
 
 export { handler };
-
-//To close all lambdas :  aws lambda put-function-concurrency --function-name backend-microservice-staging-synchronizer --reserved-concurrent-executions 0
-

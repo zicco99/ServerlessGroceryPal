@@ -1,9 +1,7 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { PrismaClient, Recipe } from './prisma/client';
-
-const BASE_URL = 'https://www.giallozafferano.it/ricette-cat/';
+import { PrismaClient, Recipe } from '../../prisma/client';
 
 type RecipeData = {
     title: string | null;
@@ -56,7 +54,7 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
 
 const prisma = new PrismaClient();
 
-export async function saveRecipeOnDB(recipeData: RecipeData): Promise<Recipe | null> {
+async function saveRecipeOnDB(recipeData: RecipeData): Promise<Recipe | null> {
     try {
         // 1. Create Ingredients
         const createdIngredients = await prisma.ingredient.createMany({
@@ -106,4 +104,6 @@ export async function saveRecipeOnDB(recipeData: RecipeData): Promise<Recipe | n
     }
 }
 
+
+export { fetchRecipeData, saveRecipeOnDB };
 

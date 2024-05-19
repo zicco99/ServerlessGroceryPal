@@ -1,16 +1,8 @@
 class PageChunk {
-    private pages: number[];
+    public pages: number[];
 
     constructor(startPage: number, endPage: number) {
         this.pages = Array.from({ length: endPage - startPage }, (_, i) => startPage + i);
-    }
-
-    getPages(): number[] {
-        return [...this.pages];
-    }
-
-    setPages(pages: number[]): void {
-        this.pages = [...pages];
     }
 
     sort(compareFn: (a: number, b: number) => number): void {
@@ -37,9 +29,9 @@ class Task {
     }
 
     toString(): string {
-        return `Task : ( \n \t start_page: ${this.startPage}, \n \t step: ${this.step}, \n \t page_chunk: [${this.pageChunk.getPages().join(', ')}]\n)`;
+        return `Task : ( \n \t start_page: ${this.startPage}, \n \t step: ${this.step}, \n \t page_chunk: [${this.pageChunk.pages.join(', ')}]\n)`;
     }
-    
+
     sortPageChunk(compareFn: (a: number, b: number) => number): void {
         console.log("Sorting page chunk...");
         this.pageChunk.sort(compareFn);

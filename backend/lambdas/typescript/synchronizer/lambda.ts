@@ -114,7 +114,10 @@ const handler: Handler = async (
         }
 
         let task: Task | null = null;
+        console.log("Received event:", JSON.stringify(event, null, 2));
+
         if(event.startPage && event.step && event.pageChunk.pages) {
+            console.log("Received: ", event.startPage, event.step, event.pageChunk.pages);
             task = new Task(event.startPage, event.step);
             task.setPageChunkPages(event.pageChunk.pages);
         }

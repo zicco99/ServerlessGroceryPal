@@ -44,6 +44,10 @@ class Task {
         this.pageChunk.setPages(pages)
     }
 
+    getPageChunkPages(): number[] {
+        return this.pageChunk.getPages();
+    }
+
     sortPageChunk(compareFn: (a: number, b: number) => number): void {
         console.log("Sorting page chunk...");
         this.pageChunk.sort(compareFn);

@@ -117,8 +117,9 @@ const handler: Handler = async (
         }
 
         let task: Task | undefined = undefined;
-        if(event.startPage && event.step) {
+        if(event.startPage && event.step && event.pageChunk.pages) {
             task = new Task(event.startPage, event.step);
+            task.setPageChunkPages(event.pageChunk.pages);
         }
 
         if (task) { // Parallel execution

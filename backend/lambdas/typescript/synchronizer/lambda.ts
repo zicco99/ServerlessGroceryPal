@@ -135,6 +135,8 @@ const handler: Handler = async (
     context: Context,
     callback: Callback,
 ): Promise<void> => {
+    console.log('Received event:', JSON.stringify(event, null, 2));
+
     if (!db_client) {
         db_client = new PrismaClient();
         await db_client.$connect();

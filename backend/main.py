@@ -174,7 +174,7 @@ class BackendStack(NestedStack):
             memory_size=512,
         )
 
-        '''
+        
 
         synchronizer = lambd.Function(
             self,
@@ -205,7 +205,6 @@ class BackendStack(NestedStack):
             statements=[synchronizer_grant]
         )
         synchronizer.role.attach_inline_policy(synchronizer_policy)
-        '''
 
         backend_bucket.grant_read_write(nestjs_serverless)
 
@@ -256,14 +255,13 @@ class BackendStack(NestedStack):
             # default_method_options=authorized_api_method_options
         )
 
-        '''
+        
         api.root.add_resource("sync").add_method(
             "POST",
             integration=apigateway.LambdaIntegration(
                 synchronizer
             )
         )
-        '''
 
 
         # ------------------------------------------#

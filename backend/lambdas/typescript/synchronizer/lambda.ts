@@ -120,6 +120,7 @@ const handler: Handler = async (
             console.log("Received: ", event.startPage, event.step, event.pageChunk.pages);
             task = new Task(event.startPage, event.step);
             task.pageChunk.setPages(event.pageChunk.pages);
+            console.log(task.pageChunk.getPages());
         }
 
         if (task === null) { // Single execution

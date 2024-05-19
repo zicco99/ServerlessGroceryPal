@@ -16,7 +16,7 @@ let db_client: PrismaClient | null = null;
 const lambdaClient = new LambdaClient({});
 
 import {Task} from './src/utils/task';
-import { fetchRecipeData, saveRecipeOnDB} from './src/scrap/recipes';
+import { fetchRecipeData, saveRecipeOnDB } from './src/scrap/recipes';
 
 const lambda_id = Math.random().toString(16).slice(2)
 
@@ -24,6 +24,7 @@ const scrapRecipe = async (url: string): Promise<void> => {
     try {
         console.log('Scraping recipe:', url);
         const recipeData = await fetchRecipeData(url);
+        console.log("Data obtained: ", recipeData);
         if (recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
             saveRecipeOnDB(recipeData).then(console.log);
         } else {

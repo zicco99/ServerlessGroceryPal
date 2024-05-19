@@ -15,9 +15,9 @@ const PAGE_TASK_RATE_MIN = 3000;
 let db_client: PrismaClient | null = null;
 const lambdaClient = new LambdaClient({});
 
-import {Task, PageChunk} from './src/recipes/utils/scrap_task';
+import {Task} from './src/recipes/utils/scrap_task';
 
-
+const lambda_id = Math.random().toString(16).slice(2)
 
 const scrapRecipe = async (url: string): Promise<void> => {
     try {
@@ -73,7 +73,6 @@ const parallelize = async (context: Context): Promise<void> => {
     });
 
     tasks.forEach(async (task) => { //Still iterative
-
         console.log("[ROOT] Managing Task: ", task);
 
         task.shufflePageChunk()
@@ -107,7 +106,7 @@ const handler: Handler = async (
 ): Promise<void> => {
     try {
 
-        console.log('Received event:', JSON.stringify(event, null, 2));
+        console.log('Received event on lambda instance [ID: ', lambda_id, ']:', JSON.stringify(event, null, 2));
         if (!db_client) {
             db_client = new PrismaClient();
             await db_client.$connect();

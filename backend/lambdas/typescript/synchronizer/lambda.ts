@@ -113,13 +113,13 @@ const handler: Handler = async (
             await db_client.$connect();
         }
 
-        let task: Task | undefined = undefined;
+        let task: Task | null = null;
         if(event.startPage && event.step && event.pageChunk.pages) {
             task = new Task(event.startPage, event.step);
             task.setPageChunkPages(event.pageChunk.pages);
         }
 
-        if (task) { // Parallel execution
+        if (task === null) { // Single execution
             parallelize(context);
             const response = {
                 statusCode: 200,

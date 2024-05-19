@@ -15,16 +15,7 @@ const PAGE_TASK_RATE_MIN = 3000;
 let db_client: PrismaClient | null = null;
 const lambdaClient = new LambdaClient({});
 
-
-class Task {
-    start_page: number;
-    step: number;
-
-    constructor(start_page: number, step: number) {
-        this.start_page = start_page;
-        this.step = step;
-    }
-}
+import {Task, PageChunk} from './src/recipes/utils/scrap_task';
 
 
 
@@ -63,46 +54,46 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
             console.log("tasks = ", tasks);
 
             //Naive shuffle mechanism
-            for (let i = tasks.length*tasks.length; i > 0; i--) {
+            for (let i = 0; i < tasks.length; i++) {
                 tasks.sort(() => Math.random() - 0.5);
             }
 
             console.log("tasks = ", tasks);
         
-            const promises = tasks.map(task => {
-                return (async () => {
-                    //Wait between invocations to reuse parallel lambdas
-                    await new Promise(resolve => setTimeout(resolve, (Math.random() * (INVOCATION_RATE_MAX - INVOCATION_RATE_MIN)) + INVOCATION_RATE_MIN));
-                    const params: InvokeCommandInput = {
-                        FunctionName: context.functionName,
-                        Payload: JSON.stringify(task),
-                        InvocationType: 'Event', // Async invocation 
-                    };
-                    const command = new InvokeCommand(params);
-                    return lambdaClient.send(command);
-                })();
+            tasks.forEach(async (task) => { //Still iterative
+
+                console.log("[ROOT] Task: ", task);
+
+                // Wait between invocations to reuse parallel lambdas
+                const delay = Math.random() * (INVOCATION_RATE_MAX - INVOCATION_RATE_MIN) + INVOCATION_RATE_MIN;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            
+                const params : InvokeCommandInput = {
+                    FunctionName: context.functionName,
+                    Payload: JSON.stringify(task),
+                    InvocationType: 'Event', // Async recursive invocation
+                };
+            
+                const command = new InvokeCommand(params);
+                lambdaClient.send(command).catch(error => {
+                    console.error('Error invoking lambda function:', error);
+                });
+
+                console.log("[ROOT] Task correctly invoked:", task);
             });
-
-            console.log("promises = ", promises);
-        
-            try {
-                await Promise.all(promises);
-            } catch (error) {
-                console.error('Error invoking Lambda:', error);
-            }
-
         } 
         //-----------------------
 
         else { // Single execution
-            console.log("[START] Task: [start_page, step] = ", task.start_page, task.step);
+            console.log("[START] ProcessingTask: ", task);
+
             await new Promise(resolve => setTimeout(resolve, (Math.random() * (PAGE_TASK_RATE_MAX - PAGE_TASK_RATE_MIN)) + PAGE_TASK_RATE_MIN));
 
             //Create array from task.start_page to task.start_page + step
-            const pages = Array.from({ length: task.step }, (_, i) => i + task.start_page);
+            const pages = Array.from({ length: task.step }, (_, i) => i + task.startPage);
 
-            //Shuffle array one line
-            for (let i = pages.length*pages.length; i > 0; i--) {
+            // A task is a list of pages to scrape, then shuffle it before giving to the once that process it
+            for (let i = 0; i < pages.length; i++) {
                 pages.sort(() => Math.random() - 0.5);
             }
 
@@ -121,7 +112,7 @@ const parallelizeScraping = async (context: Context, task?: Task): Promise<void>
                     await scrapRecipe(link);
                 }));
             }
-            console.log(`[END] Task: [start_page, step] = [${task.start_page}, ${task.step}] `);
+            console.log(`[END] ProcessingTask: ${task}`);
         }
     } catch (error) {
         console.error('Error:', error);

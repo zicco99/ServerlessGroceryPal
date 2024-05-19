@@ -220,7 +220,7 @@ class BackendStack(NestedStack):
             "NestJsServerlessApi",
             rest_api_name="NestJsServerlessApi",
             description="API Gateway proxy for Nest.js serverless application",
-            default_cors_preflight_options=backend_api_cors
+            default_cors_preflight_options=backend_api_cors,
         )
 
         api.add_gateway_response(
@@ -259,7 +259,7 @@ class BackendStack(NestedStack):
         api.root.add_resource("sync").add_method(
             "POST",
             integration=apigateway.LambdaIntegration(
-                synchronizer
+                synchronizer,
             )
         )
 

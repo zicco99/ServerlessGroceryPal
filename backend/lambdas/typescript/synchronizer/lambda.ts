@@ -34,7 +34,7 @@ const executeScrapingTask = async ( task: Task) : Promise<void> => {
     console.log("[TASK EXECUTION] ProcessingTask: ", task);
     await new Promise(resolve => setTimeout(resolve, (Math.random() * (PAGE_TASK_RATE_MAX - PAGE_TASK_RATE_MIN)) + PAGE_TASK_RATE_MIN));
 
-    for (const p of task.getPageChunkPages()) {
+    for (const p of task.pageChunk.getPages()) {
         console.log('[TASK EXECUTION] Scraping page: ', p);
         const response = await axios.get(`${BASE_URL}${p}`);
         const $ = cheerio.load(response.data);
@@ -119,7 +119,7 @@ const handler: Handler = async (
         if(event.startPage && event.step && event.pageChunk.pages) {
             console.log("Received: ", event.startPage, event.step, event.pageChunk.pages);
             task = new Task(event.startPage, event.step);
-            task.setPageChunkPages(event.pageChunk.pages);
+            task.pageChunk.setPages(event.pageChunk.pages);
         }
 
         if (task === null) { // Single execution

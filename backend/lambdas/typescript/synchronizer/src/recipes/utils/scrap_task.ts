@@ -28,7 +28,7 @@ class PageChunk {
 class Task {
     private startPage: number;
     private step: number;
-    private pageChunk: PageChunk;
+    public pageChunk: PageChunk;
 
     constructor(startPage: number, step: number) {
         this.startPage = startPage;
@@ -39,15 +39,7 @@ class Task {
     toString(): string {
         return `Task : ( \n \t start_page: ${this.startPage}, \n \t step: ${this.step}, \n \t page_chunk: [${this.pageChunk.getPages().join(', ')}]\n)`;
     }
-
-    setPageChunkPages(pages: number[]): void {
-        this.pageChunk.setPages(pages)
-    }
-
-    getPageChunkPages(): number[] {
-        return this.pageChunk.getPages();
-    }
-
+    
     sortPageChunk(compareFn: (a: number, b: number) => number): void {
         console.log("Sorting page chunk...");
         this.pageChunk.sort(compareFn);

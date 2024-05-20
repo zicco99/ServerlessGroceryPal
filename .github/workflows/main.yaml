@@ -60,7 +60,7 @@ jobs:
           npm install prisma
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
           npx prisma generate --schema=./prisma/schema.prisma
-          tree -L 2
+          tree -L 2 ./prisma
 
       - name: Compile and move NestJS Backend API to lambda's relative folder
         run: |

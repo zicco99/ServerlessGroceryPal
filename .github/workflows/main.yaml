@@ -14,6 +14,7 @@ jobs:
       NODE_VERSION: '20'
       PYTHON_VERSION: '3.10'
 
+
       ts_lambdas_using_db: "synchronizer"
 
     steps:
@@ -52,6 +53,13 @@ jobs:
 
       - name: Update AWS CDK
         run: sudo npm install -g aws-cdk@latest
+
+      - name: Compile Prisma Client
+          cd backend/api
+          npm install prisma
+          echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
+          npx prisma generate --schema=./prisma/schema.prisma
+
 
       - name: Compile and move NestJS Backend API to lambda's relative folder
         run: |
@@ -97,8 +105,6 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd backend/api
-          npm install prisma
-          echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
           npx prisma migrate deploy --schema=./prisma/schema.prisma
 
       - name: Install dependencies and generate .env file

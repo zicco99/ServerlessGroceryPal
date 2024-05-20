@@ -52,17 +52,34 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
     }
 }
 
-const prisma = new PrismaClient();
 
-async function saveRecipeOnDB(recipeData: RecipeData): Promise<Recipe | null> {
+async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeData): Promise<Recipe | null> {
     try {
+        if (!prisma) {
+            throw new Error('Prisma client not initialized');
+        }
+
         // 1. Create Ingredients
-        const createdIngredients = await prisma.ingredient.createMany({
+        await prisma.ingredient.createMany({
             data: recipeData.ingredients.map((ingredient) => ({
                 name: ingredient.name,
-                quantity: ingredient.quantity,
             })),
+            skipDuplicates: true, // Avoids duplicating ingredients
         });
+
+        // Fetch created ingredients to get their IDs
+        const ingredientsInDB = await prisma.ingredient.findMany({
+            where: {
+                name: {
+                    in: recipeData.ingredients.map((ingredient) => ingredient.name),
+                },
+            },
+        });
+
+        // Check if we have all required ingredient IDs
+        if (ingredientsInDB.length !== recipeData.ingredients.length) {
+            throw new Error('Mismatch in ingredient count after creation.');
+        }
 
         // 2. Create Recipe
         const createdRecipe = await prisma.recipe.create({
@@ -72,13 +89,16 @@ async function saveRecipeOnDB(recipeData: RecipeData): Promise<Recipe | null> {
                 imageUrl: recipeData.imageUrl,
                 recipeIngredients: {
                     createMany: {
-                        data: recipeData.ingredients.map((ingredient, index) => ({
-                            ingredientId: createdIngredients[index].ingredientId,
-                            name: ingredient.name,
-                            quantity: ingredient.quantity,
-                            amountText: ingredient.quantity,
-                            amount: parseFloat(ingredient.quantity),
-                        }))
+                        data: recipeData.ingredients.map((ingredient) => {
+                            const ingredientInDB = ingredientsInDB.find(ing => ing.name === ingredient.name);
+                            return {
+                                ingredientId: ingredientInDB!.id,
+                                name: ingredient.name,
+                                quantity: ingredient.quantity,
+                                amountText: ingredient.quantity,
+                                amount: parseFloat(ingredient.quantity),
+                            };
+                        }),
                     },
                 },
                 steps: {
@@ -101,9 +121,10 @@ async function saveRecipeOnDB(recipeData: RecipeData): Promise<Recipe | null> {
     } catch (error) {
         console.error('Error saving the recipe:', error);
         return null;
+    } finally {
+        if(prisma) { await prisma.$disconnect(); }
     }
 }
-
 
 export { fetchRecipeData, saveRecipeOnDB };
 

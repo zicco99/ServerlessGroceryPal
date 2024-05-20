@@ -196,7 +196,6 @@ class BackendStack(NestedStack):
             },
             timeout=Duration.minutes(15),
             memory_size=512,
-            timeout=Duration.minutes(1),
             #phemeral_storage_size= Size.mebibytes(1024),
         )
 

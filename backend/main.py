@@ -168,7 +168,7 @@ class BackendStack(NestedStack):
                 'REGION': self.region,
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
-                "DATABASE_URL": f"postgres://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{backend_db_proxy.db_proxy_name}"
+                "DATABASE_URL": f"postgresql://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{backend_db_proxy.db_proxy_name}?schema=public"
             },
             timeout=Duration.minutes(10),
             #phemeral_storage_size= Size.mebibytes(1024),

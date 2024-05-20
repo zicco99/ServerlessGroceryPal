@@ -27,7 +27,7 @@ const scrapRecipe = async (url: string): Promise<void> => {
         console.log("Data obtained: ", recipeData);
         if (recipeData && recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
             console.log('Saving recipe on DB...');
-            saveRecipeOnDB(db_client,recipeData).then(console.log);
+            saveRecipeOnDB(db_client,recipeData).then(() => console.log('Recipe saved on DB'));
         } else {
             throw new Error('Recipe data is not complete')
         }
@@ -115,6 +115,7 @@ const handler: Handler = async (
         console.log('Received event on lambda instance [ID: ', lambda_id, ']:', JSON.stringify(event, null, 2));
         if (!db_client) {
             db_client = new PrismaClient({ datasourceUrl : process.env.DATABASE_URL });
+            console.log("connection string: ", process.env.DATABASE_URL);
             await db_client.$connect();
             console.log("DB client initialized!");
         }

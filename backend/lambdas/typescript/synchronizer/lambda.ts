@@ -2,6 +2,7 @@ import { Handler, Context, Callback } from 'aws-lambda';
 import { PrismaClient } from './prisma/client';
 import axios from 'axios';
 import cheerio from 'cheerio';
+import { SecretsManager } from 'aws-sdk';
 
 import { LambdaClient, InvokeCommand, InvokeCommandInput } from '@aws-sdk/client-lambda';
 
@@ -14,6 +15,17 @@ const PAGE_TASK_RATE_MIN = 3000;
 
 let db_client = new PrismaClient();
 const lambdaClient = new LambdaClient();
+const secretsManager = new SecretsManager({ region: process.env.REGION });
+
+async function set_connection_string(): Promise<void> {
+    const params = {
+        SecretId: process.env.DB_SECRET_ARN || "",
+    };
+    const data = await secretsManager.getSecretValue(params).promise();
+    const { SecretString } = data;
+    const { password, username, dbname, port, host } = JSON.parse(SecretString || "");
+    process.env.DATABASE_URL = `postgresql://${username}:${password}@${host}:${port}/${dbname}`;
+}
 
 import {Task} from './src/utils/task';
 import { fetchRecipeData, saveRecipeOnDB } from './src/scrap/recipes';
@@ -110,8 +122,9 @@ const handler: Handler = async (
     context: Context,
     callback: Callback,
 ): Promise<void> => {
-    try {
+    await set_connection_string();
 
+    try {
         console.log('Received event on lambda instance [ID: ', lambda_id, ']:', JSON.stringify(event, null, 2));
         if (!db_client) {
             db_client = new PrismaClient();

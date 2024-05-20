@@ -55,6 +55,7 @@ jobs:
         run: sudo npm install -g aws-cdk@latest
 
       - name: Compile Prisma Client
+        run: |
           cd backend/api
           npm install prisma
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env

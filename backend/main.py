@@ -121,11 +121,11 @@ class BackendStack(NestedStack):
 
         backend_db_proxy = rds.DatabaseProxy(
             self, 
-            f"{base_name}-db-proxy-ext",
+            f"{base_name}-db-proxy",
             proxy_target=rds.ProxyTarget.from_instance(backend_db),
             vpc=backend_vpc,
             security_groups=[rds_security_group],
-            db_proxy_name=f"{base_name}-db-proxy-ext",
+            db_proxy_name=f"{base_name}-db",
             debug_logging=False,
             secrets=[backend_db.secret],
             require_tls=True,
@@ -143,7 +143,7 @@ class BackendStack(NestedStack):
         # To isolate RDS from outside world comment the following
         rds_security_group.add_ingress_rule(peer=ec2.Peer.ipv4('0.0.0.0/0'), connection=ec2.Port.all_traffic())
         rds_security_group.add_egress_rule(peer=ec2.Peer.ipv4('0.0.0.0/0'), connection=ec2.Port.all_traffic())
-        
+
 
         backend_bucket = s3.Bucket(
             self, f"backend-bucket",
@@ -169,6 +169,7 @@ class BackendStack(NestedStack):
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
                 "DATABASE_URL": f"postgres://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{f'{base_name}-db'}"
+            
             },
             timeout=Duration.minutes(10),
             #phemeral_storage_size= Size.mebibytes(1024),

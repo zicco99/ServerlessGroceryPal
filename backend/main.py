@@ -131,9 +131,7 @@ class BackendStack(NestedStack):
             vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
             
         )
-
-        rds_proxy_db_url = f"postgresql://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{backend_db_proxy.db_proxy_name}?schema=public"
-
+        
         # Bidirectional (Lambas/DB_Proxy <---> DB Connection)
         rds_security_group.add_ingress_rule(peer=lambda_security_group, connection=ec2.Port.all_traffic())
         rds_security_group.add_egress_rule(peer=lambda_security_group, connection=ec2.Port.all_traffic())
@@ -170,7 +168,6 @@ class BackendStack(NestedStack):
                 'REGION': self.region,
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
-                "DATABASE_URL": rds_proxy_db_url,
             },
             timeout=Duration.minutes(10),
             #phemeral_storage_size= Size.mebibytes(1024),
@@ -191,8 +188,6 @@ class BackendStack(NestedStack):
             environment={
                 'REGION': self.region,
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
-                "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
-                "DATABASE_URL": rds_proxy_db_url
             },
             timeout=Duration.minutes(15),
             memory_size=512,

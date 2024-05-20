@@ -114,7 +114,7 @@ const handler: Handler = async (
 
         console.log('Received event on lambda instance [ID: ', lambda_id, ']:', JSON.stringify(event, null, 2));
         if (!db_client) {
-            db_client = new PrismaClient();
+            db_client = new PrismaClient({ datasourceUrl : process.env.DATABASE_URL });
             await db_client.$connect();
             console.log("DB client initialized!");
         }

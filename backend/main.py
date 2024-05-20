@@ -128,8 +128,8 @@ class BackendStack(NestedStack):
             db_proxy_name=f"{base_name}-db",
             debug_logging=False,
             secrets=[backend_db.secret],
-            require_tls=True,
             vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
+            
         )
 
         # Bidirectional (Lambas/DB_Proxy <---> DB Connection)

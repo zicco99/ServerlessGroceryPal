@@ -52,7 +52,6 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
     }
 }
 
-
 async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeData): Promise<Recipe | null> {
     try {
         if (!prisma) {
@@ -67,7 +66,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             skipDuplicates: true, // Avoids duplicating ingredients
         });
 
-        // Fetch created ingredients to get their IDs
+        // 2. Fetch created ingredients to get their IDs
         const ingredientsInDB = await prisma.ingredient.findMany({
             where: {
                 name: {
@@ -81,7 +80,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             throw new Error('Mismatch in ingredient count after creation.');
         }
 
-        // 2. Create Recipe
+        // 3. Create Recipe
         const createdRecipe = await prisma.recipe.create({
             data: {
                 title: recipeData.title || 'No title',
@@ -91,8 +90,11 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                     createMany: {
                         data: recipeData.ingredients.map((ingredient) => {
                             const ingredientInDB = ingredientsInDB.find(ing => ing.name === ingredient.name);
+                            if (!ingredientInDB) {
+                                throw new Error(`Ingredient ${ingredient.name} not found in the database.`);
+                            }
                             return {
-                                ingredientId: ingredientInDB!.id,
+                                ingredientId: ingredientInDB.id,
                                 name: ingredient.name,
                                 quantity: ingredient.quantity,
                                 amountText: ingredient.quantity,
@@ -122,9 +124,12 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         console.error('Error saving the recipe:', error);
         return null;
     } finally {
-        if(prisma) { await prisma.$disconnect(); }
+        if (prisma) {
+            await prisma.$disconnect();
+        }
     }
 }
+
 
 export { fetchRecipeData, saveRecipeOnDB };
 

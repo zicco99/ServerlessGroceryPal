@@ -116,6 +116,7 @@ const handler: Handler = async (
         if (!db_client) {
             db_client = new PrismaClient();
             await db_client.$connect();
+            console.log("DB client initialized!");
         }
 
         let task: Task | null = null;

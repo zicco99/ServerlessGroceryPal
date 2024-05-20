@@ -5,7 +5,7 @@ datasource db {
 
 generator js_client {
   provider = "prisma-client-js"
-  output = "./client"
+  output = "./prisma/client"
   engineType = "binary"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
   previewFeatures = ["fullTextSearch"]

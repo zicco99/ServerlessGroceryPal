@@ -12,8 +12,8 @@ const INVOCATION_RATE_MIN = 5000;
 const PAGE_TASK_RATE_MAX = 5000;
 const PAGE_TASK_RATE_MIN = 3000;
 
-let db_client: PrismaClient | null = null;
-const lambdaClient = new LambdaClient({});
+let db_client = new PrismaClient();
+const lambdaClient = new LambdaClient();
 
 import {Task} from './src/utils/task';
 import { fetchRecipeData, saveRecipeOnDB } from './src/scrap/recipes';
@@ -114,7 +114,7 @@ const handler: Handler = async (
 
         console.log('Received event on lambda instance [ID: ', lambda_id, ']:', JSON.stringify(event, null, 2));
         if (!db_client) {
-            db_client = new PrismaClient({ datasourceUrl : process.env.DATABASE_URL });
+            db_client = new PrismaClient();
             console.log("connection string: ", process.env.DATABASE_URL);
             await db_client.$connect();
             console.log("DB client initialized!");

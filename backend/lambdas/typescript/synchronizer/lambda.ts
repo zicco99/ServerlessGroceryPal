@@ -26,6 +26,7 @@ const scrapRecipe = async (url: string): Promise<void> => {
         const recipeData = await fetchRecipeData(url);
         console.log("Data obtained: ", recipeData);
         if (recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
+            console.log('Saving recipe on DB...');
             saveRecipeOnDB(db_client,recipeData).then(console.log);
         } else {
             throw new Error('Recipe data is not complete')

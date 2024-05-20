@@ -123,13 +123,9 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
     } catch (error) {
         console.error('Error saving the recipe:', error);
         return null;
-    } finally {
-        if (prisma) {
-            await prisma.$disconnect();
-        }
     }
 }
 
 
-export { fetchRecipeData, saveRecipeOnDB };
+export { fetchRecipeData, saveRecipeOnDB, RecipeData };
 

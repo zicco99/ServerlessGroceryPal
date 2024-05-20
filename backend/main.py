@@ -192,6 +192,7 @@ class BackendStack(NestedStack):
                 "DATABASE_URL": f"postgres://{backend_db_creds.secret_value_from_json('username').to_string()}:{backend_db_creds.secret_value_from_json('password').to_string()}@{backend_db_proxy.endpoint}:5432/{f'{base_name}-db'}"
             },
             timeout=Duration.minutes(15),
+            memory_size=512,
             #phemeral_storage_size= Size.mebibytes(1024),
         )
 

@@ -566,7 +566,6 @@ class BackendStack(NestedStack):
             #syncronizer: [Permission.RW_PERM_SCRAP_DB],
             #recipes: [Permission.RW_PERM_SCRAP_DB]
             nestjs_serverless: [Permission.RW_PERM_SCRAP_DB],
-            backend_db_proxy: [Permission.RW_PERM_SCRAP_DB],
             synchronizer: [Permission.RW_PERM_SCRAP_DB],
         }
 

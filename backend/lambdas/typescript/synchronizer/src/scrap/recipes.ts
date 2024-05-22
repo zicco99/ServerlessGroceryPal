@@ -61,6 +61,8 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         // Normalize ingredient names to ensure uniqueness
         const ingredientNames = [...new Set(recipeData.ingredients.map(ingredient => ingredient.name.trim().toLowerCase()))];
 
+        console.log('Normalized Ingredient Names:', ingredientNames);
+
         // Create Ingredients
         await prisma.ingredient.createMany({
             data: ingredientNames.map(name => ({ name })),
@@ -72,7 +74,11 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             where: { name: { in: ingredientNames } },
         });
 
+        console.log('Ingredients in DB:', ingredientsInDB);
+
         if (ingredientsInDB.length !== ingredientNames.length) {
+            console.error('Expected ingredient count:', ingredientNames.length);
+            console.error('Actual ingredient count:', ingredientsInDB.length);
             throw new Error('Mismatch in ingredient count after creation.');
         }
 
@@ -116,6 +122,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         return null;
     }
 }
+
 
 
 

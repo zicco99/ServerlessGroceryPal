@@ -98,7 +98,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                             ingredient: {
                                 connect: { id: ingredientMap.get(normalizedName) },
                             },
-                            quantity: ingredient.quantity,
+                            quantity: parseFloat(ingredient.quantity),
                             amountText: ingredient.quantity,
                             amount: parseFloat(ingredient.quantity),
                         };

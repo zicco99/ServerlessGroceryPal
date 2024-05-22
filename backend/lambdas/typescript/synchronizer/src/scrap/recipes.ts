@@ -53,39 +53,31 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
 }
 
 async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeData): Promise<Recipe | null> {
+    if (!prisma) {
+        throw new Error('Prisma client not initialized');
+    }
+
     try {
-        if (!prisma) {
-            throw new Error('Prisma client not initialized');
-        }
+        // Step 1: Normalize and deduplicate ingredient names
+        const normalizedIngredientNames = Array.from(
+            new Set(recipeData.ingredients.map(ingredient => ingredient.name.trim().toLowerCase()))
+        );
 
-        // Normalize ingredient names to ensure uniqueness
-        const ingredientNames = [...new Set(recipeData.ingredients.map(ingredient => ingredient.name.trim().toLowerCase()))];
-
-        console.log('Normalized Ingredient Names:', ingredientNames);
-
-        // Create Ingredients
+        // Step 2: Create Ingredients
         await prisma.ingredient.createMany({
-            data: ingredientNames.map(name => ({ name })),
-            skipDuplicates: true, // Avoids duplicating ingredients
+            data: normalizedIngredientNames.map(name => ({ name })),
+            skipDuplicates: true,
         });
 
-        // Fetch created ingredients to get their IDs
+        // Step 3: Fetch created ingredients to get their IDs
         const ingredientsInDB = await prisma.ingredient.findMany({
-            where: { name: { in: ingredientNames } },
+            where: { name: { in: normalizedIngredientNames } },
         });
-
-        console.log('Ingredients in DB:', ingredientsInDB);
-
-        if (ingredientsInDB.length !== ingredientNames.length) {
-            console.error('Expected ingredient count:', ingredientNames.length);
-            console.error('Actual ingredient count:', ingredientsInDB.length);
-            throw new Error('Mismatch in ingredient count after creation.');
-        }
 
         // Map ingredient names to their IDs
         const ingredientMap = new Map(ingredientsInDB.map(ing => [ing.name, ing.id]));
 
-        // Create Recipe
+        // Step 4: Create Recipe
         const createdRecipe = await prisma.recipe.create({
             data: {
                 title: recipeData.title || 'No title',
@@ -93,13 +85,17 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                 imageUrl: recipeData.imageUrl,
                 recipeIngredients: {
                     createMany: {
-                        data: recipeData.ingredients.map(ingredient => ({
-                            ingredientId: ingredientMap.get(ingredient.name.trim().toLowerCase())!,
-                            name: ingredient.name,
-                            quantity: ingredient.quantity,
-                            amountText: ingredient.quantity,
-                            amount: parseFloat(ingredient.quantity),
-                        })),
+                        data: recipeData.ingredients.map(ingredient => {
+                            const normalizedName = ingredient.name.trim().toLowerCase();
+                            const ingredientId = ingredientMap.get(normalizedName);
+                            return {
+                                ingredientId: ingredientId!,
+                                name: ingredient.name,
+                                quantity: ingredient.quantity,
+                                amountText: ingredient.quantity,
+                                amount: parseFloat(ingredient.quantity),
+                            };
+                        }),
                     },
                 },
                 steps: {
@@ -122,6 +118,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         return null;
     }
 }
+
 
 
 

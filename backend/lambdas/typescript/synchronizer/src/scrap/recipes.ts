@@ -58,29 +58,30 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             throw new Error('Prisma client not initialized');
         }
 
-        // 1. Create Ingredients
+        // Ensure unique ingredient names
+        const uniqueIngredients = Array.from(new Set(recipeData.ingredients.map(ingredient => ingredient.name)));
+
+        // Create Ingredients
         await prisma.ingredient.createMany({
-            data: recipeData.ingredients.map((ingredient) => ({
-                name: ingredient.name,
-            })),
+            data: uniqueIngredients.map(name => ({ name })),
             skipDuplicates: true, // Avoids duplicating ingredients
         });
 
-        // 2. Fetch created ingredients to get their IDs
+        // Fetch created ingredients to get their IDs
         const ingredientsInDB = await prisma.ingredient.findMany({
             where: {
                 name: {
-                    in: recipeData.ingredients.map((ingredient) => ingredient.name),
+                    in: uniqueIngredients,
                 },
             },
         });
 
         // Check if we have all required ingredient IDs
-        if (ingredientsInDB.length !== recipeData.ingredients.length) {
+        if (ingredientsInDB.length !== uniqueIngredients.length) {
             throw new Error('Mismatch in ingredient count after creation.');
         }
 
-        // 3. Create Recipe
+        // Create Recipe
         const createdRecipe = await prisma.recipe.create({
             data: {
                 title: recipeData.title || 'No title',
@@ -88,7 +89,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                 imageUrl: recipeData.imageUrl,
                 recipeIngredients: {
                     createMany: {
-                        data: recipeData.ingredients.map((ingredient) => {
+                        data: recipeData.ingredients.map(ingredient => {
                             const ingredientInDB = ingredientsInDB.find(ing => ing.name === ingredient.name);
                             if (!ingredientInDB) {
                                 throw new Error(`Ingredient ${ingredient.name} not found in the database.`);
@@ -98,7 +99,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                                 name: ingredient.name,
                                 quantity: ingredient.quantity,
                                 amountText: ingredient.quantity,
-                                amount: parseFloat(ingredient.quantity),
+                                amount: parseFloat(ingredient.quantity), // Assumes quantity is numeric, handle parse error as needed
                             };
                         }),
                     },
@@ -125,6 +126,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         return null;
     }
 }
+
 
 
 export { fetchRecipeData, saveRecipeOnDB, RecipeData };

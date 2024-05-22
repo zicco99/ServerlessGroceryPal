@@ -98,9 +98,8 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                             ingredient: {
                                 connect: { id: ingredientMap.get(normalizedName) },
                             },
-                            quantity: parseFloat(ingredient.quantity),
+                            amount : parseFloat(ingredient.quantity) || 0,
                             amountText: ingredient.quantity,
-                            amount: parseFloat(ingredient.quantity),
                         };
                     }),
                 },
@@ -116,8 +115,6 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             },
             include: { recipeIngredients: true },
         });
-        
-
         console.log('Recipe saved:', createdRecipe);
         return createdRecipe;
     } catch (error) {

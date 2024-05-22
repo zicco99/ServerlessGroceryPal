@@ -32,9 +32,9 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
             }
         });
 
-        // Find Image
-        const imageURL = $('.gz-featured-image img[data-src]').attr('data-src') || "";
-
+        // Find Image URL
+        const imageURL = $('.gz-featured-image img[data-src]').attr('data-src') || $('#gz-raccomandatore-trigger img').attr('src') || "";
+        
         // Find Steps
         const steps: { imageUrl: string | null; explaining: string }[] = [];
         $('.gz-content-recipe-step').each((i, elem) => {
@@ -113,7 +113,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                     },
                 },
             },
-            include: { recipeIngredients: true },
+            include: { recipeIngredients: true, steps: true },
         });
         console.log('Recipe saved:', createdRecipe);
         return createdRecipe;

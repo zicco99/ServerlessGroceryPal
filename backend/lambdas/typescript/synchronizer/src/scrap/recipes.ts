@@ -57,71 +57,80 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         throw new Error('Prisma client not initialized');
     }
 
-    try {
-        // Normalize and deduplicate ingredient names
-        const normalizedIngredientNames = Array.from(
-            new Set(recipeData.ingredients.map(ingredient => ingredient.name.trim().toLowerCase()))
-        );
+    if (!recipeData.title || !recipeData.category || !Array.isArray(recipeData.ingredients) || !Array.isArray(recipeData.steps)) {
+        throw new Error('Invalid recipe data');
+    }
 
-        // Create or connect existing ingredients
-        const ingredientsInDB = await prisma.ingredient.findMany({
-            where: { name: { in: normalizedIngredientNames } },
-        });
+    return await prisma.$transaction(async (transaction) => {
+        try {
+            const normalizedIngredientNames = Array.from(
+                new Set(recipeData.ingredients.map(ingredient => ingredient.name.trim().toLowerCase()))
+            );
 
-        console.log("ingredientsInDB: ", ingredientsInDB.length);
+            const ingredientsInDB = await transaction.ingredient.findMany({
+                where: { name: { in: normalizedIngredientNames } },
+            });
 
+            const existingIngredientNames = new Set(ingredientsInDB.map(ingredient => ingredient.name));
+            const newIngredientNames = normalizedIngredientNames.filter(name => !existingIngredientNames.has(name));
 
-        // Check which ingredients are missing and create them
-        const existingIngredientNames = ingredientsInDB.map(ingredient => ingredient.name);
-        const newIngredientNames = normalizedIngredientNames.filter(name => !existingIngredientNames.includes(name));
-        await prisma.ingredient.createMany({
-            data: newIngredientNames.map(name => ({ name })),
-            skipDuplicates: true,
-        });
+            if (newIngredientNames.length > 0) {
+                await transaction.ingredient.createMany({
+                    data: newIngredientNames.map(name => ({ name })),
+                    skipDuplicates: true,
+                });
+            }
 
-        // Fetch all ingredient IDs (newly added + existing)
-        const allIngredientsInDB = await prisma.ingredient.findMany({
-            where: { name: { in: normalizedIngredientNames } },
-        });
-        const ingredientMap = new Map(allIngredientsInDB.map(ing => [ing.name, ing.id]));
+            const allIngredientsInDB = await transaction.ingredient.findMany({
+                where: { name: { in: normalizedIngredientNames } },
+            });
+            const ingredientMap = new Map(allIngredientsInDB.map(ing => [ing.name, ing.id]));
 
-        // Create Recipe with ingredients and steps
-        const createdRecipe = await prisma.recipe.create({
-            data: {
-                title: recipeData.title || 'No title',
-                category: recipeData.category || 'No category',
-                imageUrl: recipeData.imageUrl,
-                recipeIngredients: {
-                    create: recipeData.ingredients.map(ingredient => {
-                        const normalizedName = ingredient.name.trim().toLowerCase();
-                        return {
-                            ingredient: {
-                                connect: { id: ingredientMap.get(normalizedName) },
-                            },
-                            amount : parseFloat(ingredient.quantity) || 0,
-                            amountText: ingredient.quantity,
-                        };
-                    }),
-                },
-                steps: {
-                    createMany: {
-                        data: recipeData.steps.map((step, index) => ({
-                            explaining: step.explaining,
-                            imageUrl: step.imageUrl,
-                            nStep: index + 1,
-                        })),
+            const ingredientEntries = recipeData.ingredients.map(ingredient => {
+                const normalizedName = ingredient.name.trim().toLowerCase();
+                const ingredientId = ingredientMap.get(normalizedName);
+                if (!ingredientId) {
+                    throw new Error(`Failed to find ingredient ID for ${normalizedName}`);
+                }
+                return {
+                    ingredient: {
+                        connect: { id: ingredientId },
+                    },
+                    amount: parseFloat(ingredient.quantity) || 0,
+                    amountText: ingredient.quantity,
+                };
+            });
+
+            const createdRecipe = await transaction.recipe.create({
+                data: {
+                    title: recipeData.title || "not-found",
+                    category: recipeData.category || "not-found",
+                    imageUrl: recipeData.imageUrl,
+                    recipeIngredients: {
+                        create: ingredientEntries,
+                    },
+                    steps: {
+                        createMany: {
+                            data: recipeData.steps.map((step, index) => ({
+                                explaining: step.explaining,
+                                imageUrl: step.imageUrl,
+                                nStep: index + 1,
+                            })),
+                        },
                     },
                 },
-            },
-            include: { recipeIngredients: true, steps: true },
-        });
-        console.log('Recipe saved:', createdRecipe);
-        return createdRecipe;
-    } catch (error) {
-        console.error('Error saving the recipe:', error);
-        return null;
-    }
+                include: { recipeIngredients: true, steps: true },
+            });
+
+            console.log('Recipe saved:', createdRecipe);
+            return createdRecipe;
+        } catch (error) {
+            console.error('Error saving the recipe:', error.message);
+            throw error;
+        }
+    });
 }
+
 
 
 

@@ -106,6 +106,7 @@ jobs:
         run: |
           cd backend/api
           npx prisma migrate deploy --schema=./prisma/schema.prisma
+          npx prisma db push --force-reset --schema=./prisma/schema.prisma && npx prisma db seed --schema=./prisma/schema.prisma
 
       - name: Install dependencies and generate .env file
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

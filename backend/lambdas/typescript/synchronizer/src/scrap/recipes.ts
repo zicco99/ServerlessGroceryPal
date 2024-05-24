@@ -130,7 +130,9 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             console.error("Error saving recipe: ", error);
             throw error;
         }
-    });
+    },
+    { maxWait: 5000, timeout: 10000 }
+    );
 
     try {
         return await transaction;

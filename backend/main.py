@@ -584,7 +584,7 @@ class BackendStack(NestedStack):
 
         backend_db_proxy_policy = iam.Policy(
             self,
-            "{base_name}-backend-db-write-permissions-policy",
+            f"{base_name}-backend-db-write-permissions-policy",
             statements=[
                 iam.PolicyStatement(
                     actions=[ 
@@ -618,7 +618,7 @@ class BackendStack(NestedStack):
 
         scraped_recipes_table_rw_policy = iam.Policy(
             self,
-            f"{self.__generate_resource_name('scraped_recipes_table_rw_policy')}",
+            f"{base_name}-scraped-recipes-table-rw-policy",
             statements=[
                 iam.PolicyStatement(
                     actions=[

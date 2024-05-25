@@ -67,7 +67,7 @@ jobs:
 
       - name: Inject prisma client into Typescript Lambdas before transpiling
         run: |
-          for dir in {"nestjs_serverless", "typescript"}; do
+          for dir in {"synchronizer","claude_chef"}; do
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/"
             echo "Folder structure for $dir Lambda:"
             tree -L 2 "./backend/lambdas/typescript/$dir/"

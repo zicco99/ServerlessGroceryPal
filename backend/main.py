@@ -203,7 +203,6 @@ class BackendStack(NestedStack):
             environment={
                 'REGION': self.region,
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
-                'SCRAPED_RECIPES_TABLE_ARN': scraped_recipes_table.table_arn
             },
             timeout=Duration.minutes(15),
             memory_size=512,
@@ -227,6 +226,7 @@ class BackendStack(NestedStack):
             environment={
                 'REGION': self.region,
                 'CLAUDE_AI_API_KEY': claude_ai_api_key.secret_value_from_json("aws-claude-chef").to_string(),
+
             }
         )
 

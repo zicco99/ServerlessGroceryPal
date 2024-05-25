@@ -64,11 +64,10 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
 
 async function saveOnDynamoDB(recipeData: RecipeData, of_task: number): Promise<Recipe | null> {
     try {
-        const dynamoDBTableName = process.env.DYNAMODB_TABLE_NAME;
-
+        const scrapedRecipeTable = process.env.SCRAPED_RECIPES_TABLE;
         const dynamoDB = new AWS.DynamoDB();
 
-        if (!dynamoDBTableName) {
+        if (!scrapedRecipeTable) {
             console.error("DynamoDB table name is not defined.");
             return null;
         }
@@ -125,7 +124,7 @@ async function saveOnDynamoDB(recipeData: RecipeData, of_task: number): Promise<
         console.log("Row Saved :", dynamoDBData);
 
         const params: AWS.DynamoDB.PutItemInput = {
-            TableName: dynamoDBTableName,
+            TableName: scrapedRecipeTable,
             Item: dynamoDBData,
         };
 

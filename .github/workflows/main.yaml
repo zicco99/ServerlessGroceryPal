@@ -80,7 +80,7 @@ jobs:
             if [ -d "$dir" ]; then
               echo "Transpiling $dir to JS"
               cd "$dir"
-              npm install --save typescript
+              npm ci --only=production
               npm run build-lambda
               cd ../  # Return to the parent directory after transpilation
             else

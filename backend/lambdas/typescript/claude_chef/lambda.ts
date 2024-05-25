@@ -1,7 +1,5 @@
 import { DynamoDBStreamEvent} from 'aws-lambda';
 import { SecretsManager } from 'aws-sdk';
-import { RecipeData } from '../synchronizer/src/scrap/recipes';
-import { Recipe } from '../synchronizer/prisma/client';
 
 import Anthropic from '@anthropic-ai/sdk';
 

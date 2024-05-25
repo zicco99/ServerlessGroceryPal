@@ -15,7 +15,7 @@ jobs:
       PYTHON_VERSION: '3.10'
 
 
-      ts_lambdas_using_db: "synchronizer"
+      ts_lambdas_using_db: "synchronizer, claude_chef"
 
     steps:
       - name: Checkout code

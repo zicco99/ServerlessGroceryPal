@@ -10,8 +10,8 @@ from aws_cdk import (
     aws_cognito as cognito,
     aws_s3 as s3,
     aws_dynamodb as dynamodb,
-
-    Stage
+    aws_lambda_event_sources as event_sources,
+    Stage,
 )
 
 from constructs import Construct
@@ -35,6 +35,7 @@ class BackendStackOutputs:
 
 class Permission(Enum):
     RW_PERM_SCRAP_DB = "rw_backend_db"
+    RW_SCRAPED_RECIPES_DYNAMO = "rw_scraped_recipes_dynamo"
     READ_USERPOOL = "r_user_pool"
     WRITE_USERPOOL = "w_user_pool"
     ADMIN_ACCESS_USERPOOL = "a_user_pool"
@@ -208,7 +209,40 @@ class BackendStack(NestedStack):
             #phemeral_storage_size= Size.mebibytes(1024),
         )
 
-        scraped_recipes_table.grant_read_write_data(synchronizer)
+        claude_ai_api_key = secretsmanager.Secret.from_secret_complete_arn(
+            self, 
+            f"{base_name}-claude-chef-api-key", "arn:aws:secretsmanager:eu-west-1:438500340234:secret:backend-microservice-staging-db-creds-Uu46tW"
+            ).secret_value_from_json("aws-claude-chef").to_string()
+
+        claude_chef = lambd.Function(
+            self,
+            f"{base_name}-claude-chef",
+            function_name=f"{base_name}-claude-chef",
+            runtime=lambd.Runtime.NODEJS_18_X,
+            handler="main.handler",
+            code=lambd.Code.from_asset("backend/lambdas/typescript/claude_chef"),
+            vpc=backend_vpc,
+            security_groups=[lambda_security_group],
+            environment={
+                'REGION': self.region,
+                'CLAUDE_AI_API_KEY': claude_ai_api_key
+            }
+        )
+
+         ###########################
+        #     DYNAMODB STREAM     #
+        ###########################
+
+        # Declaring the event stream so that /invites_keeper can listen for PUT/DELETE/MODIFY events
+        claude_chef_event_source = event_sources.DynamoEventSource(
+            table=scraped_recipes_table,
+            starting_position=lambd.StartingPosition.TRIM_HORIZON,  # events are processed sequentially in the order they occurred
+            retry_attempts=3,  # if an event fails to be processed, it is not retried
+        )
+
+        claude_chef.add_event_source(claude_chef_event_source)
+
+        
 
         synchronizer_grant = iam.PolicyStatement(
             actions=['lambda:InvokeFunction'],
@@ -577,12 +611,43 @@ class BackendStack(NestedStack):
             backend_db_policy_env,
         )
 
+        # SCRAPED RECIPES TABLE RW ----------------------------------------------------
+        # IAM policy to access scraped recipes table
+
+        scraped_recipes_table_rw_policy = iam.Policy(
+            self,
+            f"{self.__generate_resource_name('scraped_recipes_table_rw_policy')}",
+            statements=[
+                iam.PolicyStatement(
+                    actions=[
+                        "dynamodb:GetItem",
+                        "dynamodb:PutItem",
+                        "dynamodb:UpdateItem",
+                        "dynamodb:DeleteItem",
+                        "dynamodb:Query",
+                        "dynamodb:Scan",
+                    ],
+                    resources=[scraped_recipes_table.table_arn],
+                )
+            ],
+        )
+
+        scraped_recipes_table_env = {
+            "SCRAPED_RECIPES_TABLE": scraped_recipes_table.table_name,
+        }
+
+        enum_perm_to_policy_and_env[Permission.RW_SCRAPED_RECIPES_DYNAMO] = (
+            scraped_recipes_table_rw_policy,
+            scraped_recipes_table_env,
+        )
+
         lambda_perms_association = {
             #db_bootstrap: [Permission.RW_PERM_SCRAP_DB],
             #syncronizer: [Permission.RW_PERM_SCRAP_DB],
             #recipes: [Permission.RW_PERM_SCRAP_DB]
             nestjs_serverless: [Permission.RW_PERM_SCRAP_DB],
-            synchronizer: [Permission.RW_PERM_SCRAP_DB],
+            synchronizer: [Permission.RW_PERM_SCRAP_DB, Permission.RW_SCRAPED_RECIPES_DYNAMO],
+            claude_chef: [Permission.RW_PERM_SCRAP_DB, Permission.RW_SCRAPED_RECIPES_DYNAMO],
         }
 
         for lamdba, perms in lambda_perms_association.items():

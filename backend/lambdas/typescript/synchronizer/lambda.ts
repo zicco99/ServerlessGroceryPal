@@ -28,7 +28,7 @@ async function set_connection_string(): Promise<void> {
 }
 
 import {Task} from './src/utils/task';
-import { fetchRecipeData, saveOnDynamoDB, saveRecipeOnDB,  } from './src/scrap/recipes';
+import { fetchRecipeData, saveOnDynamoDB  } from './src/scrap/recipes';
 
 const lambda_id = Math.random().toString(16).slice(2)
 

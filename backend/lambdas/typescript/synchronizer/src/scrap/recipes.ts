@@ -76,7 +76,6 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             const newIngredientNames = normalizedIngredientNames.filter(name => !existingIngredientNames.has(name));
 
             if (newIngredientNames.length > 0) {
-                
                 await prisma.ingredient.createMany({
                     data: newIngredientNames.map(name => ({ name })),
                     skipDuplicates: true, // Ensure no duplicates are created

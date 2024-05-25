@@ -2,6 +2,7 @@ import { DynamoDBStreamEvent} from 'aws-lambda';
 import { SecretsManager } from 'aws-sdk';
 
 import Anthropic from '@anthropic-ai/sdk';
+import { log } from 'console';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY, // This is the default and can be omitted
@@ -36,12 +37,10 @@ export async function handler(event: DynamoDBStreamEvent): Promise<void> {
         for (const record of event.Records) {
             if (record.eventName === 'INSERT') {
                 const newRecipeData = record.dynamodb?.NewImage
+                console.log(newRecipeData);
                 if (newRecipeData) {
                     await askClaudeChef(newRecipeData);
                 }
-
-
-                
             }
         }
     } catch (error) {

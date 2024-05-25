@@ -64,16 +64,16 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                 new Set(recipeData.ingredients.map(ingredient => ingredient.name.trim().toLowerCase()))
             );
 
-            // Fetch existing ingredients
+            // Fetch existing ingredients from the database
             const ingredientsInDB = await prisma.ingredient.findMany({
                 where: { name: { in: normalizedIngredientNames } },
             });
 
-            console.log("[REC]: ingredientsInDB: ", ingredientsInDB.length);
+            console.log("[REC]: ingredientsInDB:", ingredientsInDB);
 
             // Identify new ingredients to be added
-            const existingIngredientNames = ingredientsInDB.map(ingredient => ingredient.name);
-            const newIngredientNames = normalizedIngredientNames.filter(name => !existingIngredientNames.includes(name));
+            const existingIngredientNames = new Set(ingredientsInDB.map(ingredient => ingredient.name));
+            const newIngredientNames = normalizedIngredientNames.filter(name => !existingIngredientNames.has(name));
 
             if (newIngredientNames.length > 0) {
                 await prisma.ingredient.createMany({
@@ -81,7 +81,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
                     skipDuplicates: true, // Ensure no duplicates are created
                 });
 
-                console.log("[REC] NEW ingredients: ", newIngredientNames.length);
+                console.log("[REC] NEW ingredients:", newIngredientNames);
             }
 
             // Fetch all ingredient IDs to create a map

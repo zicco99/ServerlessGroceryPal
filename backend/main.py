@@ -187,7 +187,8 @@ class BackendStack(NestedStack):
                 type=dynamodb.AttributeType.STRING
             ),
             removal_policy=RemovalPolicy.DESTROY,
-            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            stream=dynamodb.StreamViewType.NEW_IMAGE
         )
 
         synchronizer = lambd.Function(
@@ -232,6 +233,7 @@ class BackendStack(NestedStack):
          ###########################
         #     DYNAMODB STREAM     #
         ###########################
+
 
         # Declaring the event stream so that /invites_keeper can listen for PUT/DELETE/MODIFY events
         claude_chef_event_source = event_sources.DynamoEventSource(

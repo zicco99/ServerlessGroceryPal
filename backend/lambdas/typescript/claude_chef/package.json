@@ -6,6 +6,7 @@
     "build-lambda": "export NODE_OPTIONS=--openssl-legacy-provider && webpack --mode production"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.21.1",
     "@aws-sdk/client-lambda": "^3.577.0",
     "@prisma/client": "^2.30.3",
     "@types/axios": "^0.14.0",

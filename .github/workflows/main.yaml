@@ -82,6 +82,11 @@ jobs:
               cd "$dir"
               npm ci
               npm run build-lambda
+              
+              rm -rf node_modules
+              rm -rf package-lock.json
+
+              npm ci --production
               cd ../  # Return to the parent directory after transpilation
             else
               echo "Directory $dir does not exist"

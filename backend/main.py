@@ -210,10 +210,10 @@ class BackendStack(NestedStack):
             #phemeral_storage_size= Size.mebibytes(1024),
         )
 
-        claude_ai_api_key = secretsmanager.Secret.from_secret_complete_arn(
-            self, 
-            f"{base_name}-claude-chef-api-key", "arn:aws:secretsmanager:eu-west-1:438500340234:secret:backend-microservice-staging-db-creds-Uu46tW"
-            ).secret_value_from_json("aws-claude-chef").to_string()
+        claude_ai_api_key = secretsmanager.Secret.from_secret_name_v2(
+            self, f"{base_name}-claude-ai-api-key", "/backend-microservice/claude-ai-api-key"
+        )
+    
 
         claude_chef = lambd.Function(
             self,
@@ -226,7 +226,7 @@ class BackendStack(NestedStack):
             security_groups=[lambda_security_group],
             environment={
                 'REGION': self.region,
-                'CLAUDE_AI_API_KEY': claude_ai_api_key
+                'CLAUDE_AI_API_KEY': claude_ai_api_key.secret_value_from_json("aws-claude-chef").to_string(),
             }
         )
 

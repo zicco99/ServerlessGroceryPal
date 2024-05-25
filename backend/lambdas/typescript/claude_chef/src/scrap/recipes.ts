@@ -53,42 +53,6 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
     }
 }
 
-async function saveOnDynamoDB(recipeData: RecipeData): Promise<Recipe | null> {
-    try {
-        const dynamoDBTableName = process.env.DYNAMODB_TABLE_NAME;
-
-        const dynamoDB = new AWS.DynamoDB();
-
-        const recipe: Recipe = {
-            id: generateUniqueId(), // Assuming you have a function to generate a unique ID
-            title: recipeData.title || 'No title',
-            category: recipeData.category || 'No category',
-            imageUrl: recipeData.imageUrl || '',
-            ingredients: recipeData.ingredients || [],
-            steps: recipeData.steps || [],
-        };
-
-        console.log("Saving recipe to DynamoDB :", recipe);
-
-
-        const dynamoDBData = {
-            recipeId: { S: recipe.id.toString() },
-            jsonData: { S: JSON.stringify(recipeData) }
-        };
-
-        const params: AWS.DynamoDB.PutItemInput = {
-            TableName: dynamoDBTableName || "recipes",
-            Item: dynamoDBData,
-        };
-
-        await dynamoDB.putItem(params).promise();
-
-        return recipe;
-    } catch (error) {
-        console.error("Error saving recipe to DynamoDB:", error);
-        return null;
-    }
-}
 
 async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeData): Promise<Recipe | null> {
     if (!prisma) {

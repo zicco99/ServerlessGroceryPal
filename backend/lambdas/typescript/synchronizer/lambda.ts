@@ -28,18 +28,18 @@ async function set_connection_string(): Promise<void> {
 }
 
 import {Task} from './src/utils/task';
-import { fetchRecipeData, saveRecipeOnDB } from './src/scrap/recipes';
+import { fetchRecipeData, saveOnDynamoDB, saveRecipeOnDB,  } from './src/scrap/recipes';
 
 const lambda_id = Math.random().toString(16).slice(2)
 
-const scrapRecipe = async (url: string): Promise<void> => {
+const scrapRecipe = async (url: string, of_task: number): Promise<void> => {
     try {
         console.log('Scraping recipe:', url);
         const recipeData = await fetchRecipeData(url);
         console.log("Data obtained: ", recipeData);
         if (recipeData && recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
             console.log('Saving recipe on DB...');
-            saveRecipeOnDB(db_client,recipeData).then(() => console.log('Recipe saved on DB'));
+            saveOnDynamoDB(recipeData, of_task).then(() => console.log('Recipe saved on DB'));
         } else {
             throw new Error('Recipe data is not complete')
         }
@@ -67,7 +67,7 @@ const executeScrapingTask = async ( task: Task) : Promise<void> => {
             }
         });
         await Promise.all(recipeLinks.map(async (link) => {
-            await scrapRecipe(link);
+            await scrapRecipe(link, task.n_task);
         }));
     }
     console.log(`[TASK EXECUTION] Completed Task: ${task}`);

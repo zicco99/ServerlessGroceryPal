@@ -9,6 +9,8 @@ from aws_cdk import (
     aws_secretsmanager as secretsmanager,
     aws_cognito as cognito,
     aws_s3 as s3,
+    aws_dynamodb as dynamodb,
+
     Stage
 )
 
@@ -174,7 +176,18 @@ class BackendStack(NestedStack):
             memory_size=512,
         )
 
-        
+
+        scraped_recipes_table = dynamodb.Table(
+            self,
+            f"{base_name}-scraped-recipes-table",
+            table_name=f"{base_name}-scraped-recipes-table",
+            partition_key=dynamodb.Attribute(
+                name="id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            removal_policy=RemovalPolicy.DESTROY,
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
+        )
 
         synchronizer = lambd.Function(
             self,
@@ -188,11 +201,14 @@ class BackendStack(NestedStack):
             environment={
                 'REGION': self.region,
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
+                'SCRAPED_RECIPES_TABLE_ARN': scraped_recipes_table.table_arn
             },
             timeout=Duration.minutes(15),
             memory_size=512,
             #phemeral_storage_size= Size.mebibytes(1024),
         )
+
+        scraped_recipes_table.grant_read_write_data(synchronizer)
 
         synchronizer_grant = iam.PolicyStatement(
             actions=['lambda:InvokeFunction'],

@@ -21,10 +21,8 @@ class Task {
     private startPage: number;
     private step: number;
     public pageChunk: PageChunk;
-    public n_task: number;
 
     constructor(startPage: number, step: number) {
-        this.n_task = startPage / step;
         this.startPage = startPage;
         this.step = step;
         this.pageChunk = new PageChunk(startPage, startPage + step);

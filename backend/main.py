@@ -220,7 +220,7 @@ class BackendStack(NestedStack):
             function_name=f"{base_name}-claude-chef",
             runtime=lambd.Runtime.NODEJS_18_X,
             handler="main.handler",
-            code=lambd.Code.from_asset("backend/lambdas/typescript/claude_chef"),
+            code=lambd.Code.from_asset("backend/lambdas/typescript/claude_chef/dist"),
             vpc=backend_vpc,
             security_groups=[lambda_security_group],
             environment={
@@ -236,15 +236,13 @@ class BackendStack(NestedStack):
 
 
         # Declaring the event stream so that /invites_keeper can listen for PUT/DELETE/MODIFY events
-        claude_chef_event_source = event_sources.DynamoEventSource(
+        scraped_recipes_table_source = event_sources.DynamoEventSource(
             table=scraped_recipes_table,
             starting_position=lambd.StartingPosition.TRIM_HORIZON,  # events are processed sequentially in the order they occurred
             retry_attempts=3,  # if an event fails to be processed, it is not retried
         )
 
-        claude_chef.add_event_source(claude_chef_event_source)
-
-        
+        claude_chef.add_event_source(scraped_recipes_table_source)
 
         synchronizer_grant = iam.PolicyStatement(
             actions=['lambda:InvokeFunction'],

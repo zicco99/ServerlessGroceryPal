@@ -59,7 +59,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 {
-                    from: 'prisma',
+                    from: './prisma',
                     to: 'prisma'
                 }
             ]

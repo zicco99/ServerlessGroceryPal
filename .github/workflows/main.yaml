@@ -65,7 +65,7 @@ jobs:
           npm run build-lambda
           mv dist ../lambdas/nestjs_serverless
 
-      - name: Inject prisma client into Typescript Lambdas before transpiling
+      - name: Inject Prisma Client into TypeScript Lambdas before transpiling
         run: |
           for dir in {"synchronizer","claude_chef"}; do
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/"
@@ -76,11 +76,16 @@ jobs:
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
           cd backend/lambdas/typescript
-          for dir in */; do
-            echo "Transpiling $dir to JS"
-            cd "$dir"
-            npm install --save typescript
-            npm run build-lambda
+          for dir in synchronizer claude_chef; do
+            if [ -d "$dir" ]; then
+              echo "Transpiling $dir to JS"
+              cd "$dir"
+              npm install --save typescript
+              npm run build-lambda
+              cd ../  # Return to the parent directory after transpilation
+            else
+              echo "Directory $dir does not exist"
+            fi
           done
 
       - name: Install CDK dependencies and Python requirements

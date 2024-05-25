@@ -14,9 +14,6 @@ jobs:
       NODE_VERSION: '20'
       PYTHON_VERSION: '3.10'
 
-
-      ts_lambdas_using_db: "synchronizer, claude_chef"
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -70,7 +67,7 @@ jobs:
 
       - name: Inject prisma client into Typescript Lambdas before transpiling
         run: |
-          for dir in ${{ env.ts_lambdas_using_db }}; do
+          for dir in {"nestjs_serverless", "typescript"}; do
             cp -r ./backend/api/prisma "./backend/lambdas/typescript/$dir/"
             echo "Folder structure for $dir Lambda:"
             tree -L 2 "./backend/lambdas/typescript/$dir/"

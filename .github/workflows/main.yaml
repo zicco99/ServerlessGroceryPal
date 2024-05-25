@@ -72,7 +72,7 @@ jobs:
             echo "Folder structure for $dir Lambda:"
             tree -L 2 "./backend/lambdas/typescript/$dir/"
           done
-          
+
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
           cd backend/lambdas/typescript
@@ -80,7 +80,7 @@ jobs:
             if [ -d "$dir" ]; then
               echo "Transpiling $dir to JS"
               cd "$dir"
-              npm ci --production
+              npm install -g typescript
               npm run build-lambda
               cd ../../  # Navigate back to the project root
             else

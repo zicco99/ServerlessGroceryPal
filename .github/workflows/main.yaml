@@ -83,7 +83,7 @@ jobs:
               npm install -g typescript
               npm install
               npm run build-lambda
-              cd ../../  # Navigate back to the project root
+              cd ../../  
             else
               echo "Directory $dir does not exist"
             fi

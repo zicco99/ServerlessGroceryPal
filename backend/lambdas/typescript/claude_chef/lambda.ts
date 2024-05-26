@@ -1,7 +1,7 @@
 import { Callback, Context, DynamoDBStreamEvent, Handler } from 'aws-lambda';
 import { SecretsManager} from 'aws-sdk';
 import Anthropic from '@anthropic-ai/sdk';
-import { fetchAlreadyKnownIngredients } from './src/scrap/recipes';
+import { ClaudeChefKnowledgeBase, fetchAlreadyKnownIngredients, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
 
 const anthropic = new Anthropic({
@@ -43,8 +43,8 @@ export const handler: Handler = async (
                 if (newRecipeData) {
                     const jsonData = JSON.parse(newRecipeData.jsonData.S as string);
                     console.log("JSON data: ", jsonData);
-                    const already_known_ingredients = await fetchAlreadyKnownIngredients(db_client)
-                    const normalizedRecipe = await askClaudeChef(jsonData,already_known_ingredients);
+                    const kb : ClaudeChefKnowledgeBase = await fetchAlreadyKnownIngredients(db_client)
+                    const normalizedRecipe = await askClaudeChef(jsonData,kb);
                     console.log("Normalized recipe: ", normalizedRecipe);
                 }
             }
@@ -55,19 +55,39 @@ export const handler: Handler = async (
     }
 }
 
-async function askClaudeChef(recipeData: any, knownIngredients: any): Promise<any> {
+async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledgeBase): Promise<any> {
     try {
         console.log('Asking Claude Chef...');
-        console.log('Claude Chef parameters:', recipeData, knownIngredients);
+        console.log('Claude Chef parameters:', recipeData, knowledgeBase);
 
+        const context = `
+        You are a helpful assistant that clean and normalize recipe JSON to be insert then in DB.
+        You know that:
+        - Categories already in DB: ${knowledgeBase.categories}
+        - Ingredients already in DB: ${knowledgeBase.ingredients}
+
+        Using the knowledge base, take user's give recipe data (R) and:
+        - If R should be in an already known category, then use it into the resulting recipe
+        - If R should be in an already known ingredient, then use it into the resulting recipe
+        - Fix typos in the whole json
+
+        In the end take all correct info and return them in a JSON with the following format:
+        {
+            title: string | null;
+            category: string | null;
+            imageUrl: string | null;
+            ingredients: { name: string; quantity: string }[];
+            steps: { imageUrl: string | null; explaining: string }[];
+        }
+        `
         const response = await anthropic.messages.create({
             model: 'claude-3-opus-20240229',
             max_tokens: 2080,
             messages: [{
                 role: 'user',
-                content: JSON.stringify({ R: recipeData, I: knownIngredients })
+                content: JSON.stringify(recipeData)
             }],
-            system: 'You are a helpful assistant that enhances recipes JSON data, fixes typos, and adds missing data. You will be given a recipe (R) and a list of already known ingredients (I). Your task is to return a JSON with the following format: { "recipe": [recipeData sanitized with enhanced inferred infos], "new_ingredients": [...] }',
+            system: context,
             temperature: 0.7
         });
 
@@ -76,6 +96,7 @@ async function askClaudeChef(recipeData: any, knownIngredients: any): Promise<an
         const responseContent = response.content[0].text;
         const enhancedRecipe = JSON.parse(responseContent); 
 
+        saveRecipeOnDB(db_client, enhancedRecipe["recipe"]);
 
         console.log('Enhanced Recipe:', enhancedRecipe);
 

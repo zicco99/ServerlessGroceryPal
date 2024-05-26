@@ -180,8 +180,8 @@ class BackendStack(NestedStack):
 
         scraped_recipes_table = dynamodb.Table(
             self,
-            f"{base_name}-scraped-recipes-table",
-            table_name=f"{base_name}-scraped-recipes-table",
+            f"{base_name}-scraped-recipes",
+            table_name=f"{base_name}-scraped-recipes",
             partition_key=dynamodb.Attribute(
                 name="recipeId",
                 type=dynamodb.AttributeType.STRING

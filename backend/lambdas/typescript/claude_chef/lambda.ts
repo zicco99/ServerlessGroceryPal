@@ -33,6 +33,7 @@ export const handler: Handler = async (
                 const newRecipeData = record.dynamodb?.NewImage;
                 if (newRecipeData) {
                     const jsonData = JSON.parse(newRecipeData.jsonData.S as string);
+                    console.log("JSON data: ", jsonData);
                     const normalizedRecipe = await askClaudeChef(jsonData, await fetchAlreadyKnownIngredients(db_client));
                     console.log("Normalized recipe: ", normalizedRecipe);
                 }

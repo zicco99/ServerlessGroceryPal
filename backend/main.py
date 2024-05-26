@@ -226,6 +226,7 @@ class BackendStack(NestedStack):
                 'REGION': self.region,
                 'CLAUDE_AI_API_KEY': claude_ai_api_key.secret_value_from_json("aws-claude-chef").to_string(),
             }
+            memory_size=256,
         )
 
          ###########################
@@ -569,8 +570,6 @@ class BackendStack(NestedStack):
 
         # DB PROXY WRITE PERM ----------------------------------------------------
         # IAM policy to access DB Proxy
-
-
 
         backend_db_policy_env = {
             'DB_SECRET_ARN': backend_db_creds.secret_arn,

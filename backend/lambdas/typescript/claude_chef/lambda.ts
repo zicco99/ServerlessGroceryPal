@@ -34,7 +34,7 @@ async function setConnectionString(): Promise<void> {
 
 
 export const handler: Handler = async (
-    event: DynamoDBStreamEvent,
+    event: any,
     context: Context,
     callback: Callback,
 ): Promise<void> => {
@@ -43,11 +43,10 @@ export const handler: Handler = async (
         for (const record of event.Records) {
             if (record.eventName === 'INSERT') {
                 const newRecipeData = record.dynamodb?.NewImage;
-                console.log("New recipe data:", newRecipeData);
                 if (newRecipeData) {
-                    const normalizedRecipe = await askClaudeChef(newRecipeData.jsonData.S!, await fetchAlreadyKnownIngredients(db_client));
-                    console.log(normalizedRecipe)
-                    // Save normalizedRecipe to your database
+                    const jsonData = JSON.parse(newRecipeData.jsonData.S);
+                    const normalizedRecipe = await askClaudeChef(jsonData, await fetchAlreadyKnownIngredients(db_client));
+                    console.log("Normalized recipe: ", normalizedRecipe);
                 }
             }
         }

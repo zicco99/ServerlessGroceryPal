@@ -55,37 +55,44 @@ export const handler: Handler = async (
     }
 }
 
-async function askClaudeChef(recipeData: string, knownIngredients: string[]): Promise<string> {
+async function askClaudeChef(recipeData, knownIngredients) {
     try {
+        const anthropic = require('@anthropic-ai/sdk'); // Ensure you have the correct SDK imported and configured
+
+        // Construct the message payload
+        const messages = [
+            {
+                role: 'system',
+                content: 'You are an expert assistant helping with recipe bibliography.'
+            },
+            {
+                role: 'user',
+                content: 
+                    'You are a culinary expert. ' +
+                    'You will be given a recipe (R), ' +
+                    'a list of already known ingredients (I), ' +
+                    'and you will return a JSON with the following format: ' +
+                    '{ "recipe": [recipeData sanitized with enhanced inferred infos], ' +
+                    '"new_ingredients": [...] }.\n' +
+                    JSON.stringify({ R: recipeData, I: knownIngredients })
+            }
+        ];
+
+        // Call the API
         const response = await anthropic.messages.create({
             model: 'claude-3-opus-20240229',
             max_tokens: 1024,
-            messages: [
-                {
-                    
-                    role: 'user',
-                    content: 
-                        'You are a culinary expert.\
-                        You will be given a recipe (R),\
-                        a list of already known ingredients (I)\
-                        and you will return a JSON with the following format:\
-                        { "recipe": [recipeData sanitized with enhanced inferred infos],\
-                        "new_ingredients": [...] }.\n' + 
-                        JSON.stringify({ R: recipeData, I: knownIngredients })
-                },
-                {
-                    role:"assistant",
-                    content: "Here is the JSON requested:\n{"
-                }
-            ],
-            system: "You are an expert assistant helping with recipe bibliography.",
+            messages: messages,
             temperature: 0.7,
-            stop_sequences: ["\n"]
+            stop: ["\n"]
         });
 
-        console.log('Claude Chef response:', + "{" + response.content.values[0]);
+        // Parse and log the response
+        const result = response.data.choices[0].message.content;
+        console.log('Claude Chef response:', result);
 
-        return response.content.values[0];
+        // Return the parsed response
+        return result;
     } catch (error) {
         console.error('Error in askClaudeChef:', error);
         throw error;

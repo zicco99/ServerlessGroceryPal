@@ -55,17 +55,14 @@ export const handler: Handler = async (
     }
 }
 
-async function askClaudeChef(recipeData, knownIngredients) {
+async function askClaudeChef(recipeData: any, knownIngredients: any) {
     try {
-        const anthropic = require('@anthropic-ai/sdk'); // Ensure you have the correct SDK imported and configured
-
-        // Construct the message payload
-        const messages = [
-            {
-                role: 'system',
-                content: 'You are an expert assistant helping with recipe bibliography.'
-            },
-            {
+        console.log('Asking Claude Chef...');
+        console.log('Claude Chef parameters:', recipeData, knownIngredients);
+        const message : any = await anthropic.messages.create({
+            model: 'claude-3-opus-20240229',
+            max_tokens: 1024,
+            messages: [{
                 role: 'user',
                 content: 
                     'You are a culinary expert. ' +
@@ -74,25 +71,18 @@ async function askClaudeChef(recipeData, knownIngredients) {
                     'and you will return a JSON with the following format: ' +
                     '{ "recipe": [recipeData sanitized with enhanced inferred infos], ' +
                     '"new_ingredients": [...] }.\n' +
-                    JSON.stringify({ R: recipeData, I: knownIngredients })
-            }
-        ];
-
-        // Call the API
-        const response = await anthropic.messages.create({
-            model: 'claude-3-opus-20240229',
-            max_tokens: 1024,
-            messages: messages,
+                    JSON.stringify({ R: recipeData, I: knownIngredients } + '\n')
+            }],
             temperature: 0.7,
-            stop: ["\n"]
+            stop_sequences: ['\n']
         });
 
-        // Parse and log the response
-        const result = response.data.choices[0].message.content;
-        console.log('Claude Chef response:', result);
+        message.choices[0].text = message.choices[0].text.trim();
+        const enhanced_recipe = JSON.parse(message.choices[0].text);
 
-        // Return the parsed response
-        return result;
+        console.log('Claude Chef response:', enhanced_recipe);
+
+        return enhanced_recipe;
     } catch (error) {
         console.error('Error in askClaudeChef:', error);
         throw error;

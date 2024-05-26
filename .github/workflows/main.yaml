@@ -75,19 +75,19 @@ jobs:
 
       - name: Transpile TypeScript Lambdas to JS (as Lambdas do not support TS directly)
         run: |
-          cd backend/lambdas/typescript
           for dir in synchronizer claude_chef; do
-            if [ -d "$dir" ]; then
+            if [ -d "backend/lambdas/typescript/$dir" ]; then
               echo "Transpiling $dir to JS"
-              cd "$dir"
+              cd "backend/lambdas/typescript/$dir"
               npm install -g typescript
               npm install
               npm run build-lambda
-              cd ../../  
+              cd -  # go back to the previous directory
             else
-              echo "Directory $dir does not exist"
+              echo "Directory backend/lambdas/typescript/$dir does not exist"
             fi
           done
+
 
       - name: Install CDK dependencies and Python requirements
         run: |

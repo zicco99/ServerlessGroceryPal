@@ -9,11 +9,12 @@ type ScrapedRecipe = {
 */
 
 
-import { DynamoDBStreamEvent } from 'aws-lambda';
+import { Callback, Context, DynamoDBStreamEvent, Handler } from 'aws-lambda';
 import { SecretsManager, RDSDataService } from 'aws-sdk';
 import Anthropic from '@anthropic-ai/sdk';
 import { fetchAlreadyKnownIngredients } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
+import { event } from 'jquery';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY,
@@ -32,7 +33,11 @@ async function setConnectionString(): Promise<void> {
 }
 
 
-export async function handler(event: DynamoDBStreamEvent): Promise<void> {
+export const handler: Handler = async (
+    event: DynamoDBStreamEvent,
+    context: Context,
+    callback: Callback,
+): Promise<void> => {
     await setConnectionString();
     try {
         for (const record of event.Records) {

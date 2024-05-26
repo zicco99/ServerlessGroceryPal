@@ -58,20 +58,31 @@ export const handler: Handler = async (
 async function askClaudeChef(recipeData: string, knownIngredients: string[]): Promise<string> {
     try {
         const response = await anthropic.messages.create({
+            model: 'claude-3-opus-20240229',
             max_tokens: 1024,
             messages: [
-                { role: 'user', content: 
-                'You are a culinary expert. \
-                You will be given a recipe (R), \
-                a list of already known ingredients (I) \
-                and you will return a JSON with the following format: \
-                { "recipe": [recipeData sanitized with enhanced inferred infos], \
-                "new_ingredients": [...] }.\n' + JSON.stringify({ R: recipeData, I: knownIngredients })},
+                {
+                    role: 'user',
+                    content: 
+                        'You are a culinary expert. \
+                        You will be given a recipe (R), \
+                        a list of already known ingredients (I) \
+                        and you will return a JSON with the following format: \
+                        { "recipe": [recipeData sanitized with enhanced inferred infos], \
+                        "new_ingredients": [...] }.\n' + 
+                        JSON.stringify({ R: recipeData, I: knownIngredients })
+                },
+                {
+                    role:"assistant",
+                    content: "Here is the JSON requested:\n{"
+                }
             ],
-            model: 'claude-3-opus-20240229',
+            system: "You are an expert assistant helping with recipe bibliography.",
+            temperature: 0.7,
+            stop_sequences: ["\n"]
         });
 
-        console.log('Claude Chef response:', response);
+        console.log('Claude Chef response:', + "{" + response.content.values[0]);
 
         return response.content.values[0];
     } catch (error) {

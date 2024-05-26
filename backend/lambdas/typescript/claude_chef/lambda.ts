@@ -73,8 +73,7 @@ async function askClaudeChef(recipeData: any, knownIngredients: any) : Promise<a
                     '"new_ingredients": [...] }.\n' +
                     JSON.stringify({ R: recipeData, I: knownIngredients } + '\n')
             }],
-            temperature: 0.7,
-            stop_sequences: ['\n']
+            temperature: 0.7
         }).then((response: any) => {
             console.log('Claude Chef response:', response);
             return response;

@@ -27,6 +27,8 @@ export const handler: Handler = async (
     context: Context,
     callback: Callback,
 ): Promise<void> => {
+    console.log("Event: ", event);
+    console.log("Retrieving DB Info")
     await setConnectionString();
     try {
         for (const record of event.Records) {

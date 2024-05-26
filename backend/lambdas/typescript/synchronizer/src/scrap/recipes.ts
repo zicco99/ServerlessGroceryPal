@@ -119,16 +119,16 @@ async function saveOnDynamoDB(recipeData: RecipeData, of_task: number): Promise<
             of_task: { S: of_task.toString() },
             scheduled_at: { S: new Date().getTime().toString() },
             jsonData: { S: JSON.stringify(recipeData) },
-        }; 
-
-        console.log("Row Saved :", dynamoDBData);
+        };
 
         const params: AWS.DynamoDB.PutItemInput = {
             TableName: scrapedRecipeTable,
             Item: dynamoDBData,
         };
 
-        await dynamoDB.putItem(params).promise();
+        const res = await dynamoDB.putItem(params).promise();
+        console.log(res.$response.data);
+        console.log("Row Saved :", dynamoDBData);
 
         return recipe;
     

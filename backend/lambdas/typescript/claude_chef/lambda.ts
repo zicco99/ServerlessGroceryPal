@@ -1,20 +1,8 @@
-// DynamoDB Row Schema
-/*
-type ScrapedRecipe = {
-    recipeId: { "S": string };
-    of_task: { "S": string };
-    scheduled_at: { "S": string };
-    jsonData: { "S": string };
-};
-*/
-
-
 import { Callback, Context, DynamoDBStreamEvent, Handler } from 'aws-lambda';
-import { SecretsManager, RDSDataService } from 'aws-sdk';
+import { SecretsManager} from 'aws-sdk';
 import Anthropic from '@anthropic-ai/sdk';
 import { fetchAlreadyKnownIngredients } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
-import { event } from 'jquery';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY,
@@ -34,7 +22,7 @@ async function setConnectionString(): Promise<void> {
 
 
 export const handler: Handler = async (
-    event: any,
+    event: DynamoDBStreamEvent,
     context: Context,
     callback: Callback,
 ): Promise<void> => {
@@ -44,7 +32,7 @@ export const handler: Handler = async (
             if (record.eventName === 'INSERT') {
                 const newRecipeData = record.dynamodb?.NewImage;
                 if (newRecipeData) {
-                    const jsonData = JSON.parse(newRecipeData.jsonData.S);
+                    const jsonData = JSON.parse(newRecipeData.jsonData.S as string);
                     const normalizedRecipe = await askClaudeChef(jsonData, await fetchAlreadyKnownIngredients(db_client));
                     console.log("Normalized recipe: ", normalizedRecipe);
                 }

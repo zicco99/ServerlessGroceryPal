@@ -1,14 +1,3 @@
-import { DynamoDBStreamEvent} from 'aws-lambda';
-import { SecretsManager } from 'aws-sdk';
-
-import Anthropic from '@anthropic-ai/sdk';
-import { log } from 'console';
-
-const anthropic = new Anthropic({
-    apiKey: process.env.CLAUDE_AI_API_KEY, // This is the default and can be omitted
-  });
-
-
 // DynamoDB Row Schema
 /*
 type ScrapedRecipe = {
@@ -20,64 +9,62 @@ type ScrapedRecipe = {
 */
 
 
+import { DynamoDBStreamEvent } from 'aws-lambda';
+import { SecretsManager, RDSDataService } from 'aws-sdk';
+import Anthropic from '@anthropic-ai/sdk';
+import { fetchAlreadyKnownIngredients } from './src/scrap/recipes';
+import { PrismaClient } from './prisma/client';
+
+const anthropic = new Anthropic({
+    apiKey: process.env.CLAUDE_AI_API_KEY,
+});
+
+let db_client = new PrismaClient();
+
 const secretsManager = new SecretsManager({ region: process.env.REGION });
 
-async function set_connection_string(): Promise<void> {
-    const params = {
-        SecretId: process.env.DB_SECRET_ARN || "",
-    };
+async function setConnectionString(): Promise<void> {
+    const params = { SecretId: process.env.DB_SECRET_ARN || "" };
     const data = await secretsManager.getSecretValue(params).promise();
     const { SecretString } = data;
     const { password, username, dbname, port, host } = JSON.parse(SecretString || "");
     process.env.DATABASE_URL = `postgresql://${username}:${password}@${host}:${port}/${dbname}`;
 }
 
+
 export async function handler(event: DynamoDBStreamEvent): Promise<void> {
+    await setConnectionString();
     try {
         for (const record of event.Records) {
             if (record.eventName === 'INSERT') {
-                const newRecipeData = record.dynamodb?.NewImage
-                console.log(newRecipeData);
+                const newRecipeData = record.dynamodb?.NewImage;
                 if (newRecipeData) {
-                    await askClaudeChef(newRecipeData);
+                    const normalizedRecipe = await askClaudeChef(newRecipeData.jsonData.S!, await fetchAlreadyKnownIngredients(db_client));
+                    console.log(normalizedRecipe)
+                    // Save normalizedRecipe to your database
                 }
             }
         }
     } catch (error) {
         console.error("Error processing DynamoDB stream event:", error);
-        // Optionally, you can throw the error to trigger a retry or handle it accordingly
         throw error;
     }
 }
 
-async function askClaudeChef(recipeDatav) {
+async function askClaudeChef(recipeData: string, knownIngredients: string[]): Promise<string> {
     try {
-        const message = await anthropic.messages.create({
+        const response = await anthropic.messages.create({
             max_tokens: 1024,
             messages: [
-                { role: 'user', content: 'Hello, Claude' },
-                { role: 'user', content: `Please provide a recipe with the following data: ${JSON.stringify(recipeDatav)}` }
+                { role: 'assistant', content: 'You are a culinary expert. You will be given a recipe (R), a list of already known ingredients (I) and you will return a JSON with the following format: { "recipe": [recipeData with correct infos, without infos], "new_ingredients": [...] }.' },
+                { role: 'user', content: JSON.stringify({ R: recipeData, I: knownIngredients }) },
             ],
             model: 'claude-3-opus-20240229',
         });
-        
-        // Assuming the response is in message.data.content
-        const response = message.content;
-        const recipe = response;
-        
-        console.log(recipe);
-        return recipe;
+
+        return response.content.values[0];
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error in askClaudeChef:', error);
+        throw error;
     }
 }
-
-// Example usage:
-askClaudeChef({ ingredient: "chicken", cuisine: "Italian" })
-    .then(recipe => {
-        if (recipe) {
-            console.log('Received recipe:', recipe);
-        }
-    });
-
-

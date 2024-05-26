@@ -10,6 +10,19 @@ type RecipeData = {
     steps: { imageUrl: string | null; explaining: string }[];
 };
 
+async function fetchAlreadyKnownIngredients(prisma: PrismaClient | null): Promise<string[]> {
+    if (!prisma) {
+        throw new Error('Prisma client not initialized');
+    }
+
+    try {
+        const ingredients = await prisma.ingredient.findMany();
+        return ingredients.map(ingredient => ingredient.name);
+    } catch (error) {
+        console.error('Error fetching ingredients:', error);
+        throw error;
+    }
+}
 
 async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeData): Promise<Recipe | null> {
     if (!prisma) {
@@ -102,5 +115,5 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
 }
 
 
-export { saveRecipeOnDB, RecipeData };
+export { saveRecipeOnDB, RecipeData, fetchAlreadyKnownIngredients };
 

@@ -38,6 +38,7 @@ export async function handler(event: DynamoDBStreamEvent): Promise<void> {
         for (const record of event.Records) {
             if (record.eventName === 'INSERT') {
                 const newRecipeData = record.dynamodb?.NewImage;
+                console.log("New recipe data:", newRecipeData);
                 if (newRecipeData) {
                     const normalizedRecipe = await askClaudeChef(newRecipeData.jsonData.S!, await fetchAlreadyKnownIngredients(db_client));
                     console.log(normalizedRecipe)

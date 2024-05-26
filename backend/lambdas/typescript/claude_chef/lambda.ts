@@ -21,6 +21,8 @@ async function setConnectionString(): Promise<void> {
     console.log("DB connection string set: ", process.env.DATABASE_URL);
 }
 
+await setConnectionString();
+
 
 export const handler: Handler = async (
     event: any,
@@ -28,8 +30,13 @@ export const handler: Handler = async (
     callback: Callback,
 ): Promise<void> => {
     console.log("Event: ", event);
-    console.log("Retrieving DB Info")
-    await setConnectionString();
+
+    if (!db_client) {
+        db_client = new PrismaClient();
+        await db_client.$connect();
+        console.log("DB client initialized!");
+    }
+    
     try {
         for (const record of event.Records) {
             if (record.eventName === 'INSERT') {

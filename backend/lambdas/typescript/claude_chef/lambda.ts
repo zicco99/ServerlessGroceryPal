@@ -37,7 +37,8 @@ export const handler: Handler = async (
                 if (newRecipeData) {
                     const jsonData = JSON.parse(newRecipeData.jsonData.S as string);
                     console.log("JSON data: ", jsonData);
-                    const normalizedRecipe = await askClaudeChef(jsonData, await fetchAlreadyKnownIngredients(db_client));
+                    const already_known_ingredients = await fetchAlreadyKnownIngredients(db_client)
+                    const normalizedRecipe = await askClaudeChef(jsonData,already_known_ingredients);
                     console.log("Normalized recipe: ", normalizedRecipe);
                 }
             }
@@ -58,6 +59,8 @@ async function askClaudeChef(recipeData: string, knownIngredients: string[]): Pr
             ],
             model: 'claude-3-opus-20240229',
         });
+
+        console.log('Claude Chef response:', response);
 
         return response.content.values[0];
     } catch (error) {

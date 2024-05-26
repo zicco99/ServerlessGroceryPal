@@ -59,7 +59,7 @@ async function askClaudeChef(recipeData: any, knownIngredients: any) : Promise<a
     try {
         console.log('Asking Claude Chef...');
         console.log('Claude Chef parameters:', recipeData, knownIngredients);
-        const response : any = await anthropic.messages.create({
+        const response = await anthropic.messages.create({
             model: 'claude-3-opus-20240229',
             max_tokens: 1024,
             messages: [{
@@ -68,16 +68,10 @@ async function askClaudeChef(recipeData: any, knownIngredients: any) : Promise<a
             }],
             system: 'You are a helpful assistant that enhance recipes json data, fix typos and add missing data . You will be given a recipe (R), a list of already known ingredients (I), and you will return a JSON with the following format: { "recipe": [recipeData sanitized with enhanced inferred infos], "new_ingredients": [...] }',
             temperature: 0.7
-        }).then((response: any) => {
-            console.log('Claude Chef response:', response);
-            return response;
-        }).catch((error: any) => {
-            console.error('Error in askClaudeChef:', error);
-            throw error;
         });
 
         console.log('Claude Chef response:', response);
-        const enhanced_recipe = JSON.parse(response.choices[0].text);
+        const enhanced_recipe = JSON.parse(response.content.toString());
 
         return enhanced_recipe;
     } catch (error) {
@@ -85,3 +79,4 @@ async function askClaudeChef(recipeData: any, knownIngredients: any) : Promise<a
         throw error;
     }
 }
+

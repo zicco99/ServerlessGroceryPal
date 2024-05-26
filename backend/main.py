@@ -183,7 +183,7 @@ class BackendStack(NestedStack):
             f"{base_name}-scraped-recipes-table",
             table_name=f"{base_name}-scraped-recipes-table",
             partition_key=dynamodb.Attribute(
-                name="id",
+                name="recipeId",
                 type=dynamodb.AttributeType.STRING
             ),
             removal_policy=RemovalPolicy.DESTROY,

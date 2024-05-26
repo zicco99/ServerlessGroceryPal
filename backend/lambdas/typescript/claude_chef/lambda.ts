@@ -1,7 +1,7 @@
 import { Callback, Context, DynamoDBStreamEvent, Handler } from 'aws-lambda';
 import { SecretsManager} from 'aws-sdk';
 import Anthropic from '@anthropic-ai/sdk';
-import { ClaudeChefKnowledgeBase, fetchAlreadyKnownIngredients, saveRecipeOnDB } from './src/scrap/recipes';
+import { ClaudeChefKnowledgeBase, RecipeData, fetchAlreadyKnownIngredients, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
 
 const anthropic = new Anthropic({
@@ -94,11 +94,11 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
         console.log('Received response from Claude Chef:', response);
 
         const responseContent = response.content[0].text;
-        const enhancedRecipe = JSON.parse(responseContent); 
+        const enhancedRecipe : RecipeData = JSON.parse(responseContent); 
 
-        saveRecipeOnDB(db_client, enhancedRecipe["recipe"]);
+        console.log('Enhanced recipe:', enhancedRecipe);
 
-        console.log('Enhanced Recipe:', enhancedRecipe);
+        saveRecipeOnDB(db_client, enhancedRecipe).then(() => console.log('Recipe saved on DB'));
 
         return enhancedRecipe;
     } catch (error) {

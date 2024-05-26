@@ -92,7 +92,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
             },
             {
                 role: 'assistant',
-                content: "Using the knowledge base and the given recipe the JSON should be: {\n"
+                content: "Using the knowledge base and the given recipe the JSON should be: {"
             }],
             system: context,
             temperature: 0.7
@@ -102,7 +102,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
 
         const responseContent = response.content[0].text;
         const enhancedRecipe : RecipeData = JSON.parse(responseContent);
-        
+
 
         console.log('Enhanced recipe:', enhancedRecipe);
 

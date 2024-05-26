@@ -1,7 +1,7 @@
 import { Callback, Context, DynamoDBStreamEvent, Handler } from 'aws-lambda';
 import { SecretsManager} from 'aws-sdk';
 import Anthropic from '@anthropic-ai/sdk';
-import { ClaudeChefKnowledgeBase, RecipeData, fetchAlreadyKnownIngredients, saveRecipeOnDB } from './src/scrap/recipes';
+import { ClaudeChefKnowledgeBase, RecipeData, fetchKnowledgeBase, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
 
 const anthropic = new Anthropic({
@@ -43,7 +43,7 @@ export const handler: Handler = async (
                 if (newRecipeData) {
                     const jsonData = JSON.parse(newRecipeData.jsonData.S as string);
                     console.log("JSON data: ", jsonData);
-                    const kb : ClaudeChefKnowledgeBase = await fetchAlreadyKnownIngredients(db_client)
+                    const kb : ClaudeChefKnowledgeBase = await fetchKnowledgeBase(db_client)
                     const normalizedRecipe = await askClaudeChef(jsonData,kb);
                     console.log("Normalized recipe: ", normalizedRecipe);
                 }

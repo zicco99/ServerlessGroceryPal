@@ -55,11 +55,11 @@ export const handler: Handler = async (
     }
 }
 
-async function askClaudeChef(recipeData: any, knownIngredients: any) {
+async function askClaudeChef(recipeData: any, knownIngredients: any) : Promise<any> {
     try {
         console.log('Asking Claude Chef...');
         console.log('Claude Chef parameters:', recipeData, knownIngredients);
-        const message : any = await anthropic.messages.create({
+        const response : any = await anthropic.messages.create({
             model: 'claude-3-opus-20240229',
             max_tokens: 1024,
             messages: [{
@@ -75,12 +75,16 @@ async function askClaudeChef(recipeData: any, knownIngredients: any) {
             }],
             temperature: 0.7,
             stop_sequences: ['\n']
+        }).then((response: any) => {
+            console.log('Claude Chef response:', response);
+            return response;
+        }).catch((error: any) => {
+            console.error('Error in askClaudeChef:', error);
+            throw error;
         });
 
-        message.choices[0].text = message.choices[0].text.trim();
-        const enhanced_recipe = JSON.parse(message.choices[0].text);
-
-        console.log('Claude Chef response:', enhanced_recipe);
+        console.log('Claude Chef response:', response);
+        const enhanced_recipe = JSON.parse(response.choices[0].text);
 
         return enhanced_recipe;
     } catch (error) {

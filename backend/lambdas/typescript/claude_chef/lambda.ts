@@ -80,22 +80,29 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
             steps: { imageUrl: string | null; explaining: string }[];
         }
         `
+
+        console.log('Claude Context: ', context);
+
         const response = await anthropic.messages.create({
             model: 'claude-3-opus-20240229',
             max_tokens: 2080,
             messages: [{
                 role: 'user',
-                content: JSON.stringify(recipeData)
+                content: JSON.stringify(recipeData),
+            },
+            {
+                role: 'assistant',
+                content: "Using the knowledge base and the given recipe the JSON should be: {\n"
             }],
             system: context,
             temperature: 0.7
         });
 
-        console.log('Received response from Claude Chef:', response);
+        console.log('Received response from Claude Chef:', "{" + response);
 
         const responseContent = response.content[0].text;
-        const enhancedRecipe : RecipeData = JSON.parse(responseContent); 
-
+        const enhancedRecipe : RecipeData = JSON.parse(responseContent);
+        
         console.log('Enhanced recipe:', enhancedRecipe);
 
         saveRecipeOnDB(db_client, enhancedRecipe).then(() => console.log('Recipe saved on DB'));

@@ -73,8 +73,9 @@ async function askClaudeChef(recipeData: any, knownIngredients: any): Promise<an
 
         console.log('Received response from Claude Chef:', response);
 
-        // Parse the response content
-        const enhancedRecipe = JSON.parse(response.content.toString());
+        const responseContent = response.content[0].text;
+        const enhancedRecipe = JSON.parse(responseContent); 
+
 
         console.log('Enhanced Recipe:', enhancedRecipe);
 

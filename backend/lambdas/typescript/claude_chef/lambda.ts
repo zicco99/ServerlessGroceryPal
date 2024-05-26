@@ -64,14 +64,7 @@ async function askClaudeChef(recipeData: any, knownIngredients: any) : Promise<a
             max_tokens: 1024,
             messages: [{
                 role: 'user',
-                content: 
-                    'You are a culinary expert. ' +
-                    'You will be given a recipe (R), ' +
-                    'a list of already known ingredients (I), ' +
-                    'and you will return a JSON with the following format: ' +
-                    '{ "recipe": [recipeData sanitized with enhanced inferred infos], ' +
-                    '"new_ingredients": [...] }.\n' +
-                    JSON.stringify({ R: recipeData, I: knownIngredients } + '\n')
+                content: `You are a culinary expert. You will be given a recipe (R), a list of already known ingredients (I), and you will return a JSON with the following format: { "recipe": [recipeData sanitized with enhanced inferred infos], "new_ingredients": [...] }.\n${JSON.stringify({ R: recipeData, I: knownIngredients })}`
             }],
             temperature: 0.7
         }).then((response: any) => {

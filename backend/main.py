@@ -202,7 +202,6 @@ class BackendStack(NestedStack):
             security_groups=[lambda_security_group],
             environment={
                 'REGION': self.region,
-                'DB_SECRET_ARN': backend_db_creds.secret_arn,
             },
             timeout=Duration.minutes(15),
             memory_size=512,
@@ -574,8 +573,7 @@ class BackendStack(NestedStack):
 
 
         backend_db_policy_env = {
-            "SCRAP_DB_CREDS_SECRET_ARN": backend_db_creds.secret_arn,
-            "SCRAP_DB_PROXY_ENDPOINT": backend_db_proxy.endpoint,
+            'DB_SECRET_ARN': backend_db_creds.secret_arn,
         }
         
 

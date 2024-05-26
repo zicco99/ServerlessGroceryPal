@@ -225,7 +225,7 @@ class BackendStack(NestedStack):
             environment={
                 'REGION': self.region,
                 'CLAUDE_AI_API_KEY': claude_ai_api_key.secret_value_from_json("aws-claude-chef").to_string(),
-            }
+            },
             memory_size=256,
         )
 

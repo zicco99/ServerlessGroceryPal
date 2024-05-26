@@ -55,28 +55,34 @@ export const handler: Handler = async (
     }
 }
 
-async function askClaudeChef(recipeData: any, knownIngredients: any) : Promise<any> {
+async function askClaudeChef(recipeData: any, knownIngredients: any): Promise<any> {
     try {
         console.log('Asking Claude Chef...');
         console.log('Claude Chef parameters:', recipeData, knownIngredients);
+
         const response = await anthropic.messages.create({
             model: 'claude-3-opus-20240229',
-            max_tokens: 1024,
+            max_tokens: 2080,
             messages: [{
                 role: 'user',
-                content: `${JSON.stringify({ R: recipeData, I: knownIngredients })}`
+                content: JSON.stringify({ R: recipeData, I: knownIngredients })
             }],
-            system: 'You are a helpful assistant that enhance recipes json data, fix typos and add missing data . You will be given a recipe (R), a list of already known ingredients (I), and you will return a JSON with the following format: { "recipe": [recipeData sanitized with enhanced inferred infos], "new_ingredients": [...] }',
+            system: 'You are a helpful assistant that enhances recipes JSON data, fixes typos, and adds missing data. You will be given a recipe (R) and a list of already known ingredients (I). Your task is to return a JSON with the following format: { "recipe": [recipeData sanitized with enhanced inferred infos], "new_ingredients": [...] }',
             temperature: 0.7
         });
 
-        console.log('Claude Chef response:', response);
-        const enhanced_recipe = JSON.parse(response.content.toString());
+        console.log('Received response from Claude Chef:', response);
 
-        return enhanced_recipe;
+        // Parse the response content
+        const enhancedRecipe = JSON.parse(response.content.toString());
+
+        console.log('Enhanced Recipe:', enhancedRecipe);
+
+        return enhancedRecipe;
     } catch (error) {
         console.error('Error in askClaudeChef:', error);
         throw error;
     }
 }
+
 

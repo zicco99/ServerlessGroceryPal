@@ -227,7 +227,6 @@ class BackendStack(NestedStack):
                 'CLAUDE_AI_API_KEY': claude_ai_api_key.secret_value_from_json("aws-claude-chef").to_string(),
             },
             memory_size=256,
-            allow_all_outbound=True,
         )
 
          ###########################

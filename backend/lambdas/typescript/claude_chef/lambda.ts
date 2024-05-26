@@ -18,11 +18,12 @@ async function setConnectionString(): Promise<void> {
     const { SecretString } = data;
     const { password, username, dbname, port, host } = JSON.parse(SecretString || "");
     process.env.DATABASE_URL = `postgresql://${username}:${password}@${host}:${port}/${dbname}`;
+    console.log("DB connection string set: ", process.env.DATABASE_URL);
 }
 
 
 export const handler: Handler = async (
-    event: DynamoDBStreamEvent,
+    event: any,
     context: Context,
     callback: Callback,
 ): Promise<void> => {

@@ -84,7 +84,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
         console.log('Claude Context: ', context);
 
         const response = await anthropic.messages.create({
-            model: 'claude-3-opus-20240229',
+            model: 'claude-3-haiku-20240307',
             max_tokens: 2080,
             messages: [{
                 role: 'user',
@@ -113,5 +113,10 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
         throw error;
     }
 }
+
+
+//Per ogni ingrediente dai in pasto a claude la quantità unica per scegliere un'unità di misura unica e converti le altre
+
+
 
 

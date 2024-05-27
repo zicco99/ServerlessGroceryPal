@@ -98,7 +98,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
             temperature: 0.7
         });
 
-        const json_result = jsonrepair(response.content[0].text);
+        const json_result = jsonrepair('{' + response.content[0].text);
         console.log(json_result);
         const enhancedRecipe : RecipeData = JSON.parse(json_result);
         console.log('Received response from Claude Chef:', enhancedRecipe);

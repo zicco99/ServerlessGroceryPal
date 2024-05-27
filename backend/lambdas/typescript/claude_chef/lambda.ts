@@ -3,6 +3,7 @@ import { SecretsManager} from 'aws-sdk';
 import Anthropic from '@anthropic-ai/sdk';
 import { ClaudeChefKnowledgeBase, RecipeData, fetchKnowledgeBase, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
+import { jsonrepair } from 'jsonrepair';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY,
@@ -96,8 +97,10 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
             system: context,
             temperature: 0.7
         });
-        console.log(response.content);
-        const enhancedRecipe : RecipeData = JSON.parse(response.content[0].text);
+
+        const json_result = jsonrepair(response.content[0].text);
+        console.log(json_result);
+        const enhancedRecipe : RecipeData = JSON.parse(json_result);
         console.log('Received response from Claude Chef:', enhancedRecipe);
 
         console.log('Enhanced recipe:', enhancedRecipe);

@@ -62,16 +62,15 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
 
         const context = `
         You are a helpful assistant that clean and normalize recipe JSON to be insert then in DB.
-        You know that:
+        Here it is your knowledge base:
         - Categories already in DB: ${knowledgeBase.categories}
         - Ingredients already in DB: ${knowledgeBase.ingredients}
 
         Using the knowledge base, take user's give recipe data (R) and:
-        - If R should be in an already known category, then use it into the resulting recipe
-        - If R should be in an already known ingredient, then use it into the resulting recipe
-        - Fix typos in the whole json
-
-        In the end take all correct info and return them in a JSON with the following format:
+        1. Clean the data
+        2. Normalize the data using the knowledge base
+        3. Add the missing information
+        4. Return the data in JSON format with the following format:
         {
             title: string | null;
             category: string | null;
@@ -92,17 +91,14 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
             },
             {
                 role: 'assistant',
-                content: "Using the knowledge base and the given recipe the JSON should be: {"
+                content: "Here is the result of your steps: {"
             }],
             system: context,
             temperature: 0.7
         });
-
-        console.log('Received response from Claude Chef:', "{" + response);
-
-        const responseContent = response.content[0].text;
-        const enhancedRecipe : RecipeData = JSON.parse(responseContent);
-
+        console.log(response.content);
+        const enhancedRecipe : RecipeData = JSON.parse(response.content[0].text);
+        console.log('Received response from Claude Chef:', enhancedRecipe);
 
         console.log('Enhanced recipe:', enhancedRecipe);
 

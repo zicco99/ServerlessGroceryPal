@@ -68,7 +68,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
         - Ingredients already in DB: ${knowledgeBase.ingredients}
 
         Using the knowledge base, take user's give recipe data (R) and:
-        1. Clean the data
+        1. Rewrite the data, cleaning it to be insert in DB
         2. Normalize the data using the knowledge base
         3. Add the missing information
         4. Return the data in JSON format with the following format using italian language for values:

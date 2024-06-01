@@ -179,18 +179,11 @@ class BackendStack(NestedStack):
         )
 
 
-        scraped_recipes_table = dynamodb.Table(
-            self,
-            f"{base_name}-scraped-recipes",
-            table_name=f"{base_name}-scraped-recipes",
-            partition_key=dynamodb.Attribute(
-                name="recipeId",
-                type=dynamodb.AttributeType.STRING
-            ),
-            removal_policy=RemovalPolicy.DESTROY,
-            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            stream=dynamodb.StreamViewType.NEW_IMAGE
-        )
+
+
+
+
+        
 
         recipes_queue = sqs.Queue(
             self, f"{base_name}-recipes-queue",
@@ -253,16 +246,6 @@ class BackendStack(NestedStack):
          ###########################
         #     DYNAMODB STREAM     #
         ###########################
-
-
-        # Declaring the event stream so that /invites_keeper can listen for PUT/DELETE/MODIFY events
-        scraped_recipes_table_source = event_sources.DynamoEventSource(
-            table=scraped_recipes_table,
-            starting_position=lambd.StartingPosition.TRIM_HORIZON,  # events are processed sequentially in the order they occurred
-            retry_attempts=3,  # if an event fails to be processed, it is not retried
-        )
-
-        claude_chef.add_event_source(scraped_recipes_table_source)
 
         synchronizer_grant = iam.PolicyStatement(
             actions=['lambda:InvokeFunction'],

@@ -129,7 +129,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
     );
 
     try {
-        return await transaction;
+        return transaction;
     } catch (error) {
         console.error("Transaction failed: ", error);
         return null;

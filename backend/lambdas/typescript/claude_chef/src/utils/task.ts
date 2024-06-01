@@ -29,7 +29,7 @@ class Task {
     }
 
     toString(): string {
-        return `Task : ( \n \t start_page: ${this.startPage}, \n \t step: ${this.step}, \n \t page_chunk: [${this.pageChunk.pages.join(', ')}]\n)`;
+        return `Task(startPage=${this.startPage}, step=${this.step}, pageChunk=${this.pageChunk.pages})`;
     }
 
     sortPageChunk(compareFn: (a: number, b: number) => number): void {

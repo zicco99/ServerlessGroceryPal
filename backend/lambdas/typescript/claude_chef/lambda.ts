@@ -29,29 +29,24 @@ export const handler: Handler = async (
     callback: Callback,
 ): Promise<void> => {
     console.log("Event: ", event);
-
-    await setConnectionString();
-    if (!db_client) {
-        db_client = new PrismaClient();
-        await db_client.$connect();
-        console.log("DB client initialized!");
-    }
-
     try {
-        for (const record of event.Records) {
-            if (record.eventName === 'INSERT') {
-                const newRecipeData = record.dynamodb?.NewImage;
-                if (newRecipeData) {
-                    const jsonData = JSON.parse(newRecipeData.jsonData.S as string);
-                    console.log("JSON data: ", jsonData);
-                    const kb : ClaudeChefKnowledgeBase = await fetchKnowledgeBase(db_client)
-                    const normalizedRecipe = await askClaudeChef(jsonData,kb);
-                    console.log("Normalized recipe: ", normalizedRecipe);
-                }
-            }
+        await setConnectionString();
+        if (!db_client) {
+            db_client = new PrismaClient();
+            await db_client.$connect();
+            console.log("DB client initialized!");
+        }
+
+        const recipeData : RecipeData = JSON.parse(event as string);
+        console.log("JSON data: ", recipeData);
+        const kb : ClaudeChefKnowledgeBase = await fetchKnowledgeBase(db_client)
+        const normalizedRecipe = await askClaudeChef(recipeData,kb);
+        console.log("Normalized recipe: ", normalizedRecipe);
+        if (normalizedRecipe) {
+            await saveRecipeOnDB(db_client, normalizedRecipe);
         }
     } catch (error) {
-        console.error("Error processing DynamoDB stream event:", error);
+        console.error('Error processing event:', error);
         throw error;
     }
 }

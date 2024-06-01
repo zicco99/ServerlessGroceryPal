@@ -11,6 +11,7 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_dynamodb as dynamodb,
     aws_lambda_event_sources as event_sources,
+    aws_sqs as sqs,
     Stage,
 )
 
@@ -191,6 +192,14 @@ class BackendStack(NestedStack):
             stream=dynamodb.StreamViewType.NEW_IMAGE
         )
 
+        recipes_queue = sqs.Queue(
+            self, f"{base_name}-recipes-queue",
+            queue_name=f"{base_name}-recipes-queue",
+            removal_policy=RemovalPolicy.DESTROY,
+            visibility_timeout=Duration.minutes(5),
+            dead_letter_queue=sqs.DeadLetterQueue(max_receive_count=5) # Do 5 attempts before moving the message to DLQ
+        )
+
         synchronizer = lambd.Function(
             self,
             f"{base_name}-synchronizer",
@@ -202,11 +211,14 @@ class BackendStack(NestedStack):
             security_groups=[lambda_security_group],
             environment={
                 'REGION': self.region,
+                'RECIPES_QUEUE_URL': recipes_queue.queue_url,
             },
             timeout=Duration.minutes(15),
             memory_size=512,
             #phemeral_storage_size= Size.mebibytes(1024),
         )
+
+        recipes_queue.grant_send_messages(synchronizer)
 
         claude_ai_api_key = secretsmanager.Secret.from_secret_name_v2(
             self, f"{base_name}-claude-ai-api-key", "/backend-microservice/claude-ai-api-key"
@@ -225,10 +237,18 @@ class BackendStack(NestedStack):
             environment={
                 'REGION': self.region,
                 'CLAUDE_AI_API_KEY': claude_ai_api_key.secret_value_from_json("aws-claude-chef").to_string(),
+                'RECIPES_QUEUE_UR': recipes_queue.queue_url,
             },
             memory_size=256,
             timeout=Duration.seconds(300),
         )
+
+        recipes_queue.grant_consume_messages(claude_chef)
+
+        claude_chef.add_event_source(event_sources.SqsEventSource(
+            queue=recipes_queue,
+            batch_size=1  # Number of messages to process per invocation, set to 1 for single message processing
+        ))
 
          ###########################
         #     DYNAMODB STREAM     #

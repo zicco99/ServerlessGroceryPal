@@ -54,53 +54,56 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
     }
 }
 
-async function sendScrapedRecipeToSQS(recipeData: RecipeData, of_task: number): Promise<RecipeData | null> {
+async function sendScrapedRecipeToSQS(recipeData, of_task) {
     try {
-
         if (!process.env.RECIPES_QUEUE_URL || !recipeData || !recipeData.title || !recipeData.category || !recipeData.ingredients.length || !recipeData.steps.length) {
             console.error("Invalid recipe data.");
-            return null;            
+            return Promise.resolve(null);
         } 
 
         const hash = crypto.createHash('sha256');
         hash.update(JSON.stringify(recipeData));
         const recipe_id = hash.digest('hex').slice(0, 20);
 
-        const recipe : any = {
+        const recipe = {
             id: recipe_id,
             title: recipeData.title || 'No title',
             category: recipeData.category || 'No category',
             imageUrl: recipeData.imageUrl || '',
+            ingredients: recipeData.ingredients.map((ingredient, index) => ({
+                id: index + 1,
+                name: ingredient.name,
+                unit: "",
+            })),
+            steps: recipeData.steps.map((step, index) => ({
+                id: index + 1,
+                recipeId: recipe_id, // Assuming recipeId should be recipe_id
+                imageUrl: step.imageUrl || '',
+                explaining: step.explaining || '',
+                nStep: index + 1,
+            }))
         };
 
-        const modelIngredients = recipeData.ingredients.map((ingredient, index) => ({
-            id: index + 1,
-            name: ingredient.name,
-            unit: "",
-        }));
+        const recipeMessage = {
+            recipe_id,
+            of_task,
+            scheduled_at: new Date(),
+            jsonData: recipeData
+        };
 
-        const modelSteps = recipeData.steps.map((step, index) => ({
-            id: index + 1,
-            recipeId: 1,
-            imageUrl: step.imageUrl || '',
-            explaining: step.explaining || '',
-            nStep: index + 1,
-        }));
+        const params = {
+            MessageBody: JSON.stringify(recipeMessage),
+            QueueUrl: process.env.RECIPES_QUEUE_URL
+        };
+        
+        await sqsClient.sendMessage(params).promise();
+        console.log("Recipe sent to SQS.");
 
-        recipe.ingredients = modelIngredients;
-        recipe.steps = modelSteps;
-
-        await sqsClient.sendMessage({
-            QueueUrl: process.env.RECIPES_QUEUE_URL || "",
-            MessageBody: JSON.stringify(recipe)
-        }).promise();
-
-        console.log("Recipe sent to queue:", recipe);
-        return recipe;
+        return recipeMessage;
     
     } catch (error) {
         console.error("Error sending recipe to SQS:", error);
-        return null;
+        return Promise.resolve(null);
     }
 }
 

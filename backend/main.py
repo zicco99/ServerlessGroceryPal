@@ -225,7 +225,6 @@ class BackendStack(NestedStack):
                 'RECIPES_QUEUE_UR': recipes_queue.queue_url,
             },
             memory_size=256,
-            timeout=Duration.seconds(300),
             retry_attempts=2
         )
 

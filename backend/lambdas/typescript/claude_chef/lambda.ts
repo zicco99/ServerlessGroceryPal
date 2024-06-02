@@ -102,9 +102,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
         
         console.log('Enhanced recipe:', enhancedRecipe);
 
-        saveRecipeOnDB(db_client, enhancedRecipe).then(() => console.log('Recipe saved on DB'));
-
-        return enhancedRecipe;
+        return saveRecipeOnDB(db_client, enhancedRecipe);
     } catch (error) {
         console.error('Error in askClaudeChef:', error);
         throw error;

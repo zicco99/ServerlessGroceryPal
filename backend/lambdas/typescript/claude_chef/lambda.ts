@@ -88,7 +88,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
             },
             {
                 role: 'assistant',
-                content: "Here is result from 4 step, after done the cleaning and normalization : {"
+                content: "{"
             }],
             system: context,
             temperature: 0.7

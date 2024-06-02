@@ -1,7 +1,7 @@
 import { Callback, Context, DynamoDBStreamEvent, Handler } from 'aws-lambda';
 import { SecretsManager} from 'aws-sdk';
 import Anthropic from '@anthropic-ai/sdk';
-import { ClaudeChefKnowledgeBase, RecipeData, fetchKnowledgeBase, saveRecipeOnDB } from './src/scrap/recipes';
+import { ClaudeChefKnowledgeBase, RecipeData, ScrapedRecipeMessage, fetchKnowledgeBase, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
 import { jsonrepair } from 'jsonrepair';
 
@@ -37,10 +37,10 @@ export const handler: Handler = async (
             console.log("DB client initialized!");
         }
 
-        const recipeData : RecipeData = JSON.parse(event as string);
+        const recipeData : ScrapedRecipeMessage = JSON.parse(event as string);
         console.log("JSON data: ", recipeData);
         const kb : ClaudeChefKnowledgeBase = await fetchKnowledgeBase(db_client)
-        const normalizedRecipe = await askClaudeChef(recipeData,kb);
+        const normalizedRecipe = await askClaudeChef(recipeData.jsonData,kb);
         console.log("Normalized recipe: ", normalizedRecipe);
         if (normalizedRecipe) {
             await saveRecipeOnDB(db_client, normalizedRecipe);
@@ -51,7 +51,7 @@ export const handler: Handler = async (
     }
 }
 
-async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledgeBase): Promise<any> {
+async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKnowledgeBase): Promise<any> {
     try {
         console.log('Asking Claude Chef...');
         console.log('Claude Chef parameters:', recipeData, knowledgeBase);

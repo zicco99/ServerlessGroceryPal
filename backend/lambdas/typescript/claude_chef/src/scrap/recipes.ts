@@ -3,11 +3,19 @@ import axios from 'axios';
 import { PrismaClient, Recipe } from '../../prisma/client';
 
 type RecipeData = {
+    id: string;
     title: string | null;
     category: string | null;
     imageUrl: string | null;
     ingredients: { name: string; quantity: string }[];
     steps: { imageUrl: string | null; explaining: string }[];
+};
+
+type ScrapedRecipeMessage = {
+    recipe_id: string;
+    of_task: number;
+    scheduled_at: Date;
+    jsonData: RecipeData;
 };
 
 
@@ -137,5 +145,5 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
 }
 
 
-export { saveRecipeOnDB, RecipeData, fetchKnowledgeBase, ClaudeChefKnowledgeBase };
+export { saveRecipeOnDB, RecipeData, fetchKnowledgeBase, ClaudeChefKnowledgeBase, ScrapedRecipeMessage };
 

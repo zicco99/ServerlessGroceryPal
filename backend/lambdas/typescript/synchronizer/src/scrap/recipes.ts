@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import * as AWS from 'aws-sdk';
 
 type RecipeData = {
+    id: string;
     title: string | null;
     category: string | null;
     imageUrl: string | null;
@@ -47,10 +48,10 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
             }
         });
 
-        return { title: titleRecipe, category, imageUrl: imageURL, ingredients: allIngredients, steps };
+        return { id : "", title: titleRecipe, category, imageUrl: imageURL, ingredients: allIngredients, steps };
     } catch (error) {
         console.error('Error fetching the recipe:', error);
-        return { title: null, category: null, imageUrl: null, ingredients: [], steps: [] };
+        return { id: "", title: null, category: null, imageUrl: null, ingredients: [], steps: [] };
     }
 }
 
@@ -65,7 +66,7 @@ async function sendScrapedRecipeToSQS(recipeData, of_task) {
         hash.update(JSON.stringify(recipeData));
         const recipe_id = hash.digest('hex').slice(0, 20);
 
-        const recipe = {
+        const recipe : RecipeData = {
             id: recipe_id,
             title: recipeData.title || 'No title',
             category: recipeData.category || 'No category',
@@ -77,7 +78,7 @@ async function sendScrapedRecipeToSQS(recipeData, of_task) {
             })),
             steps: recipeData.steps.map((step, index) => ({
                 id: index + 1,
-                recipeId: recipe_id, // Assuming recipeId should be recipe_id
+                recipeId: recipe_id, 
                 imageUrl: step.imageUrl || '',
                 explaining: step.explaining || '',
                 nStep: index + 1,
@@ -88,7 +89,7 @@ async function sendScrapedRecipeToSQS(recipeData, of_task) {
             recipe_id,
             of_task,
             scheduled_at: new Date(),
-            jsonData: recipeData
+            jsonData: recipe
         };
 
         const params = {

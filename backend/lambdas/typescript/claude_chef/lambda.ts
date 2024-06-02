@@ -29,6 +29,7 @@ export const handler: Handler = async (
     callback: Callback,
 ): Promise<void> => {
     console.log("Event: ", event);
+    console.log("Payload: ", event["Records"][0]["body"]);
     try {
         await setConnectionString();
         if (!db_client) {
@@ -37,7 +38,7 @@ export const handler: Handler = async (
             console.log("DB client initialized!");
         }
 
-        const recipeData : ScrapedRecipeMessage = JSON.parse(event["body"] as string);
+        const recipeData : ScrapedRecipeMessage = JSON.parse(event["Records"][0]["body"] as string);
         console.log("JSON data: ", recipeData);
         const kb : ClaudeChefKnowledgeBase = await fetchKnowledgeBase(db_client)
         const normalizedRecipe = await askClaudeChef(recipeData.jsonData,kb);

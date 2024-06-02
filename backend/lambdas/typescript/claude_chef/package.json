@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build-lambda": "webpack --mode production"
+    "build-lambda": "export NODE_OPTIONS=--openssl-legacy-provider && webpack --mode production"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.21.1",

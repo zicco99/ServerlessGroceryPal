@@ -55,7 +55,7 @@ export const handler: Handler = async (
 async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKnowledgeBase): Promise<any> {
     try {
         console.log('Asking Claude Chef...');
-        console.log('Claude Chef parameters:', recipeData, knowledgeBase);
+        console.log(`Recipe data: ${JSON.stringify(recipeData)} | Knowledge base: ${JSON.stringify(knowledgeBase)}`);
 
         const context = `
         You are a helpful assistant that clean and normalize recipe JSON to be insert then in DB.
@@ -89,7 +89,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
             },
             {
                 role: 'assistant',
-                content: "{"
+                content: "Here is the result of 4th step: {"
             }],
             system: context,
             temperature: 0.7

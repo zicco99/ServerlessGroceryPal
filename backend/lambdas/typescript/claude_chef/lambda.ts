@@ -99,8 +99,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
         const json_result = jsonrepair('{' + response.content[0].text);
         console.log(json_result);
         const enhancedRecipe : RecipeData = JSON.parse(json_result);
-        console.log('Received response from Claude Chef:', enhancedRecipe);
-
+        
         console.log('Enhanced recipe:', enhancedRecipe);
 
         saveRecipeOnDB(db_client, enhancedRecipe).then(() => console.log('Recipe saved on DB'));

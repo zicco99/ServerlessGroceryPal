@@ -38,7 +38,7 @@ const scrapRecipe = async (url: string, of_task: number): Promise<void> => {
         const recipeData = await fetchRecipeData(url);
         console.log("Data obtained: ", recipeData);
         if (recipeData && recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
-            console.log('Saving recipe on DB...');
+            console.log('Adding recipe to SQS...');
             sendScrapedRecipeToSQS(recipeData, of_task).then(() => console.log('Recipe added to SQS'));
         } else {
             throw new Error('Recipe data is not complete')

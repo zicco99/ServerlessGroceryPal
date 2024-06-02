@@ -179,18 +179,10 @@ class BackendStack(NestedStack):
         )
 
 
-
-
-
-
-        
-
         recipes_queue = sqs.Queue(
             self, f"{base_name}-recipes-queue",
             queue_name=f"{base_name}-recipes-queue",
             removal_policy=RemovalPolicy.DESTROY,
-            visibility_timeout=Duration.minutes(5),
-            dead_letter_queue=sqs.DeadLetterQueue(max_receive_count=5) # Do 5 attempts before moving the message to DLQ
         )
 
         synchronizer = lambd.Function(
@@ -234,6 +226,7 @@ class BackendStack(NestedStack):
             },
             memory_size=256,
             timeout=Duration.seconds(300),
+            retry_attempts=5
         )
 
         recipes_queue.grant_consume_messages(claude_chef)

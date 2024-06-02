@@ -67,6 +67,7 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
         2. Normalize the data using the knowledge base
         3. Add the missing information
         4. Return the data in JSON format with the following format using italian language for values:
+
         {
             title: string | null;
             category: string | null;
@@ -87,11 +88,13 @@ async function askClaudeChef(recipeData: any, knowledgeBase: ClaudeChefKnowledge
             },
             {
                 role: 'assistant',
-                content: "Here is the result of your steps: {"
+                content: "Here is result from 4 step, after done the cleaning and normalization : {"
             }],
             system: context,
             temperature: 0.7
         });
+
+        console.log("Response from Claude Chef:", response.content[0].text);
 
         const json_result = jsonrepair('{' + response.content[0].text);
         console.log(json_result);

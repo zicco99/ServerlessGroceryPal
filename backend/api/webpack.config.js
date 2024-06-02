@@ -24,6 +24,7 @@ module.exports = function (options) {
           return lazyImports.includes(resource);
         },
       }),
+      
       new CopyPlugin({
         patterns: [
           {

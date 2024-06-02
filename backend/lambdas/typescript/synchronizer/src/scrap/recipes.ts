@@ -56,9 +56,8 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
 
 async function sendScrapedRecipeToSQS(recipeData: RecipeData, of_task: number): Promise<RecipeData | null> {
     try {
-        const scrapedRecipeTable = process.env.SCRAPED_RECIPES_TABLE;
 
-        if (!scrapedRecipeTable || !recipeData || !recipeData.title || !recipeData.category || !recipeData.ingredients.length || !recipeData.steps.length) {
+        if (!process.env.RECIPES_QUEUE_URL || !recipeData || !recipeData.title || !recipeData.category || !recipeData.ingredients.length || !recipeData.steps.length) {
             console.error("Invalid recipe data.");
             return null;            
         } 

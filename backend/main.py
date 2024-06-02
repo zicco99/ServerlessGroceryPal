@@ -226,7 +226,7 @@ class BackendStack(NestedStack):
             },
             memory_size=256,
             timeout=Duration.seconds(300),
-            retry_attempts=5
+            retry_attempts=2
         )
 
         recipes_queue.grant_consume_messages(claude_chef)
@@ -607,40 +607,13 @@ class BackendStack(NestedStack):
         # SCRAPED RECIPES TABLE RW ----------------------------------------------------
         # IAM policy to access scraped recipes table
 
-        scraped_recipes_table_rw_policy = iam.Policy(
-            self,
-            f"{base_name}-scraped-recipes-table-rw-policy",
-            statements=[
-                iam.PolicyStatement(
-                    actions=[
-                        "dynamodb:GetItem",
-                        "dynamodb:PutItem",
-                        "dynamodb:UpdateItem",
-                        "dynamodb:DeleteItem",
-                        "dynamodb:Query",
-                        "dynamodb:Scan",
-                    ],
-                    resources=[scraped_recipes_table.table_arn],
-                )
-            ],
-        )
-
-        scraped_recipes_table_env = {
-            "SCRAPED_RECIPES_TABLE": scraped_recipes_table.table_name,
-        }
-
-        enum_perm_to_policy_and_env[Permission.RW_SCRAPED_RECIPES_DYNAMO] = (
-            scraped_recipes_table_rw_policy,
-            scraped_recipes_table_env,
-        )
-
         lambda_perms_association = {
             #db_bootstrap: [Permission.RW_PERM_SCRAP_DB],
             #syncronizer: [Permission.RW_PERM_SCRAP_DB],
             #recipes: [Permission.RW_PERM_SCRAP_DB]
             nestjs_serverless: [Permission.RW_PERM_SCRAP_DB],
-            synchronizer: [Permission.RW_PERM_SCRAP_DB, Permission.RW_SCRAPED_RECIPES_DYNAMO],
-            claude_chef: [Permission.RW_PERM_SCRAP_DB, Permission.RW_SCRAPED_RECIPES_DYNAMO],
+            synchronizer: [Permission.RW_PERM_SCRAP_DB],
+            claude_chef: [Permission.RW_PERM_SCRAP_DB],
         }
 
         for lamdba, perms in lambda_perms_association.items():

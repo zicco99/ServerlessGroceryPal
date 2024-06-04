@@ -95,6 +95,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         // Create Recipe with ingredients and steps
         const createdRecipe = await prisma.recipe.create({
             data: {
+                id: recipeData.id,
                 title: recipeData.title || 'No title',
                 category: recipeData.category || 'No category',
                 imageUrl: recipeData.imageUrl,

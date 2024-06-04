@@ -17,6 +17,7 @@ let db_client = new PrismaClient();
 const lambdaClient = new LambdaClient();
 const secretsManager = new SecretsManager({ region: process.env.REGION });
 
+
 async function set_connection_string(): Promise<void> {
     const params = {
         SecretId: process.env.DB_SECRET_ARN || "",

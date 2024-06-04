@@ -177,6 +177,7 @@ class BackendStack(NestedStack):
             #phemeral_storage_size= Size.mebibytes(1024),
             memory_size=512,
         )
+
         
         recipes_queue = sqs.Queue(
             self, f"{base_name}-recipes-queue",
@@ -224,7 +225,8 @@ class BackendStack(NestedStack):
                 'RECIPES_QUEUE_UR': recipes_queue.queue_url,
             },
             memory_size=256,
-            retry_attempts=2
+            retry_attempts=2,
+            timeout=Duration.seconds(40)
         )
 
         recipes_queue.grant_consume_messages(claude_chef)

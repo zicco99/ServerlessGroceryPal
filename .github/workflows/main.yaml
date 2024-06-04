@@ -57,7 +57,7 @@ jobs:
           npm install prisma
           echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
           npx prisma generate --schema=./prisma/schema.prisma
-          chmod +x backend/lambdas/typescript/claude_chef/prisma/client/query-engine-rhel-openssl-1.0.x
+          chmod +x ./prisma/client/query-engine-rhel-openssl-1.0.x
 
       - name: Compile and move NestJS Backend API to lambda's relative folder
         run: |

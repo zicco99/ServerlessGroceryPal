@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { ClaudeChefKnowledgeBase, RecipeData, ScrapedRecipeMessage, fetchKnowledgeBase, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
 import { jsonrepair } from 'jsonrepair';
-import { json } from 'stream/consumers';
+import { time } from 'console';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY,
@@ -32,6 +32,7 @@ export const handler: Handler = async (
     console.log("Event: ", event);
     console.log("Payload: ", event["Records"][0]["body"]);
     try {
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 20000 + 10000));
         await setConnectionString();
         if (!db_client) {
             global.db_client = new PrismaClient();

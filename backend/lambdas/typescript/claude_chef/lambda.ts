@@ -58,6 +58,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
     try {
         console.log('Asking Claude Chef...');
         console.log(`Recipe data: ${JSON.stringify(recipeData)} | Knowledge base: ${JSON.stringify(knowledgeBase)}`);
+        
 
         const context = `
         You are a helpful assistant that cleans and normalizes recipe JSON data for insertion into a database.

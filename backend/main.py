@@ -177,8 +177,7 @@ class BackendStack(NestedStack):
             #phemeral_storage_size= Size.mebibytes(1024),
             memory_size=512,
         )
-
-        '''
+        
         recipes_queue = sqs.Queue(
             self, f"{base_name}-recipes-queue",
             queue_name=f"{base_name}-recipes-queue",
@@ -234,6 +233,10 @@ class BackendStack(NestedStack):
             queue=recipes_queue,
             batch_size=1  # Number of messages to process per invocation, set to 1 for single message processing
         ))
+
+         ###########################
+        #     DYNAMODB STREAM     #
+        ###########################
 
         synchronizer_grant = iam.PolicyStatement(
             actions=['lambda:InvokeFunction'],
@@ -302,8 +305,6 @@ class BackendStack(NestedStack):
                 synchronizer,
             )
         )
-
-        '''
 
 
         # ------------------------------------------#
@@ -609,8 +610,8 @@ class BackendStack(NestedStack):
             #syncronizer: [Permission.RW_PERM_SCRAP_DB],
             #recipes: [Permission.RW_PERM_SCRAP_DB]
             nestjs_serverless: [Permission.RW_PERM_SCRAP_DB],
-            #synchronizer: [Permission.RW_PERM_SCRAP_DB],
-            #claude_chef: [Permission.RW_PERM_SCRAP_DB],
+            synchronizer: [Permission.RW_PERM_SCRAP_DB],
+            claude_chef: [Permission.RW_PERM_SCRAP_DB],
         }
 
         for lamdba, perms in lambda_perms_association.items():

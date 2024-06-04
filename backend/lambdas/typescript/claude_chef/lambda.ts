@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { ClaudeChefKnowledgeBase, RecipeData, ScrapedRecipeMessage, fetchKnowledgeBase, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
 import { jsonrepair } from 'jsonrepair';
+import { json } from 'stream/consumers';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY,
@@ -66,11 +67,11 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         - Categories already in the database: ${knowledgeBase.categories}
         - Ingredients already in the database: ${knowledgeBase.ingredients}
 
-        Using the knowledge base, take the user-provided recipe data and perform the following steps:
+        Using the knowledge base, take the user-provided recipe data and perform on it the following steps:
         1. Clean and rewrite the data to prepare it for insertion into the database.
         2. Normalize the data by utilizing the information from the knowledge base.
-        3. Fill in any missing information in the recipe data.
-        4. Return the processed data in JSON format using the following structure, with values in Italian:
+        3. Fill in any missing information in the recipe data and fix the one is already present
+        5. Return the processed data in JSON format using the following structure, with values in Italian:
 
 
         {
@@ -85,11 +86,11 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         console.log('Claude Context: ', context);
 
         const response = await anthropic.messages.create({
-            model: 'claude-3-haiku-20240307', // Use the best model for the task
+            model: 'claude-3-sonnet-20240229', // Use the best model for the task
             max_tokens: 2080,
             messages: [{
                 role: 'user',
-                content: JSON.stringify(recipeData),
+                content: "this is the recipe data " + JSON.stringify(recipeData),
             },
             {
                 role: 'assistant',

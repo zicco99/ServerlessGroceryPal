@@ -85,7 +85,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         console.log('Claude Context: ', context);
 
         const response = await anthropic.messages.create({
-            model: 'claude-3-haiku-20240229', // Use the best model for the task
+            model: 'claude-3-haiku-20240307', // Use the best model for the task
             max_tokens: 2080,
             messages: [{
                 role: 'user',

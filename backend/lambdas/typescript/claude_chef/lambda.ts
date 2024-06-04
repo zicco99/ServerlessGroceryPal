@@ -58,16 +58,16 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         console.log(`Recipe data: ${JSON.stringify(recipeData)} | Knowledge base: ${JSON.stringify(knowledgeBase)}`);
 
         const context = `
-        You are a helpful assistant that clean and normalize recipe JSON to be insert then in DB.
-        Here it is your knowledge base:
-        - Categories already in DB: ${knowledgeBase.categories}
-        - Ingredients already in DB: ${knowledgeBase.ingredients}
+        You are a helpful assistant that cleans and normalizes recipe JSON data for insertion into a database.
+        Here is your knowledge base:
+        - Categories already in the database: ${knowledgeBase.categories}
+        - Ingredients already in the database: ${knowledgeBase.ingredients}
 
-        Using the knowledge base, take user's give recipe data (R) and:
-        1. Rewrite the data, cleaning it to be insert in DB
-        2. Normalize the data using the knowledge base
-        3. Add the missing information
-        4. Return the data in JSON format with the following format using italian language for values:
+        Using the knowledge base, take the user-provided recipe data and perform the following steps:
+        1. Clean and rewrite the data to prepare it for insertion into the database.
+        2. Normalize the data by utilizing the information from the knowledge base.
+        3. Fill in any missing information in the recipe data.
+        4. Return the processed data in JSON format using the following structure, with values in Italian:
 
         {
             title: string | null;
@@ -81,7 +81,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         console.log('Claude Context: ', context);
 
         const response = await anthropic.messages.create({
-            model: 'claude-3-haiku-20240229',
+            model: 'claude-2', // Use the best model for the task
             max_tokens: 2080,
             messages: [{
                 role: 'user',
@@ -89,7 +89,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
             },
             {
                 role: 'assistant',
-                content: "Here is the result of 4th step: {"
+                content: "Here is the result of step 4: {"
             }],
             system: context,
             temperature: 0.7
@@ -99,7 +99,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
 
         const json_result = jsonrepair('{' + response.content[0].text);
         console.log(json_result);
-        const enhancedRecipe : RecipeData = JSON.parse(json_result);
+        const enhancedRecipe: RecipeData = JSON.parse(json_result);
         
         console.log('Enhanced recipe:', enhancedRecipe);
 

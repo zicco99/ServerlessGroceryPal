@@ -32,6 +32,7 @@ export const handler: Handler = async (
     console.log("Event: ", event);
     console.log("Payload: ", event["Records"][0]["body"]);
     try {
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 4000 + 3000));
         await setConnectionString();
         if (!db_client) {
             global.db_client = new PrismaClient();

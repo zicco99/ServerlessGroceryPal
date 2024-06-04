@@ -62,25 +62,26 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         
 
         const context = `
-        You are a helpful assistant that cleans and normalizes recipe JSON data for insertion into a database.
-        Here is your knowledge base:
-        - Categories already in the database: ${knowledgeBase.categories}
-        - Ingredients already in the database: ${knowledgeBase.ingredients}
+            Knowledge Base:
+            - Categories already in the database: ${JSON.stringify(knowledgeBase.categories)}
+            - Ingredients already in the database: ${JSON.stringify(knowledgeBase.ingredients)}
 
-        Using the knowledge base, take the user-provided recipe data and perform on it the following steps:
-        1. Clean and rewrite the data to prepare it for insertion into the database.
-        2. Normalize the data by utilizing the information from the knowledge base.
-        3. Fill in any missing information in the recipe data and fix the one is already present
-        5. Return the processed data in JSON format using the following structure, with values in Italian:
+            Using the information from the knowledge base, your task is to process the user-provided recipe data by performing the following steps:
 
+            1. Clean and rewrite the recipe data to prepare it for insertion into the database. This may involve removing any inconsistencies or errors in the data.
 
-        {
-            title: string | null;
-            category: string | null;
-            imageUrl: string | null;
-            ingredients: { name: string; quantity: string }[];
-            steps: { imageUrl: string | null; explaining: string }[];
-        }
+            2. Normalize the recipe data by utilizing the information from the knowledge base. Ensure that the categories and ingredients in the recipe data match the ones already present in the database.
+
+            3. Fill in any missing information in the recipe data and fix any incorrect or incomplete data that is already present.
+
+            4. Return the processed recipe data in JSON format using the following structure, with all values in Italian:
+                {
+                    title: string | null;
+                    category: string | null;
+                    imageUrl: string | null;
+                    ingredients: { name: string; quantity: string }[];
+                    steps: { imageUrl: string | null; explaining: string }[];
+                }
         `
 
         console.log('Claude Context: ', context);

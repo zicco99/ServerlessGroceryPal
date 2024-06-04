@@ -72,16 +72,12 @@ async function sendScrapedRecipeToSQS(recipeData, of_task) {
             category: recipeData.category || 'No category',
             imageUrl: recipeData.imageUrl || '',
             ingredients: recipeData.ingredients.map((ingredient, index) => ({
-                id: index + 1,
                 name: ingredient.name,
-                unit: "",
+                quantity: "",
             })),
             steps: recipeData.steps.map((step, index) => ({
-                id: index + 1,
-                recipeId: recipe_id, 
                 imageUrl: step.imageUrl || '',
-                explaining: step.explaining || '',
-                nStep: index + 1,
+                explaining: step.explaining || ''
             }))
         };
 

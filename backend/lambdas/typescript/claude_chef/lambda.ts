@@ -76,6 +76,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
 
             4. Return the processed recipe data in JSON format using the following structure, with all values in Italian:
                 {
+                    id: string;
                     title: string | null;
                     category: string | null;
                     imageUrl: string | null;

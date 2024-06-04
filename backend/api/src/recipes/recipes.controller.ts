@@ -14,12 +14,12 @@ export class RecipesController {
   
     @Get(':id')
     async getRecipeById(@Param('id') id: string): Promise<Recipe> {
-      return this.recipesService.getRecipeById(parseInt(id));
+      return this.recipesService.getRecipeById(id);
     }
   
     @Delete(':id')
     async deleteRecipe(@Param('id') id: string): Promise<void> {
-      await this.recipesService.deleteRecipe(parseInt(id));
+      await this.recipesService.deleteRecipe(id);
       return
     }
 

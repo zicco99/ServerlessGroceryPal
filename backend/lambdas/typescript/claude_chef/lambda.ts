@@ -33,10 +33,12 @@ export const handler: Handler = async (
     try {
         await setConnectionString();
         if (!db_client) {
-            db_client = new PrismaClient();
-            await db_client.$connect();
+            global.db_client = new PrismaClient();
+            await global.db_client.$connect();
             console.log("DB client initialized!");
         }
+
+        db_client = global.db_client;
 
         const recipeData : ScrapedRecipeMessage = JSON.parse(event["Records"][0]["body"] as string);
         console.log("JSON data: ", recipeData);

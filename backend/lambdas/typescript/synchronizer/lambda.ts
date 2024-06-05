@@ -73,10 +73,8 @@ const execute = async ( task: Task) : Promise<void> => {
 
         await Promise.all(recipeLinks.map(async (link) => {
             //This way 1000 * 10000 = 1000000 sec = 10 minutes max 
-            console.log("[RUNNER] [EXECUTE] ProcessingTask: ", task);
             await new Promise(resolve => setTimeout(resolve, (Math.random() * (PAGE_TASK_RATE_MAX - PAGE_TASK_RATE_MIN)) + PAGE_TASK_RATE_MIN));
-
-            await scrapRecipe(link, task.n_task);
+            return scrapRecipe(link, task.n_task);
         }));
     }
     console.log(`[RUNNER] [EXECUTE] Completed Task: ${task}`);

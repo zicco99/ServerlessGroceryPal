@@ -198,9 +198,8 @@ class BackendStack(NestedStack):
                 'REGION': self.region,
                 'RECIPES_QUEUE_URL': recipes_queue.queue_url,
             },
-            timeout=Duration.minutes(15),
-            memory_size=512,
-            #phemeral_storage_size= Size.mebibytes(1024),
+            timeout=Duration.minutes(15), 
+            memory_size=512
         )
 
         recipes_queue.grant_send_messages(synchronizer)
@@ -208,7 +207,6 @@ class BackendStack(NestedStack):
         claude_ai_api_key = secretsmanager.Secret.from_secret_name_v2(
             self, f"{base_name}-claude-ai-api-key", "/backend-microservice/claude-ai-api-key"
         )
-    
 
         claude_chef = lambd.Function(
             self,
@@ -222,19 +220,19 @@ class BackendStack(NestedStack):
             environment={
                 'REGION': self.region,
                 'CLAUDE_AI_API_KEY': claude_ai_api_key.secret_value_from_json("aws-claude-chef").to_string(),
-                'RECIPES_QUEUE_UR': recipes_queue.queue_url,
+                'RECIPES_QUEUE_URL': recipes_queue.queue_url,
             },
             memory_size=256,
             retry_attempts=2,
-            timeout=Duration.seconds(40),
-            reserved_concurrent_executions=3
+            timeout=Duration.seconds(20)
         )
 
         recipes_queue.grant_consume_messages(claude_chef)
 
         claude_chef.add_event_source(event_sources.SqsEventSource(
             queue=recipes_queue,
-            batch_size=1  # Number of messages to process per invocation, set to 1 for single message processing
+            batch_size=1,  # Number of messages to process per invocation, set to 1 for single message processing
+            max_concurrency=1  # Maximum number of invocations to process in parallel
         ))
 
          ###########################

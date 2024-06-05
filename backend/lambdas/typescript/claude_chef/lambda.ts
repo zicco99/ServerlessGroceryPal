@@ -60,8 +60,9 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
     try {
         console.log('Asking Claude Chef...');
         console.log(`Recipe data: ${JSON.stringify(recipeData)} | Knowledge base: ${JSON.stringify(knowledgeBase)}`);
-        
 
+        await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 seconds as Claude Chef has 60 requests per minute limit
+        
         const context = `
             Knowledge Base:
             - Categories already in the database: ${JSON.stringify(knowledgeBase.categories)}
@@ -99,7 +100,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
             },
             {
                 role: 'assistant',
-                content: "Here is the result of step 4: {"
+                content: "Here is the result of step 4: {"  //JSON mode 
             }],
             system: context,
             temperature: 0.7

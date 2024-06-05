@@ -24,6 +24,7 @@ type ClaudeChefKnowledgeBase = {
     ingredients: string[];
 }
 
+
 async function fetchKnowledgeBase(prisma: PrismaClient | null): Promise<ClaudeChefKnowledgeBase> {
     if (!prisma) {
         throw new Error('Prisma client not initialized');

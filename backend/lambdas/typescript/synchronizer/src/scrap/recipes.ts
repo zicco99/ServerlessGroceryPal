@@ -2,6 +2,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import crypto from 'crypto';
 import * as AWS from 'aws-sdk';
+import { PrismaClient } from '../../prisma/client';
 
 type RecipeData = {
     id: string;
@@ -20,6 +21,27 @@ type ScrapedRecipeMessage = {
 };
 
 const sqsClient = new AWS.SQS({ region: process.env.REGION }); 
+
+
+function obtainRecipeId(recipe : RecipeData) {
+    const hash = crypto.createHash('sha256');
+    hash.update(JSON.stringify(recipe));
+    return hash.digest('hex').slice(0, 20);
+}
+
+async function checkIfRecipeExists(prisma: PrismaClient, id : string): Promise<boolean> {
+    let recipe = await prisma.recipe.findFirst(
+        {
+            where: {
+                id: id
+            }
+        }
+    )
+    if(recipe) {
+        return true
+    }
+    return false
+}   
 
 async function fetchRecipeData(url: string): Promise<RecipeData> {
     try {
@@ -62,9 +84,7 @@ async function sendScrapedRecipeToSQS(recipeData, of_task) {
             return Promise.resolve(null);
         } 
 
-        const hash = crypto.createHash('sha256');
-        hash.update(JSON.stringify(recipeData));
-        const recipe_id = hash.digest('hex').slice(0, 20);
+        const recipe_id = obtainRecipeId(recipeData);
 
         const recipe : RecipeData = {
             id: recipe_id,
@@ -104,4 +124,4 @@ async function sendScrapedRecipeToSQS(recipeData, of_task) {
     }
 }
 
-export { fetchRecipeData, sendScrapedRecipeToSQS, RecipeData };
+export { fetchRecipeData, sendScrapedRecipeToSQS, checkIfRecipeExists, obtainRecipeId, RecipeData };

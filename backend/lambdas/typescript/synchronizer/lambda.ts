@@ -28,7 +28,7 @@ async function set_connection_string(): Promise<void> {
 }
 
 import {Task} from './src/utils/task';
-import { fetchRecipeData, sendScrapedRecipeToSQS } from './src/scrap/recipes';
+import { checkIfRecipeExists, fetchRecipeData, obtainRecipeId, sendScrapedRecipeToSQS } from './src/scrap/recipes';
 
 const lambda_id = Math.random().toString(16).slice(2)
 
@@ -39,7 +39,11 @@ const scrapRecipe = async (url: string, of_task: number): Promise<void> => {
         console.log("Data obtained: ", recipeData);
         if (recipeData && recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
             console.log('Adding recipe to SQS...');
-            sendScrapedRecipeToSQS(recipeData, of_task).then(() => console.log('Recipe added to SQS'));
+            if (await checkIfRecipeExists(db_client, obtainRecipeId(recipeData))===false) {
+                sendScrapedRecipeToSQS(recipeData, of_task).then(() => console.log('Recipe added to SQS'));
+            } else {
+                console.log("Recipe already on the db, skipping")
+            }
         } else {
             throw new Error('Recipe data is not complete')
         }
@@ -100,6 +104,8 @@ const parallelize = async (context: Context): Promise<void> => {
 
         console.log("[ROOT] Shuffled Task: ", task);
 
+        
+
         // Wait between invocations to reuse parallel lambdas
         const delay = Math.random() * (INVOCATION_RATE_MAX - INVOCATION_RATE_MIN) + INVOCATION_RATE_MIN;
         await new Promise(resolve => setTimeout(resolve, delay));
@@ -129,11 +135,14 @@ const handler: Handler = async (
 
     try {
         console.log('Received event on lambda instance [ID: ', lambda_id, ']:', JSON.stringify(event, null, 2));
+        await set_connection_string();
         if (!db_client) {
-            db_client = new PrismaClient();
-            await db_client.$connect();
+            global.db_client = new PrismaClient();
+            await global.db_client.$connect();
             console.log("DB client initialized!");
         }
+
+        db_client = global.db_client;
 
         let task: Task | null = null;
         console.log("Received event:", JSON.stringify(event, null, 2));

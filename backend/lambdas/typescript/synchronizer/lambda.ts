@@ -38,8 +38,8 @@ const scrapRecipe = async (url: string, of_task: number): Promise<void> => {
         const recipeData = await fetchRecipeData(url);
         console.log("Data obtained: ", recipeData);
         if (recipeData && recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
-            console.log('Adding recipe to SQS...');
             if (await checkIfRecipeExists(db_client, obtainRecipeId(recipeData))===false) {
+                console.log('Adding recipe to SQS...');
                 sendScrapedRecipeToSQS(recipeData, of_task).then(() => console.log('Recipe added to SQS'));
             } else {
                 console.log("Recipe already on the db, skipping")

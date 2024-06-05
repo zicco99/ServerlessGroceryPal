@@ -61,7 +61,7 @@ const execute = async ( task: Task) : Promise<void> => {
         if(i>3) break //TODO REMOVE
         i++;
         console.log('[RUNNER] [EXECUTE] Scraping page: ', p);
-        const response = await axios.get(`${BASE_URL}${p}`);
+        const response = await axios.get(`${BASE_URL}page${p}/`);
         const $ = cheerio.load(response.data);
         const recipeLinks: string[] = [];
         $('.gz-title a').each((index: number, element: any) => { // Use CheerioElement here

@@ -232,7 +232,7 @@ class BackendStack(NestedStack):
         claude_chef.add_event_source(event_sources.SqsEventSource(
             queue=recipes_queue,
             batch_size=1,  # Number of messages to process per invocation, set to 1 for single message processing
-            max_concurrency=1  # Maximum number of invocations to process in parallel
+            max_concurrency=2  # Maximum number of invocations to process in parallel
         ))
 
          ###########################

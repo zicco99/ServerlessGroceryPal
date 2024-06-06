@@ -42,6 +42,7 @@ export const handler: Handler = async (
 
         db_client = global.db_client;
 
+        
         const scraped_recipe_message : ScrapedRecipeMessage = JSON.parse(event["Records"][0]["body"] as string);
         console.log("JSON data: ", scraped_recipe_message);
         const recipeData : RecipeData = scraped_recipe_message.jsonData;

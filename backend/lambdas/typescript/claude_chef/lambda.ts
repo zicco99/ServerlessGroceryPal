@@ -42,10 +42,11 @@ export const handler: Handler = async (
 
         db_client = global.db_client;
 
-        const recipeData : ScrapedRecipeMessage = JSON.parse(event["Records"][0]["body"] as string);
-        console.log("JSON data: ", recipeData);
-        const kb : ClaudeChefKnowledgeBase = await fetchKnowledgeBase(db_client)
-        const normalizedRecipe = await askClaudeChef(recipeData.jsonData,kb);
+        const scraped_recipe_message : ScrapedRecipeMessage = JSON.parse(event["Records"][0]["body"] as string);
+        console.log("JSON data: ", scraped_recipe_message);
+        const recipeData : RecipeData = scraped_recipe_message.jsonData;
+        const kb : ClaudeChefKnowledgeBase = await fetchKnowledgeBase(db_client,recipeData);
+        const normalizedRecipe = await askClaudeChef(recipeData,kb);
         console.log("Normalized recipe: ", normalizedRecipe);
         if (normalizedRecipe) {
             await saveRecipeOnDB(db_client, normalizedRecipe);

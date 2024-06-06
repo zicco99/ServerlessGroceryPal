@@ -1,6 +1,5 @@
-import axios from 'axios';
-
 import { PrismaClient, Recipe } from '../../prisma/client';
+import stringSimilarity from 'string-similarity';
 
 type RecipeData = {
     id: string;
@@ -25,32 +24,37 @@ type ClaudeChefKnowledgeBase = {
 }
 
 
-async function fetchKnowledgeBase(prisma: PrismaClient | null): Promise<ClaudeChefKnowledgeBase> {
+async function fetchKnowledgeBase(prisma: PrismaClient, recipeData: RecipeData): Promise<ClaudeChefKnowledgeBase> {
     if (!prisma) {
         throw new Error('Prisma client not initialized');
     }
 
-    // I want to give a knowledge base to Claude.
-    let known_categories : any[] = []
-    let known_ingredients : any[] = []
-
     try {
-        known_categories = await prisma.recipe.findMany({
-            where: {},
+        const knownCategories = await prisma.recipe.findMany({
             distinct: ['category'],
-        })
+        }).then(categories => categories.map(category => category.category));
 
-        known_ingredients = await prisma.ingredient.findMany({
-            where: {},
+        const knownIngredients = await prisma.ingredient.findMany({
             distinct: ['name'],
-        })
+        });
 
-        const kb : ClaudeChefKnowledgeBase = { categories: known_categories, ingredients: known_ingredients }
+        const similarIngredients: string[] = [];
 
-        return kb
+        for (const ingredient of recipeData.ingredients) {
+            knownIngredients.forEach(knownIngredient => {
+                const similarity = stringSimilarity.compareTwoStrings(knownIngredient.name, ingredient.name);
+                if (similarity > 0.5) {
+                    similarIngredients.push(knownIngredient.name);
+                }
+            });
+        }
+
+        const knowledgeBase: ClaudeChefKnowledgeBase = { categories: knownCategories, ingredients: similarIngredients};
+
+        return knowledgeBase;
 
     } catch (error) {
-        console.error('Error fetching ingredients:', error);
+        console.error('Error fetching knowledge base:', error);
         throw error;
     }
 }

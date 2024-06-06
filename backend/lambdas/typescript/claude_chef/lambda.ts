@@ -80,7 +80,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
 
             4. Rewrite and split or merge steps if enhance readability and cooking efficiency. In the end translate the resulting steps into Italian. 
 
-            4. Use results from the processed recipe data to put them in JSON format using the following structure, with all values in Italian:
+            Use results from the processed recipe data to put them in JSON format using the following structure, with all values in Italian:
                 {
                     id: string;
                     title: string | null;

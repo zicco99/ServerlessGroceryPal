@@ -40,7 +40,12 @@ async function checkIfRecipeExists(prisma: PrismaClient, id: string): Promise<bo
 
 async function fetchRecipeData(url: string): Promise<RecipeData> {
     try {
-        const { data } = await axios.get(url);
+        const response = await axios.get(url);
+        const { data } = response;
+
+        if (!data) {
+            throw new Error('No data received from the website');
+        }
         const $ = cheerio.load(data);
 
         const titleRecipe = $('.gz-title-recipe.gz-mBottom2x').text().trim() || null;
@@ -56,7 +61,6 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
                 allIngredients.push({ name: nameIngredient, quantity: quantityProduct });
             }
         });
-
         $('.gz-content-recipe-step').each((i, elem) => {
             const imageUrl = $(elem).find('img').attr('data-src') || null;
             const explaining = $(elem).find('p').text().trim();
@@ -65,10 +69,26 @@ async function fetchRecipeData(url: string): Promise<RecipeData> {
             }
         });
 
-        return { id : "", title: titleRecipe, category, imageUrl: imageURL, ingredients: allIngredients, steps };
+        const result = { id: "", title: titleRecipe, category, imageUrl: imageURL, ingredients: allIngredients, steps };
+
+        //check if any attributes is undefined
+        if (!result.title || !result.category || !result.imageUrl || !result.ingredients.length || !result.steps.length) {
+            throw new Error('Invalid recipe data, some attributes are undefined');
+        }
+
+        return result;
     } catch (error) {
-        console.error('Error fetching the recipe:', error);
-        return { id: "", title: null, category: null, imageUrl: null, ingredients: [], steps: [] };
+        if (error.response) {
+            // The request was made, but the server responded with an error
+            console.error(`Error fetching the recipe: ${error.response.status} ${error.response.statusText}`);
+        } else if (error.request) {
+            // The request was made, but no response was received
+            console.error('Error fetching the recipe: No response received');
+        } else {
+            // Something else happened while setting up the request
+            console.error('Error fetching the recipe:', error.message);
+        }
+        throw error;
     }
 }
 

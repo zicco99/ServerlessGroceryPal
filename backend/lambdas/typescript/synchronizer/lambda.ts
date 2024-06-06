@@ -38,6 +38,9 @@ const scrapRecipe = async (url: string, of_task: number): Promise<void> => {
     try {
         console.log('[RUNNER] [EXECUTE] Scraping recipe:', url);
         const recipeData = await fetchRecipeData(url);
+        if(!recipeData) {
+            
+        }
         console.log("[RUNNER] [EXECUTE] Data obtained: ", recipeData);
         if (recipeData && recipeData.title && recipeData.category && recipeData.ingredients.length > 0 && recipeData.steps.length > 0) {
             if (await checkIfRecipeExists(db_client, obtainRecipeId(recipeData)) === false) {

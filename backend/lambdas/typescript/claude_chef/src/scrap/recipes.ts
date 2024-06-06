@@ -68,6 +68,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         throw new Error('Invalid recipe data provided');
     }
 
+
     try {
         const transaction = await prisma.$transaction(async (prisma) => {
             const createdRecipe = await prisma.recipe.create({

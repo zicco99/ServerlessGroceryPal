@@ -224,7 +224,7 @@ class BackendStack(NestedStack):
             },
             memory_size=256,
             retry_attempts=2,
-            timeout=Duration.seconds(20)
+            timeout=Duration.minutes(1),
         )
 
         recipes_queue.grant_consume_messages(claude_chef)

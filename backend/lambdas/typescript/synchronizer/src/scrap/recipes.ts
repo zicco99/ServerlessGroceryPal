@@ -29,19 +29,14 @@ function obtainRecipeId(recipe : RecipeData) {
     return hash.digest('hex').slice(0, 20);
 }
 
-async function checkIfRecipeExists(prisma: PrismaClient, id : string): Promise<boolean> {
-    let recipe = await prisma.recipe.findFirst(
-        {
-            where: {
-                id: id
-            }
+async function checkIfRecipeExists(prisma: PrismaClient, id: string): Promise<boolean> {
+    const recipe = await prisma.recipe.findFirst({
+        where: {
+            id: id
         }
-    )
-    if(recipe) {
-        return true
-    }
-    return false
-}   
+    });
+    return !!recipe;
+}
 
 async function fetchRecipeData(url: string): Promise<RecipeData> {
     try {

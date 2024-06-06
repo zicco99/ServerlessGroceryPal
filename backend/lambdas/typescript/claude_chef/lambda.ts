@@ -67,6 +67,9 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 seconds as Claude Chef has 60 requests per minute limit
 
         const context = `
+            You are an expert in cooking, user will provide you with a recipe, then he will ask you some questions to fix or enhance the recipe until
+            he will ask for the complete recipe in JSON format.
+
             Knowledge Base:
             - Categories already in the database: ${JSON.stringify(knowledgeBase.categories)}
             - Ingredients already in the database: ${JSON.stringify(knowledgeBase.ingredients)}
@@ -106,7 +109,8 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
             model: 'claude-3-haiku-20240307', // Use the best model for the task
             max_tokens: 2080,
             messages: messages,
-            temperature: 0.7
+            temperature: 0.7,
+            system: context,
         });
 
         console.log("Response from Claude Chef:", response);

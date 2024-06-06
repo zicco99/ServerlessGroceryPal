@@ -4,7 +4,6 @@ import Anthropic from '@anthropic-ai/sdk';
 import { ClaudeChefKnowledgeBase, RecipeData, ScrapedRecipeMessage, fetchKnowledgeBase, saveRecipeOnDB } from './src/scrap/recipes';
 import { PrismaClient } from './prisma/client';
 import { jsonrepair } from 'jsonrepair';
-import { time } from 'console';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY,
@@ -78,7 +77,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
 
             3. Fill in any missing information in the recipe data and fix any incorrect or incomplete data that is already present.
 
-            4. Rewrite and split or merge steps if enhance readability and cooking efficiency. In the end translate the resulting steps into Italian. 
+            4. Add unit information to the ingredients in the recipe data. Ensure that the units are basic ones (g,ml etc.)
 
             Use results from the processed recipe data to put them in JSON format using the following structure, with all values in Italian:
                 {
@@ -86,7 +85,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
                     title: string | null;
                     category: string | null;
                     imageUrl: string | null;
-                    ingredients: { name: string; quantity: string }[];
+                    ingredients: {name: string; quantity: string, unit: string }[];
                     steps: { imageUrl: string | null; explaining: string }[];
                 }
         `

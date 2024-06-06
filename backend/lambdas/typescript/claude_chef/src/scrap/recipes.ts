@@ -6,7 +6,7 @@ type RecipeData = {
     title: string | null;
     category: string | null;
     imageUrl: string | null;
-    ingredients: { name: string; quantity: string }[];
+    ingredients: {name: string; quantity: string, unit: string }[];
     steps: { imageUrl: string | null; explaining: string }[];
 };
 
@@ -64,86 +64,67 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
         throw new Error('Prisma client not initialized');
     }
 
-    const transaction = await prisma.$transaction(async (prisma) => {
-        try {
-            // Normalize and deduplicate ingredient names
-        const normalizedIngredientNames = Array.from(
-            new Set(recipeData.ingredients.map(ingredient => ingredient.name.trim().toLowerCase()))
-        );
-
-        // Fetch existing ingredients from the database
-        const ingredientsInDB = await prisma.ingredient.findMany({
-            where: { name: { in: normalizedIngredientNames } },
-        });
-
-        console.log("[REC]: ingredientsInDB:", ingredientsInDB.length);
-
-        // Identify new ingredients to be added
-        const existingIngredientNames = new Set(ingredientsInDB.map(ingredient => ingredient.name));
-        const newIngredientNames = normalizedIngredientNames.filter(name => !existingIngredientNames.has(name));
-
-        if (newIngredientNames.length > 0) {
-            await prisma.ingredient.createMany({
-                data: newIngredientNames.map(name => ({ name })),
-                skipDuplicates: true, // Ensure no duplicates are created
-            });
-
-            console.log("[REC] NEW ingredients:", newIngredientNames.length);
-        }
-
-        // Fetch all ingredient IDs to create a map
-        const allIngredientsInDB = await prisma.ingredient.findMany({
-            where: { name: { in: normalizedIngredientNames } },
-        });
-        const ingredientMap = new Map(allIngredientsInDB.map(ing => [ing.name.toLowerCase(), ing.id]));
-
-        // Create Recipe with ingredients and steps
-        const createdRecipe = await prisma.recipe.create({
-            data: {
-                id: recipeData.id,
-                title: recipeData.title || 'No title',
-                category: recipeData.category || 'No category',
-                imageUrl: recipeData.imageUrl,
-                recipeIngredients: {
-                    create: recipeData.ingredients.map(ingredient => {
-                        const normalizedName = ingredient.name.trim().toLowerCase();
-                        const ingredientId = ingredientMap.get(normalizedName);
-                        if (!ingredientId) {
-                            throw new Error(`Ingredient ${normalizedName} not found in the database.`);
-                        }
-                        return {
-                            ingredient: {
-                                connect: { id: ingredientId },
-                            },
-                            amount: parseFloat(ingredient.quantity) || 0,
-                            amountText: ingredient.quantity,
-                        };
-                    }),
-                },
-                steps: {
-                    createMany: {
-                        data: recipeData.steps.map((step, index) => ({
-                            explaining: step.explaining,
-                            imageUrl: step.imageUrl,
-                            nStep: index + 1,
-                        })),
-                    },
-                },
-            },
-            include: { recipeIngredients: true, steps: true },
-        });
-
-        return createdRecipe;
-        } catch (error) {
-            console.error("Error saving recipe: ", error);
-            throw error;
-        }
-    },
-    { maxWait: 5000, timeout: 10000 }
-    );
+    if (!recipeData || !recipeData.id || !recipeData.ingredients || !recipeData.steps) {
+        throw new Error('Invalid recipe data provided');
+    }
 
     try {
-        return transaction;
+        const transaction = await prisma.$transaction(async (prisma) => {
+            const createdRecipe = await prisma.recipe.create({
+                data: {
+                    id: recipeData.id,
+                    title: recipeData.title || 'No title',
+                    category: recipeData.category || 'No category',
+                    imageUrl: recipeData.imageUrl,
+                    recipeIngredients: {
+                        create: await Promise.all(recipeData.ingredients.map(async ingredientData => {
+                            let ingredient = await prisma.ingredient.findFirst({
+                                where: {
+                                    name: ingredientData.name
+                                }
+                            });
+                            if (!ingredient) {
+                                ingredient = await prisma.ingredient.create({
+                                    data: {
+                                        name: ingredientData.name,
+                                        unit: ingredientData.unit,
+                                    },
+                                });
+                            }
+                            return {
+                                amount: parseFloat(ingredientData.quantity) || 0,
+                                amountText: ingredientData.quantity,
+                                unit: ingredientData.unit,
+                                ingredient: {
+                                    connect: { id: ingredient.id },
+                                },
+                            };
+                        })),
+                    },
+                    steps: {
+                        createMany: {
+                            data: recipeData.steps.map((step, index) => ({
+                                explaining: step.explaining,
+                                imageUrl: step.imageUrl,
+                                nStep: index + 1,
+                            })),
+                        },
+                    },
+                },
+                include: { recipeIngredients: true, steps: true },
+            });
+
+            console.log("Recipe created:", createdRecipe);
+            return createdRecipe;
+        }, { maxWait: 5000, timeout: 10000 });
+
+        if (transaction) {
+            console.log("Transaction successful");
+            return transaction;
+        } else {
+            throw new Error("Transaction failed: Unable to create recipe.");
+        }
+
     } catch (error) {
         console.error("Transaction failed: ", error);
         return null;

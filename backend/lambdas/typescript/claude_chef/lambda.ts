@@ -5,7 +5,6 @@ import { ClaudeChefKnowledgeBase, RecipeData, ScrapedRecipeMessage, fetchKnowled
 import { PrismaClient } from './prisma/client';
 import { jsonrepair } from 'jsonrepair';
 import { time } from 'console';
-import { MessageParam } from '@anthropic-ai/sdk/resources/messages.mjs';
 
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_AI_API_KEY,
@@ -65,64 +64,57 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
         console.log(`Recipe data: ${JSON.stringify(recipeData)} | Knowledge base: ${JSON.stringify(knowledgeBase)}`);
 
         await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 seconds as Claude Chef has 60 requests per minute limit
-
+        
         const context = `
-            You are an expert in cooking, user will provide you with a recipe, then he will ask you some questions to fix or enhance the recipe until
-            he will ask for the complete recipe in JSON format.
-
             Knowledge Base:
             - Categories already in the database: ${JSON.stringify(knowledgeBase.categories)}
             - Ingredients already in the database: ${JSON.stringify(knowledgeBase.ingredients)}
-        `;
 
-        const messages : MessageParam[] = [
-            {
-                role: 'user',
-                content: 'Normalize the categories and ingredients in the recipe data to match the ones already present in the database.',
-            },
-            {
-                role: 'assistant',
-                content: "Ok, these are the ingredients and categories we can subsistitute in order to reuse an already known ingredient: ",
-            },
-            {
-                role: 'user',
-                content: 'Fill in any missing information and fix any incorrect or incomplete data in the recipe data.',
-            },
-            {
-                role: 'assistant',
-                content: "Ok, these infos were missing or where incorrect, we can fix them: ",
-            },
-            {
-                role: 'user',
-                content: `Use the new data to create a new recipe in the following JSON format, with all values in Italian:\n\n{
-                    "id": string, \
-                    "title": string | null,
-                    "category": string | null,
-                    "imageUrl": string | null,
-                    "ingredients": [{ "name": string, "quantity": string }],
-                    "steps": [{ "imageUrl": string | null, "explaining": string }]
-                }`,
-            },
-            {
-                role: 'assistant',
-                content: 'Ok, here is the resulting recipe: {',
-            }
-        ];
+            Using the information from the knowledge base, your task is to process the user-provided recipe data by performing the following steps:
+
+            1. Clean and rewrite the recipe data to prepare it for insertion into the database. This may involve removing any inconsistencies or errors in the data.
+
+            2. Normalize the recipe data by utilizing the information from the knowledge base. Ensure that the categories and ingredients in the recipe data match the ones already present in the database.
+
+            3. Fill in any missing information in the recipe data and fix any incorrect or incomplete data that is already present.
+
+            4. Rewrite and split or merge steps if enhance readability and cooking efficiency. In the end translate the resulting steps into Italian. 
+
+            4. Use results from the processed recipe data to put them in JSON format using the following structure, with all values in Italian:
+                {
+                    id: string;
+                    title: string | null;
+                    category: string | null;
+                    imageUrl: string | null;
+                    ingredients: { name: string; quantity: string }[];
+                    steps: { imageUrl: string | null; explaining: string }[];
+                }
+        `
+
+        console.log('Claude Context: ', context);
 
         const response = await anthropic.messages.create({
             model: 'claude-3-haiku-20240307', // Use the best model for the task
             max_tokens: 2080,
-            messages: messages,
-            temperature: 0.7,
+            messages: [{
+                role: 'user',
+                content: "this is the recipe data " + JSON.stringify(recipeData),
+            },
+            {
+                role: 'assistant',
+                content: "I computed 1,2,3,4 steps on the recipe sent user, here is the resulting JSON: {"  //JSON mode 
+            }],
             system: context,
+            temperature: 0.7
         });
 
         console.log("Response from Claude Chef:", response);
 
-        const json_result = jsonrepair("{ " + response.content[response.content.length - 1].text);
+        const json_result = jsonrepair('{' + response.content[0].text);
         console.log(json_result);
         const enhancedRecipe: RecipeData = JSON.parse(json_result);
-
+        enhancedRecipe.id = recipeData.id;
+        
         console.log('Enhanced recipe:', enhancedRecipe);
 
         return saveRecipeOnDB(db_client, enhancedRecipe);

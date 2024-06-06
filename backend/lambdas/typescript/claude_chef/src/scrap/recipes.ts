@@ -70,7 +70,7 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
 
 
     try {
-        const transaction = await prisma.$transaction(async (prisma) => {
+        const recipe : Recipe = await prisma.$transaction(async (prisma) => {
             const createdRecipe = await prisma.recipe.create({
                 data: {
                     id: recipeData.id,
@@ -118,9 +118,9 @@ async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeDat
             return createdRecipe;
         }, { maxWait: 5000, timeout: 10000 });
 
-        if (transaction) {
+        if (recipe) {
             console.log("Transaction successful");
-            return transaction;
+            return recipe;
         } else {
             throw new Error("Transaction failed: Unable to create recipe.");
         }

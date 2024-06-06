@@ -58,7 +58,7 @@ const scrapRecipe = async (url: string, of_task: number): Promise<void> => {
 const execute = async ( task: Task) : Promise<void> => {
     let i=0;
     for (const p of task.pageChunk.pages) {
-        if(i>3) break //TODO REMOVE
+        if(i>5) break //TODO REMOVE
         i++;
         console.log('[RUNNER] [EXECUTE] Scraping page: ', p);
         const response = await axios.get(`${BASE_URL}page${p}/`);

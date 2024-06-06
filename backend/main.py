@@ -223,7 +223,7 @@ class BackendStack(NestedStack):
                 'RECIPES_QUEUE_URL': recipes_queue.queue_url,
             },
             memory_size=256,
-            retry_attempts=5,
+            retry_attempts=2,
             timeout=Duration.minutes(1),
         )
 
@@ -232,6 +232,7 @@ class BackendStack(NestedStack):
         claude_chef.add_event_source(event_sources.SqsEventSource(
             queue=recipes_queue,
             batch_size=1,  # Number of messages to process per invocation, set to 1 for single message processing
+            max_concurrency=2  # Maximum number of invocations to process in parallel
         ))
 
          ###########################

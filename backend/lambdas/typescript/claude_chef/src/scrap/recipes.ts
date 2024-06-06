@@ -60,13 +60,20 @@ async function fetchKnowledgeBase(prisma: PrismaClient, recipeData: RecipeData):
 }
 
 async function saveRecipeOnDB(prisma: PrismaClient | null, recipeData: RecipeData): Promise<Recipe | null> {
+
     if (!prisma) {
         throw new Error('Prisma client not initialized');
     }
 
-    if (!recipeData || !recipeData.id || !recipeData.ingredients || !recipeData.steps) {
+    if (
+        !recipeData ||
+        !recipeData.id ||
+        !recipeData.ingredients || !Array.isArray(recipeData.ingredients) || recipeData.ingredients.length === 0 ||
+        !recipeData.steps || !Array.isArray(recipeData.steps) || recipeData.steps.length === 0
+    ) {
         throw new Error('Invalid recipe data provided');
     }
+
 
 
     try {

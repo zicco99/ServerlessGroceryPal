@@ -103,6 +103,10 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
                     "steps": [{ "imageUrl": string | null, "explaining": string }]
                 }`,
             },
+            {
+                role: 'assistant',
+                content: 'Ok, here is the resulting recipe: {',
+            }
         ];
 
         const response = await anthropic.messages.create({
@@ -115,7 +119,7 @@ async function askClaudeChef(recipeData: RecipeData, knowledgeBase: ClaudeChefKn
 
         console.log("Response from Claude Chef:", response);
 
-        const json_result = jsonrepair(response.content[response.content.length - 1].text);
+        const json_result = jsonrepair("{ " + response.content[response.content.length - 1].text);
         console.log(json_result);
         const enhancedRecipe: RecipeData = JSON.parse(json_result);
 

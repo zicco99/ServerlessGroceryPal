@@ -308,7 +308,7 @@ class BackendStack(NestedStack):
             )
         )
 
-        self.api_base_url: str = api.url + "/nest-js-serverless"
+        self.api_base_url: str = api.url + "nest-js-serverless"
 
         # ------------------------------------------#
         #                   LAMBDAS                 #

@@ -7,10 +7,12 @@ import Home from "./pages/Home.tsx";
 import Secret from "./pages/Secret.tsx";
 import { Layout } from "./Layout.tsx";
 import Profile from "./pages/Profile.tsx";
+import { AxiosProvider } from "./providers/axios.tsx";
 
 const App = () => {
   return (
     <>
+    <AxiosProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -21,6 +23,7 @@ const App = () => {
           </Route>
         </Routes>
       </BrowserRouter>
+    </AxiosProvider>
     </>
   );
 };

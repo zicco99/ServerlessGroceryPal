@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button } from 'react-bulma-components';
+import { Card } from 'react-bulma-components';
 
 interface RecipeSwiperProps {
   recipes: string[];

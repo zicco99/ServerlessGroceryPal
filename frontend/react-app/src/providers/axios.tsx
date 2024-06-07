@@ -12,7 +12,7 @@ export const useAxios = (): AxiosInstance => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'https://api.example.com',
+  baseURL: import.meta.env.VITE_NESTJSBASEURL ?? 'https://api.example.com',
   timeout: 5000,
 });
 

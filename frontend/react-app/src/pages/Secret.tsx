@@ -10,7 +10,7 @@ const Secret: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (authStatus === "authenticated") {
-        const response = await axios.get(process.env.VITE_NESTJSBASEURL+'/recipes');
+        const response = await axios.get(import.meta.env.VITE_NESTJSBASEURL+'/recipes');
         setResponse(response.data);
       }
     }

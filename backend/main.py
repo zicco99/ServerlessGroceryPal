@@ -287,6 +287,7 @@ class BackendStack(NestedStack):
             nestjs_serverless,
             proxy=True,
             passthrough_behavior=apigateway.PassthroughBehavior.WHEN_NO_MATCH,
+            default_cors_preflight_options=backend_api_cors
         )
 
         # (Root) resource.add_method("GET", apigateway.LambdaIntegration(companies))

@@ -183,7 +183,7 @@ class AppStack(Stack):
         CfnOutput(self, "DistributionUrl", value=frontend_stack_outputs.distribution_url)
         CfnOutput(self, "FrontendBucketName", value=frontend_stack_outputs.frontend_bucket_name)
         CfnOutput(self, "BackendBucketName", value=backend_stack_outputs.backend_bucket_name)
-        CfnOutput(self, "ApiBaseUrl", value=backend_stack_outputs.api_base_url)
+        CfnOutput(self, "NestJsBaseUrl", value=backend_stack_outputs.api_base_url)
         CfnOutput(self, "FrontendDistributionId", value=frontend_stack_outputs.distribution_id)
         CfnOutput(self, "UserPoolId",value=user_pool.user_pool_id, description="Cognito User Pool ID")
         CfnOutput(self, "UserPoolClientId",value=user_pool_client.user_pool_client_id, description="Cognito User Pool Client ID")

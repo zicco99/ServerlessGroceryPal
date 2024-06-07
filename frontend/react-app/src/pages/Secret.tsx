@@ -3,31 +3,36 @@ import { useEffect, useState } from "react";
 import { useAxios } from "../providers/axios";
 import RecipeSwiper from "../components/RecipeSwiper/RecipeSwiper";
 
+
 const Secret: React.FC = () => {
+  const { user } = useAuthenticator((context) => [context.user]);
   const { authStatus } = useAuthenticator((context) => [context.authStatus]);
-  const [response, setResponse] = useState([]);
+  const [response, setResponse] = useState<Recipe[]>([]);
 
   const axios = useAxios();
 
   useEffect(() => {
     const fetchData = async () => {
-      if (authStatus === "authenticated") {
-        const response = await axios.get(axios.defaults.baseURL + '/recipes');
-        setResponse(response.data);
-      }
+      console.log("Fetching recipes...");
+      console.log(axios.defaults.baseURL);
+      const response = await axios.get(axios.defaults.baseURL + '/recipes');
+      console.log(response);
+      const recipes : Recipe[] = response.data["body"];
+      console.log(recipes);
+      setResponse(recipes);
     }
+    console.log("hello");
     fetchData();
-  }, [authStatus])
+  }, [axios])
 
   return (
     <>
       {authStatus === "authenticated" ? "You are logged in!" : "Please Login!"}
       <br></br>
-      {authStatus === "authenticated" && response.length > 0 && (
-        <RecipeSwiper recipes={response} />
-      )}
+      {authStatus === "authenticated" && (<RecipeSwiper recipes={response} />)}
     </>
   );
 };
 
 export default Secret;
+

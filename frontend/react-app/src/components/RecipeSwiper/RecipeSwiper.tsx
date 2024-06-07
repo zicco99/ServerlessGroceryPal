@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Card } from 'react-bulma-components';
+import 'bulma/css/bulma.min.css';
+import { Card, Image} from 'react-bulma-components';
 
 interface RecipeSwiperProps {
-  recipes: string[];
+  recipes: Recipe[];
 }
 
 const RecipeSwiper: React.FC<RecipeSwiperProps> = ({ recipes }) => {
@@ -29,7 +30,13 @@ const RecipeSwiper: React.FC<RecipeSwiperProps> = ({ recipes }) => {
       {recipes.length > 0 ? (
         <Card>
           <Card.Content>
-            <p className="title">{recipes[currentRecipeIndex]}</p>
+            <p className="title">{recipes[currentRecipeIndex].title}</p>
+            <div className="recipe-details">
+              <p>{recipes[currentRecipeIndex].title}</p>
+              <p>Category: {recipes[currentRecipeIndex].category}</p>
+              {recipes[currentRecipeIndex].imageUrl && <Image src={recipes[currentRecipeIndex].imageUrl || ""} alt="Recipe image" />}
+              <p>Ingredients:</p>
+            </div>
           </Card.Content>
           <Card.Footer>
             <Card.Footer.Item renderAs="a" onClick={handleSwipeLeft}>
@@ -48,4 +55,3 @@ const RecipeSwiper: React.FC<RecipeSwiperProps> = ({ recipes }) => {
 };
 
 export default RecipeSwiper;
-

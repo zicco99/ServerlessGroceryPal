@@ -20,18 +20,11 @@ export class RecipesController {
         }
     }
 
-    @Get(':id')
-    async getRecipeById(@Param('id') id: string): Promise<LambdaResponse> {
+    @Get(':id/show')
+    async getRecipeAndRel(@Param('id') id: string): Promise<LambdaResponse> {
         try {
-            const recipe = await this.recipesService.getRecipeById(id);
-            if (recipe) {
-                return new LambdaResponse(LambdaResponseCode.OK, recipe);
-            } else {
-                throw new HttpException(
-                    new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Recipe not found' }),
-                    LambdaResponseCode.NOT_FOUND
-                );
-            }
+            const recipes = await this.recipesService.getRecipeAndRel(id);
+            return new LambdaResponse(LambdaResponseCode.OK, recipes);
         } catch (error) {
             throw new HttpException(
                 new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
@@ -39,6 +32,20 @@ export class RecipesController {
             );
         }
     }
+
+    @Get(':id')
+    async getRecipeIndex(@Param('id') id: string): Promise<LambdaResponse> {
+        try {
+            const recipe = await this.recipesService.getRecipeById(id);
+            return new LambdaResponse(LambdaResponseCode.OK, recipe);
+        } catch (error) {
+            throw new HttpException(
+                new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
+                LambdaResponseCode.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 
     @Delete(':id')
     async deleteRecipe(@Param('id') id: string): Promise<LambdaResponse> {

@@ -21,4 +21,14 @@ export class RecipesService {
       where: { id },
     });
   }
+
+  async getRecipeAndRel(id: string) {
+    return await this.db_client.recipe.findUnique({
+      where: { id },
+      include: {
+        steps: true,
+        recipeIngredients: true,
+      }
+    });
+  }
 }

@@ -1,6 +1,13 @@
 import { PrismaClient, Recipe } from '../../prisma/client';
 import stringSimilarity from 'string-similarity';
 
+type ScrapedRecipeMessage = {
+    recipe_id: string;
+    of_task: number;
+    scheduled_at: Date;
+    jsonData: RecipeData;
+};
+
 type RecipeData = {
     id: string;
     title: string | null;
@@ -8,13 +15,6 @@ type RecipeData = {
     imageUrl: string | null;
     ingredients: {name: string; quantity: string, unit: string }[];
     steps: { imageUrl: string | null; explaining: string }[];
-};
-
-type ScrapedRecipeMessage = {
-    recipe_id: string;
-    of_task: number;
-    scheduled_at: Date;
-    jsonData: RecipeData;
 };
 
 

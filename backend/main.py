@@ -31,8 +31,9 @@ class BackendStackParams:
         self.user_pool_domain : cognito.UserPoolDomain = user_pool_domain
 
 class BackendStackOutputs:
-    def __init__(self, backend_bucket_name):
+    def __init__(self, backend_bucket_name, api_base_url):
         self.backend_bucket_name = backend_bucket_name
+        self.api_base_url = api_base_url
 
 class Permission(Enum):
     RW_PERM_SCRAP_DB = "rw_backend_db"
@@ -45,7 +46,7 @@ class Permission(Enum):
 class BackendStack(NestedStack):
 
     def get_outputs(self) -> BackendStackOutputs:
-        return BackendStackOutputs(self.backend_bucket_name)
+        return BackendStackOutputs(self.backend_bucket_name, self.api_base_url)
     
     def __init__(self, scope: Construct, id: str, params: BackendStackParams, **kwargs):
         super().__init__(scope, id, **kwargs)
@@ -307,6 +308,7 @@ class BackendStack(NestedStack):
             )
         )
 
+        self.api_base_url: str = api.url + "/nest-js-serverless"
 
         # ------------------------------------------#
         #                   LAMBDAS                 #

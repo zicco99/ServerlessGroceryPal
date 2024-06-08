@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import 'bulma/css/bulma.min.css';
-import { Card, Image} from 'react-bulma-components';
+import { Card, Image } from 'react-bulma-components';
+import { useAxios } from '../../providers/axios';
+
 
 interface RecipeSwiperProps {
   recipes: Recipe[];
@@ -8,35 +10,69 @@ interface RecipeSwiperProps {
 
 const RecipeSwiper: React.FC<RecipeSwiperProps> = ({ recipes }) => {
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState<number>(0);
+  const [currentRecipe, setCurrentRecipe] = useState<RecipeShow | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const axios = useAxios();
 
-  // Function to handle swiping right (like)
-  const handleSwipeRight = () => {
-    // Handle liking the current recipe (e.g., save it to favorites, send data to server, etc.)
-    setCurrentRecipeIndex(currentIndex => currentIndex + 1);
+  const fetchRecipeData = async (id: string) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${axios.defaults.baseURL}/recipes/${id}/show`);
+      const recipe_to_be_shown : RecipeShow = JSON.parse(response.data["body"]);
+      setCurrentRecipe(recipe_to_be_shown);
+    } catch (error) {
+      console.error("Error fetching recipe data:", error);
+      setCurrentRecipe(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Function to handle swiping left (dislike)
-  const handleSwipeLeft = () => {
-    // Handle disliking the current recipe (e.g., skip it, hide it, etc.)
-    setCurrentRecipeIndex(currentIndex => currentIndex + 1);
-  };
+  // Update the current recipe when the index changes
+  useEffect(() => {
+    if (recipes.length > 0 && currentRecipeIndex < recipes.length) {
+      fetchRecipeData(recipes[currentRecipeIndex].id);
+      console.log(recipes[currentRecipeIndex]);
+    }
+  }, [currentRecipeIndex, recipes]);
 
+  // Reset to the first recipe when the recipes prop changes
   useEffect(() => {
     setCurrentRecipeIndex(0);
   }, [recipes]);
 
+  // Function to handle swiping right (like)
+  const handleSwipeRight = () => {
+    if (currentRecipeIndex < recipes.length - 1) {
+      setCurrentRecipeIndex(currentIndex => currentIndex + 1);
+    }
+  };
+
+  // Function to handle swiping left (dislike)
+  const handleSwipeLeft = () => {
+    if (currentRecipeIndex < recipes.length - 1) {
+      setCurrentRecipeIndex(currentIndex => currentIndex + 1);
+    }
+  };
+
   return (
     <div className="container">
-      {recipes.length > 0 ? (
+      {loading ? (
+        <p>Loading...</p>
+      ) : currentRecipe ? (
         <Card>
           <Card.Content>
-            <p className="title">{recipes[currentRecipeIndex].title}</p>
-            <div className="recipe-details">
-              <p>{recipes[currentRecipeIndex].title}</p>
-              <p>Category: {recipes[currentRecipeIndex].category}</p>
-              {recipes[currentRecipeIndex].imageUrl && <Image src={recipes[currentRecipeIndex].imageUrl || ""} alt="Recipe image" />}
-              <p>Ingredients:</p>
-            </div>
+            <Card.Header>{currentRecipe.title}</Card.Header>
+            <Card.Image
+              src={currentRecipe.imageUrl}
+              alt={currentRecipe.title}
+            />
+            <Card.Content>
+              <p>{currentRecipe.ingredients}</p>
+            </Card.Content>
+
+
+
           </Card.Content>
           <Card.Footer>
             <Card.Footer.Item renderAs="a" onClick={handleSwipeLeft}>

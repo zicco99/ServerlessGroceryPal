@@ -1,4 +1,11 @@
 type Recipe = {
+  id: string;
+  title: string;
+  category: string;
+  imageUrl?: string | null;
+}
+
+type RecipeShow = {
   ingredients: any;
   id: string;
   title: string;

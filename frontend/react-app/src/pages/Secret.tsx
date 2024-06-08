@@ -13,15 +13,10 @@ const Secret: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("Fetching recipes...");
-      console.log(axios.defaults.baseURL);
       const response = await axios.get(axios.defaults.baseURL + '/recipes');
-      console.log(response);
-      const recipes : Recipe[] = response.data["body"];
-      console.log(recipes);
+      const recipes : Recipe[] = JSON.parse(response.data["body"]);
       setResponse(recipes);
     }
-    console.log("hello");
     fetchData();
   }, [axios])
 

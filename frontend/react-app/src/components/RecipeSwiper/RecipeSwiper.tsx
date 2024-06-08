@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import 'bulma/css/bulma.min.css';
-import { Card, Image } from 'react-bulma-components';
+import { Card } from 'react-bulma-components';
 import { useAxios } from '../../providers/axios';
 
 

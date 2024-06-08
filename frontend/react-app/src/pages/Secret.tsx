@@ -5,7 +5,6 @@ import RecipeSwiper from "../components/RecipeSwiper/RecipeSwiper";
 
 
 const Secret: React.FC = () => {
-  const { user } = useAuthenticator((context) => [context.user]);
   const { authStatus } = useAuthenticator((context) => [context.authStatus]);
   const [response, setResponse] = useState<Recipe[]>([]);
 

@@ -8,6 +8,7 @@ import Secret from "./pages/Secret.tsx";
 import { Layout } from "./Layout.tsx";
 import Profile from "./pages/Profile.tsx";
 import { AxiosProvider } from "./providers/axios.tsx";
+import Scan from "./pages/Scan.tsx";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
+            <Route path="*" element={<Scan />} />
             <Route index element={<Home />} />
             <Route path="login" element={<Login />} />
             <Route path="profile" element={<Profile />} />

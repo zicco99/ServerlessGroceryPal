@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { useZxing } from "react-zxing";
+import { Hero, Container, Columns, Button, Content } from "react-bulma-components";
 
-interface BarcodeScannerProps {
-  scanningAreaStyle?: React.CSSProperties;
-}
+interface BarcodeScannerProps {}
 
-export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
-  scanningAreaStyle,
-}) => {
+export const BarcodeScanner: React.FC<BarcodeScannerProps> = () => {
   const [isScanning, setIsScanning] = useState<boolean>(true);
   const {
     ref,
@@ -28,52 +25,49 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
   };
 
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          ...scanningAreaStyle,
-        }}
-      >
-        {isScanning && <p>Scanning...</p>}
-        <div style={{ position: "relative", width: "80%", maxWidth: "500px" }}>
-          <video
-            ref={ref}
-            style={{
-              width: "100%",
-              height: "auto",
-            }}
-          />
-        </div>
-        {status !== "unavailable" ? (
-          <button style={{ marginTop: "20px" }} onClick={toggleTorch}>
-            {status === "on" ? "Turn off" : "Turn on"} torch
-          </button>
-        ) : (
-          <strong>Unfortunately, torch is not available on this device.</strong>
+    <Hero color="dark">
+      <Hero.Body>
+        {isScanning && (
+          <Container>
+            <Content>
+              <p className="title has-text-centered">Scanning...</p>
+            </Content>
+          </Container>
         )}
-      </div>
-      {/* Floating button */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          right: "20px",
-          zIndex: 999,
-        }}
-      >
-        <button onClick={toggleTorch}>
-          {status === "on" ? "Turn off" : "Turn on"} torch
-        </button>
-      </div>
-    </div>
+        <Container>
+          <Columns centered>
+            <Columns.Column size={9}>
+              <div style={{ position: "relative", paddingTop: "56.25%" }}>
+                <video
+                  ref={ref}
+                  className="video"
+                  autoPlay
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            </Columns.Column>
+          </Columns>
+        </Container>
+        {status !== "unavailable" && (
+          <Button
+            color="primary"
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              zIndex: 999,
+            }}
+            onClick={toggleTorch}
+          >
+            {status === "on" ? "Turn off" : "Turn on"} torch
+          </Button>
+        )}
+      </Hero.Body>
+    </Hero>
   );
 };

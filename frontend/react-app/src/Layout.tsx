@@ -1,20 +1,29 @@
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { Container } from "react-bootstrap";
-import NavigationBar from "./components/NavigationBar/NavigationBar";
-import Footer from "./components/navigation/footer";
+import BottomBar from "./components/navigation/BottomBar";
+import NavigationBar from "./components/navigation/NavigationBar";
 
-export function Layout() {
+const Layout = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  const checkMobile = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    setIsMobile(!userAgent.match(/mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini|windows phone/i) !== null);
+  };
+
+  useEffect(() => {
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
-    <>
-      <div className="d-flex flex-column h-100">
-        <NavigationBar />
-
-        <Container>
-          <Outlet />
-        </Container>
-
-        <Footer />
-      </div>
-    </>
+    <div>
+      {isMobile ? <BottomBar isMobile /> : <NavigationBar />}
+      <Outlet />
+      {isMobile && <div style={{ height: "20rem" }}></div>} {/* Add empty div for padding */}
+    </div>
   );
-}
+};
+
+export { Layout };

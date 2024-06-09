@@ -1,0 +1,54 @@
+.bottom-bar {
+    /* Default styles */
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    padding-left: 30px;
+    padding-right: 30px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background-color: #2d2d2d;
+  }
+  
+
+
+@media (max-aspect-ratio: 1/1) {
+    /* Apply rounded corners only on screens with a square or round aspect ratio */
+    .bottom-bar {
+      border-bottom-left-radius: 50vw;
+      border-bottom-right-radius: 50vw;
+    }
+  }
+
+  
+.icon-container {
+display: flex;
+justify-content: center;
+align-items: center;
+position: relative;
+}
+
+.icon-container.active-rect {
+border: 2px solid white;
+border-radius: 10px; /* Smooth vertices */
+padding: 4px;
+}
+
+.icon-container.active-circle {
+border: 2px solid white;
+border-radius: 50%;
+padding: 4px;
+}
+
+.circle-button {
+border: none;
+background-color: transparent;
+}
+
+.is-mobile .column {
+text-align: center;
+}

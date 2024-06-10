@@ -5,7 +5,7 @@ import NavigationBar from "./components/navigation/NavigationBar";
 
 const Layout = () => {
   const [isMobile, setIsMobile] = useState(false);
-
+  
   const checkMobile = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     setIsMobile(!userAgent.match(/mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini|windows phone/i) !== null);

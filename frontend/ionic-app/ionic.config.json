@@ -1,5 +1,7 @@
 {
-  "name": "ionic-app-base",
-  "integrations": {},
-  "type": "react-vite"
+  "name": "ionic-react-typescript-boilerplate",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
 }

@@ -120,7 +120,7 @@ jobs:
           npm ci --prefix "$frontend_directory"
           env_file_path="$frontend_directory/.env"
           > "$env_file_path"
-          jq -r '.AppStack | to_entries | .[] | "REACT_APP_\(.key | ascii_upcase | gsub("([a-z])([A-Z])"; "\\1_\\2"))=\(.value)"' cdk_outputs.json >> "$env_file_path"
+          jq -r '.AppStack | to_entries | .[] | "VITE_\(.key | ascii_upcase | gsub("([a-z])([A-Z])"; "\\1_\\2"))=\(.value)"' cdk_outputs.json >> "$env_file_path"
           cat "$env_file_path"
 
       - name: Run Frontend Build and Upload to S3 bucket

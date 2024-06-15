@@ -2,6 +2,7 @@
 
 interface ImportMeta {
     readonly env: {
+      VITE_DISTRIBUTIONURL: string | URL;
       readonly VITE_STACKREGION: string;
       readonly VITE_USERPOOLID: string;
       readonly VITE_USERPOOLCLIENTID: string;

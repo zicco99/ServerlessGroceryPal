@@ -1,0 +1,7 @@
+{
+  "name": "ionic-react-typescript-boilerplate",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

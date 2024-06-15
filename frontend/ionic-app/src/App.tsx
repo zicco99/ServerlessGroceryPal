@@ -5,6 +5,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Auth from './pages/auth/Auth';
 import Scanner from './pages/scanner/Scanner';
+import Profile from './pages/profile/Profile';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -67,6 +68,9 @@ const App: React.FC = () => {
           </Route>
           <Route exact path="/scan">
             <Scanner/>
+          </Route>
+          <Route exact path="/profile">
+            {isAuthenticated ? <Profile /> : <Redirect to="/auth" />}
           </Route>
           <Route exact path="/">
             {isAuthenticated ? <Home /> : <Redirect to="/auth" />}

@@ -1,5 +1,4 @@
-.ios,
-.md {
+:root {
     --primary: #2172ec;
     --white: #fff;
     --text-black: #000;
@@ -14,82 +13,47 @@ ion-content {
     --background: var(--bg-color-dark);
 }
 
-
-ion-button {
-    &.btn {
-        width: 100%;
-        font-size: 0.95rem;
-        font-weight: 400;
-        letter-spacing: 0px !important;
-        height: 50px;
-        --background: var(--primary-gradient);
-        text-transform: none;
-        color: var(--white);
-        margin: 0;
-        --box-shadow: none;
-
-        &:hover:not(.disable-hover) {
-            --background: var(--primary-gradient);
-        }
-    }
+ion-img {
+    width: 100%; /* Responsive image width */
 }
 
-ion-header {
-    z-index: 99999;
+ion-fab-button {
+    width: 7vw; /* Responsive width based on viewport width */
+    height: 7vw; /* Responsive height based on viewport width */
+    font-size: 4vw; /* Responsive font size based on viewport width */
+    border-radius: 50%;
+    --background: var(--primary);
+    --box-shadow: none;
+    --background-focused: var(--primary);
+    --background-activated: var(--primary);
+    --background-hover: var(--primary);
+}
 
-    &::after {
-        display: none !important;
+ion-title {
+    color: var(--white);
+    font-size: 4vw; /* Responsive font size based on viewport width */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .logo {
+        width: 8vw; /* Responsive width based on viewport width */
+        margin-right: 1vw; /* Responsive margin based on viewport width */
     }
 
-    ion-toolbar {
-        --background: var(--bg-color-dark);
-        display: flex;
-        align-items: center;
-        min-height: 50px !important;
-        height: auto;
-        overflow: visible !important;
-        --border-width: 0 !important;
+    ion-icon {
+        font-size: 4vw; /* Responsive font size based on viewport width */
+        margin-right: 1vw; /* Responsive margin based on viewport width */
+    }
 
-        ion-buttons {
-            position: relative !important;
-            margin: 0;
-            --padding-end: 0 !important;
-            --padding-start: 0 !important;
+    span {
+        font-size: 4vw; /* Responsive font size based on viewport width */
+    }
 
-            ion-back-button {
-                --color: var(--white) !important;
-                --icon-font-size: 1.35rem !important;
-                --padding-end: 0 !important;
-                --padding-start: 0 !important;
-                display: block;
-                --ripple-color: var(--transparent) !important;
-            }
-
-            ion-back-button {
-                .button-native {
-                    padding: 0 !important;
-                }
-            }
-
-            &.ios {
-                padding: 0 10px !important;
-            }
-
-        }
-
-        ion-title {
-            color: var(--white);
-            padding: 0 0px !important;
-            font-size: 1.2rem;
-            font-weight: 500;
-            display: block;
-            overflow: visible !important;
-            line-height: 50px;
-            letter-spacing: 0;
-            position: relative !important;
-            text-align: justify !important;
-        }
-
+    ion-button {
+        --padding-start: 0;
+        --padding-end: 0;
     }
 }
 

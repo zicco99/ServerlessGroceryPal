@@ -1,11 +1,22 @@
-import React,{ useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import {
+  IonApp,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonRouterOutlet,
+  setupIonicReact,
+  useIonAlert,
+  IonSpinner
+} from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Auth from './pages/auth/Auth';
 import Scanner from './pages/scanner/Scanner';
 import Profile from './pages/profile/Profile';
+import LateralMenu from './components/lateral-menu/LateralMenu';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -27,7 +38,7 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 
 import { Amplify } from 'aws-amplify';
-import { getCurrentUser } from 'aws-amplify/auth';
+import { getCurrentUser, fetchUserAttributes, FetchUserAttributesOutput} from 'aws-amplify/auth';
 import awsExports from './aws-exports';
 
 import './global.scss';
@@ -37,45 +48,65 @@ setupIonicReact();
 Amplify.configure(awsExports);
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userAttributes, setUserAttributes] = useState<FetchUserAttributesOutput | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [presentAlert] = useIonAlert();
 
   useEffect(() => {
     getCurrentUser()
       .then(() => {
         setIsAuthenticated(true);
+        fetchUserAttributes().then(
+          (userAttributes) => { //Fulfilled
+            setUserAttributes(userAttributes);
+            setTimeout(() => setIsLoading(false), 3000);
+          },
+          () => setIsAuthenticated(false)  //Rejected
+        )
         setIsLoading(false);
       })
       .catch(() => {
         setIsAuthenticated(false);
         setIsLoading(false);
+        presentAlert({
+          header: 'Error',
+          subHeader: 'Authentication failed',
+          message: 'Please try again',
+          buttons: ['OK'],
+        })
       });
   }, []);
 
-  if (isLoading) {
-    return <div>Loading...</div>; // You can customize this loading indicator
-  }
-
   return (
     <IonApp>
+      {isLoading && <IonSpinner name="circular" />}
       <IonReactRouter>
-        <IonRouterOutlet>
-          <Route exact path="/auth">
-            <Auth />
-          </Route>
-          <Route exact path="/home">
-            {isAuthenticated ? <Home /> : <Redirect to="/auth" />}
-          </Route>
-          <Route exact path="/scan">
-            <Scanner/>
-          </Route>
-          <Route exact path="/profile">
-            {isAuthenticated ? <Profile /> : <Redirect to="/auth" />}
-          </Route>
-          <Route exact path="/">
-            {isAuthenticated ? <Home /> : <Redirect to="/auth" />}
-          </Route>
-        </IonRouterOutlet>
+        {isAuthenticated && userAttributes && <LateralMenu userAttributes={userAttributes} isOpen={false} onToggle={() => {}} />}
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>App Title</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent id="main-content">
+          <IonRouterOutlet>
+            <Route exact path="/auth">
+              <Auth />
+            </Route>
+            <Route exact path="/home">
+              {isAuthenticated ? <Home /> : <Redirect to="/auth" />}
+            </Route>
+            <Route exact path="/scan">
+              {isAuthenticated ? <Scanner /> : <Redirect to="/auth" />}
+            </Route>
+            <Route exact path="/profile">
+              {isAuthenticated ? <Profile /> : <Redirect to="/auth" />}
+            </Route>
+            <Route exact path="/">
+              {isAuthenticated ? <Home /> : <Redirect to="/auth" />}
+            </Route>
+          </IonRouterOutlet>
+        </IonContent>
       </IonReactRouter>
     </IonApp>
   );

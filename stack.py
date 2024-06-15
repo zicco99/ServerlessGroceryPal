@@ -145,7 +145,9 @@ class AppStack(Stack):
             refresh_token_validity=Duration.hours(8), # Allows to refresh other tokens, moreover once it expires, the user will need to reauthenticate to obtain a new one
             access_token_validity=Duration.hours(8), # Access_token = authotization only
             id_token_validity=Duration.hours(8), # ID_token = authorization + authentication (it encapsulates user data)
-            write_attributes=cognito.ClientAttributes().with_custom_attributes(),
+            write_attributes=cognito.ClientAttributes().with_custom_attributes(
+                ""
+            ),
         )
 
         # [[ User Pool Domain ]]

@@ -11,5 +11,7 @@ interface ImportMeta {
       readonly VITE_USERPOOLCLIENTCALLBACKURLREMOTE: string;
       readonly VITE_USERPOOLCLIENTLOGOUTURLLOCAL: string;
       readonly VITE_USERPOOLCLIENTLOGOUTURLREMOTE: string;
+      readonly VITE_DISTRIBUTIONURL: string;
+
     };
   }

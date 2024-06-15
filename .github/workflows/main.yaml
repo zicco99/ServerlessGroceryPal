@@ -128,7 +128,7 @@ jobs:
           frontend_directory="$(pwd)/frontend/ionic-app"
           CI=false && npm run build --prefix "$frontend_directory"
           bucket_name=$(cat cdk_outputs.json | jq -r .AppStack.FrontendBucketName)
-          aws s3 cp "$frontend_directory/build" "s3://$bucket_name" --recursive
+          aws s3 cp "$frontend_directory/dist" "s3://$bucket_name" --recursive
 
       - name: Invalidate CloudFront Cache
         run: |

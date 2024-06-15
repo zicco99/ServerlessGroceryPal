@@ -1,6 +1,8 @@
 import './ExploreContainer.css';
+import React from 'react';
 
-interface ContainerProps { }
+interface ContainerProps {
+}
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
   return (

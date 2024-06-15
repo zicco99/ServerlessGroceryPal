@@ -1,7 +1,7 @@
 {
-  "name": "ionic-react-typescript-boilerplate",
+  "name": "grocerypal",
   "integrations": {
     "capacitor": {}
   },
-  "type": "react"
+  "type": "react-vite"
 }

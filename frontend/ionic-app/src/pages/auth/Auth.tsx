@@ -16,27 +16,37 @@ import {
   IonItem,
   IonLabel,
   IonInput,
-  IonIcon
+  IonIcon,
+  useIonRouter
 } from '@ionic/react';
 
 import styles from './Auth.module.scss';
+import { SignInInput, signIn } from 'aws-amplify/auth';
 
 const Auth: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [segment, setSegment] = useState<'login' | 'signup'>('login');
 
+  const router = useIonRouter();
+
+
   const handleSegmentChange = (value: 'login' | 'signup') => {
     setSegment(value);
   };
 
   const handleSubmit = () => {
+    if (!email || !password) {
+      return;
+    }
     // Handle form submission
     if (segment === 'login') {
-      // Perform login
-      console.log('Logging in with', email, password);
+      signIn({
+        username: email,
+        password: password
+      } as SignInInput);
+      router.goBack();
     } else {
-      // Perform sign up
       console.log('Signing up with', email, password);
     }
   };

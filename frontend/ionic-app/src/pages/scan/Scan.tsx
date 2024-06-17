@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 
-const BarcodeScannerComponent: React.FC = () => {
+const Scan: React.FC = () => {
   const [barcodeData, setBarcodeData] = useState<string | null>(null);
   const [isActive, setIsActive] = useState(false);
 
@@ -64,4 +64,4 @@ const BarcodeScannerComponent: React.FC = () => {
   );
 };
 
-export default BarcodeScannerComponent;
+export default Scan;

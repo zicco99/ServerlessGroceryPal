@@ -1,23 +1,11 @@
-.ios,
-.md {
-    --primary: #2172ec;
-    --white: #fff;
-    --text-black: #000;
-    --text-light: #808080;
-    --text-dark: #252424;
-    --bg-color: #252525;
-    --transparent: rgba(0, 0, 0, 0);
-}
-
 ion-header {
-    z-index: 99999;
 
     &::after {
         display: none !important;
     }
 
     ion-toolbar {
-        --background: var(--primary);
+        --background: var(#3a48b1)
         display: flex;
         align-items: center;
         min-height: 50px !important;

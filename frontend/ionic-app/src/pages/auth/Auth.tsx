@@ -30,7 +30,6 @@ const Auth: React.FC = () => {
 
   const router = useIonRouter();
 
-
   const handleSegmentChange = (value: 'login' | 'signup') => {
     setSegment(value);
   };
@@ -55,7 +54,7 @@ const Auth: React.FC = () => {
     if (!email || !password) {
       return;
     }
-    
+
     console.log('Signing up with', email, password);
     await login();  
   };
@@ -77,14 +76,6 @@ const Auth: React.FC = () => {
 
   return (
     <IonPage className={styles.ios}>
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/" />
-          </IonButtons>
-          <IonTitle>{segment === 'login' ? 'Login' : 'Sign Up'}</IonTitle>
-        </IonToolbar>
-      </IonHeader>
 
       <IonContent>
         <div className={styles.banner}>

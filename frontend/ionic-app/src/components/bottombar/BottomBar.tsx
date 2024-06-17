@@ -1,6 +1,6 @@
 import React from 'react';
 import { IonFab, IonFabButton, IonIcon, IonTabBar, IonTabButton } from '@ionic/react';
-import { camera, person, home, search, chatbubble, barcode } from 'ionicons/icons';
+import { camera, person, home, search, chatbubble, barcode, receiptOutline } from 'ionicons/icons';
 import './BottomBar.scss';
 
 interface Props {
@@ -26,11 +26,11 @@ const BottomBar: React.FC<Props> = ({ new_message, new_activities }) => {
         <IonTabButton className='middle-tab'>
         </IonTabButton>
 
-        <IonTabButton tab="tab3" href="/tab3">
-          <IonIcon icon={ chatbubble } />
+        <IonTabButton tab="tab3" href="/">
+          <IonIcon icon={ receiptOutline } />
         </IonTabButton>
 
-        <IonTabButton tab="tab4" href="/tab4">
+        <IonTabButton tab="receipt-outline" href="/profile">
           <IonIcon icon={ person } />
         </IonTabButton>
       </IonTabBar>

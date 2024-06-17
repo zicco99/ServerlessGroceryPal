@@ -16,7 +16,7 @@ import Home from './pages/Home';
 import Auth from './pages/auth/Auth';
 import Scanner from './pages/scanner/Scanner';
 import Profile from './pages/profile/Profile';
-import LateralMenu from './components/lateral-menu/LateralMenu';
+import Sidebar from './components/sidebar/Sidebar';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -42,6 +42,7 @@ import { getCurrentUser, fetchUserAttributes, FetchUserAttributesOutput} from 'a
 import awsExports from './aws-exports';
 
 import './global.scss';
+import BottomBar from './components/bottombar/BottomBar';
 
 setupIonicReact();
 
@@ -82,12 +83,7 @@ const App: React.FC = () => {
     <IonApp>
       {isLoading && <IonSpinner name="circular" />}
       <IonReactRouter>
-        {isAuthenticated && userAttributes && <LateralMenu userAttributes={userAttributes} isOpen={false} onToggle={() => {}} />}
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>App Title</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        {isAuthenticated && userAttributes && <Sidebar userAttributes={userAttributes} isOpen={false} onToggle={() => {}} />}
         <IonContent id="main-content">
           <IonRouterOutlet>
             <Route exact path="/auth">
@@ -105,6 +101,7 @@ const App: React.FC = () => {
             <Route exact path="/">
               {isAuthenticated ? <Home /> : <Redirect to="/auth" />}
             </Route>
+            
           </IonRouterOutlet>
         </IonContent>
       </IonReactRouter>

@@ -17,6 +17,7 @@ import { camera, cameraOutline, cameraSharp, phonePortrait } from 'ionicons/icon
 import { fetchUserAttributes } from 'aws-amplify/auth';
 
 import "./Profile.module.scss";
+import BottomBar from '../../components/bottombar/BottomBar';
 
 const ProfilePage: React.FC = () => {
     const [currentUser, setCurrentUser] = useState<any>(null);
@@ -77,6 +78,7 @@ const ProfilePage: React.FC = () => {
                     </IonGrid>
                 </IonCardContent>
             </IonCard>
+            <BottomBar />
         </IonContent>
     );
 }

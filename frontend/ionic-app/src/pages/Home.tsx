@@ -1,6 +1,7 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonFooter, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './Home.css';
+import BottomBar from '../components/bottombar/BottomBar';
 
 const Home: React.FC = () => {
   return (
@@ -18,6 +19,9 @@ const Home: React.FC = () => {
         </IonHeader>
         <ExploreContainer />
       </IonContent>
+      <IonFooter>
+        <BottomBar />
+      </IonFooter>
     </IonPage>
   );
 };

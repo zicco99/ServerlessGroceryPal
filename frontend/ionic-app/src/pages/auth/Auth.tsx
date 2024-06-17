@@ -45,7 +45,7 @@ const Auth: React.FC = () => {
         username: email,
         password: password
       } as SignInInput);
-      router.goBack();
+      router.push('/home', 'forward', 'replace');
     } else {
       console.log('Signing up with', email, password);
     }

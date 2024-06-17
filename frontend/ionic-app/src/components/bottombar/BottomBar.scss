@@ -1,55 +1,61 @@
-ion-tab-bar {
-
+.bottom-bar {
 	--background: var(--tab-background);
 	box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.4);
 	border-radius: 50px !important;
-
-	height: 50px;
-	width: 50%;
-	padding-top: 5px;
-	padding-bottom: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
-
-	bottom: 20px;
-	position: relative;
-	margin: 0 auto !important;
-	border-top: none;
-
-	.middle-tab {
-		//disable clicks and events
-		pointer-events: none; /* Disable pointer events */
-		cursor: default; /* Change cursor to default */
-
-	
-	
-	
+  
+	height: 60px;
+	width: 90%;
+	bottom: 5%;
+	position: fixed; /* Ensure it stays fixed at the bottom */
+	left: 50%; /* Center horizontally */
+	transform: translateX(-50%);
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+  
+	.tab-button {
+	  color: #555; /* Example color */
+	  &.selected {
+		color: #007aff; /* Example color for selected state */
 	  }
-}
-
-
-.middle-tab {
-	//disable everything
-	--background: transparent !important;
-	--color: var(--text-light) !important;
-	--color-selected: var(--text-light) !important;
-	--ripple-color: var(--text-light) !important;
-	--background-focused: var(--transparent) !important;
-	--background-hover: var(--transparent) !important;
-	--background-activated: var(--transparent) !important;
-	--background-activated-opacity: 0.5 !important;
-	--background-focused-opacity: 0.5 !important;
-	--background-hover-opacity: 0.5 !important;
-	--background-activated-opacity: 0.5 !important;
-	--ripple-color: var(--transparent) !important;
-	--ripple-duration: 0ms !important;
-	--ripple-opacity: 0.5 !important;
-
-
+	}
+  
+	.fab-button {
+	  ion-icon {
+		color: #fff; /* Example icon color */
+	  }
+	}
+  
+	.middle-tab {
+	  pointer-events: none; /* Disable pointer events */
+	  cursor: default; /* Change cursor to default */
+	}
 
   }
-  
-.middle-tab:hover {
-background-color: transparent !important;
 
+.scan-button {
+	//--background: var(--secundary);
+	box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.4);
+
+	position: fixed;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    background: var(--tab-background);
+    box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+	ion-icon {
+
+		&.active {
+			color: var(--primary);
+		}
+		
+	}
 }
+  

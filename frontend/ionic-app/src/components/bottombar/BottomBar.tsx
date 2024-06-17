@@ -1,16 +1,21 @@
 import React from 'react';
-import { IonFab, IonFabButton, IonIcon, IonTabBar, IonTabButton, IonBadge } from '@ionic/react';
-import { camera, compass, chatbubbles, notifications, person, home, search, chatbubble, barcode } from 'ionicons/icons';
+import { IonFab, IonFabButton, IonIcon, IonTabBar, IonTabButton } from '@ionic/react';
+import { camera, person, home, search, chatbubble, barcode } from 'ionicons/icons';
 import './BottomBar.scss';
 
-const BottomBar: React.FC = () => {
+interface Props {
+  new_message?: number;
+  new_activities?: number;
+}
+
+const BottomBar: React.FC<Props> = ({ new_message, new_activities }) => {
   const goToPictures = () => {
     console.log('Navigating to pictures...');
   };
 
   return (
-    <>
-    <IonTabBar slot="bottom">
+    <div>
+    <IonTabBar slot="bottom" className="bottom-bar">
         <IonTabButton tab="tab1" href="/home">
           <IonIcon icon={ home } />
         </IonTabButton>
@@ -18,7 +23,7 @@ const BottomBar: React.FC = () => {
           <IonIcon icon={ search } />
         </IonTabButton>
 
-        <IonTabButton className='middle_tab' disabled={false}>
+        <IonTabButton className='middle-tab'>
         </IonTabButton>
 
         <IonTabButton tab="tab3" href="/tab3">
@@ -29,12 +34,12 @@ const BottomBar: React.FC = () => {
           <IonIcon icon={ person } />
         </IonTabButton>
       </IonTabBar>
-      <IonFab vertical='bottom' horizontal='center' slot="fixed">
-        <IonFabButton onClick={goToPictures}>
-          <IonIcon icon={barcode} color='primary' />
+      <IonFab vertical='bottom' horizontal='center' slot="fixed" className='scan-fab'>
+        <IonFabButton onClick={goToPictures} className='scan-button'>
+          <IonIcon icon={barcode} />
         </IonFabButton>
       </IonFab>
-    </>
+    </div>
   );
 };
 

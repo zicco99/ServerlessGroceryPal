@@ -21,7 +21,7 @@ import {
 } from '@ionic/react';
 
 import styles from './Auth.module.scss';
-import { SignInInput, signIn } from 'aws-amplify/auth';
+import { SignInInput, SignInOutput, signIn, signUp} from 'aws-amplify/auth';
 
 const Auth: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -35,18 +35,40 @@ const Auth: React.FC = () => {
     setSegment(value);
   };
 
-  const handleSubmit = () => {
+
+  const login = async () => {
+    const sign_in : SignInOutput = await signIn({
+      username: email,
+      password: password
+    } as SignInInput);
+    if (sign_in) {
+      console.log(sign_in);
+      console.log('Signed in with', email, password);
+
+    }
+    router.push('/home', 'forward', 'replace');
+
+  };
+
+
+  const signup = async () => {
     if (!email || !password) {
       return;
     }
-    // Handle form submission
+    
+    console.log('Signing up with', email, password);
+    await login();  
+  };
+
+
+  const handleSubmit = async () => {
+    if (!email || !password) {
+      return;
+    }
     if (segment === 'login') {
-      signIn({
-        username: email,
-        password: password
-      } as SignInInput);
-      router.push('/home', 'forward', 'replace');
+      await login();
     } else {
+
       console.log('Signing up with', email, password);
     }
   };

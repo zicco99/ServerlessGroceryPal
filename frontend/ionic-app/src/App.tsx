@@ -16,8 +16,6 @@ import { Amplify } from 'aws-amplify';
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import awsExports from './aws-exports';
 
-import './global.scss';
-
 // Configure Amplify
 Amplify.configure(awsExports);
 

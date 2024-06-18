@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import {
   IonContent,
-  IonHeader,
   IonPage,
-  IonTitle,
-  IonToolbar,
-  IonButtons,
-  IonBackButton,
   IonSegment,
   IonSegmentButton,
   IonButton,
@@ -17,99 +12,158 @@ import {
   IonLabel,
   IonInput,
   IonIcon,
-  useIonRouter
+  IonToast,
+  IonActionSheet,
+  useIonRouter,
+  IonImg,
+  IonText,
 } from '@ionic/react';
 
-import styles from './Auth.module.scss';
-import { SignInInput, SignInOutput, signIn, signUp} from 'aws-amplify/auth';
+import { SignInInput, SignInOutput, SignUpInput, signIn, signUp, ResetPasswordInput} from 'aws-amplify/auth';
 
-const Auth: React.FC = () => {
+import './Auth.module.scss';
+
+const AuthComponent: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [segment, setSegment] = useState<'login' | 'signup'>('login');
+  const [code, setCode] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [segment, setSegment] = useState<'login' | 'signup' | 'reset'>('login');
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>('');
+  const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
 
   const router = useIonRouter();
 
-  const handleSegmentChange = (value: 'login' | 'signup') => {
+  const handleSegmentChange = (value: 'login' | 'signup' | 'reset') => {
     setSegment(value);
   };
 
-
   const login = async () => {
-    const sign_in : SignInOutput = await signIn({
-      username: email,
-      password: password
-    } as SignInInput);
-    if (sign_in) {
-      console.log(sign_in);
-      console.log('Signed in with', email, password);
-
+    try {
+      const input : SignInInput = {
+        username: email,
+        password: password,
+      }
+      await signIn(input);
+      console.log('Signed in with', email);
+      router.push('/home', 'forward', 'replace');
+    } catch (error: any) {
+      setToastMessage(error.message);
+      setShowToast(true);
     }
-    router.push('/home', 'forward', 'replace');
-
   };
-
 
   const signup = async () => {
-    if (!email || !password) {
-      return;
+    try {
+      const input : SignUpInput = {
+        username: email,
+        password: password
+      }
+      await signUp(input);
+      setToastMessage('Sign up successful! Please confirm your email.');
+      setShowToast(true);
+      handleSegmentChange('login');
+    } catch (error: any) {
+      setToastMessage(error.message);
+      setShowToast(true);
     }
-
-    console.log('Signing up with', email, password);
-    await login();  
   };
 
+  const requestPasswordReset = async () => {
+    try {
+      //Implement reset Password
+      setToastMessage('Password reset code sent to your email.');
+      setShowToast(true);
+      setShowActionSheet(true);
+    } catch (error: any) {
+      setToastMessage(error.message);
+      setShowToast(true);
+    }
+  };
+
+  const resetPassword = async () => {
+    try {
+      //Implement reset Password
+      setToastMessage('Password reset successful! You can now log in with your new password.');
+      setShowToast(true);
+      handleSegmentChange('login');
+    } catch (error: any) {
+      setToastMessage(error.message);
+      setShowToast(true);
+    }
+  };
 
   const handleSubmit = async () => {
-    if (!email || !password) {
+    if (!email || (segment !== 'reset' && !password)) {
+      setToastMessage('Email and password are required.');
+      setShowToast(true);
       return;
     }
     if (segment === 'login') {
       await login();
-    } else {
-
-      console.log('Signing up with', email, password);
+    } else if (segment === 'signup') {
+      await signup();
+    } else if (segment === 'reset') {
+      await resetPassword();
     }
   };
 
-
-
   return (
-    <IonPage className={styles.ios}>
-
+    <IonPage className="auth_page">
       <IonContent>
-        <div className={styles.banner}>
-          <div className={styles.logo}>
-            <img src="/assets/logo.png" alt="Logo" />
-            <h2>Welcome</h2>
-          </div>
-          <IonSegment value={segment} onIonChange={e => handleSegmentChange(e.detail.value as 'login' | 'signup')}>
+        <div className="auth_banner">
+          <IonImg src="assets/imgs/logo.png"/>
+          <IonText color="light">GroceryPal [alpha]</IonText>
+          <IonSegment value={segment} onIonChange={e => handleSegmentChange(e.detail.value as 'login' | 'signup' | 'reset')}>
             <IonSegmentButton value="login">
               Login
             </IonSegmentButton>
             <IonSegmentButton value="signup">
               Sign Up
             </IonSegmentButton>
+            <IonSegmentButton value="reset">
+              Reset Password
+            </IonSegmentButton>
           </IonSegment>
         </div>
 
-        <div className={styles.form}>
+        <div className="login-form">
           <IonList>
             <IonItem>
               <IonLabel position="floating">Email</IonLabel>
               <IonInput type="email" value={email} onIonChange={e => setEmail(e.detail.value!)} />
             </IonItem>
-            <IonItem>
-              <IonLabel position="floating">Password</IonLabel>
-              <IonInput type="password" value={password} onIonChange={e => setPassword(e.detail.value!)} />
-            </IonItem>
+            {segment !== 'reset' && (
+              <IonItem>
+                <IonLabel position="floating">Password</IonLabel>
+                <IonInput type="password" value={password} onIonChange={e => setPassword(e.detail.value!)} />
+              </IonItem>
+            )}
+            {segment === 'reset' && (
+              <>
+                <IonItem>
+                  <IonLabel position="floating">Reset Code</IonLabel>
+                  <IonInput type="text" value={code} onIonChange={e => setCode(e.detail.value!)} />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="floating">New Password</IonLabel>
+                  <IonInput type="password" value={newPassword} onIonChange={e => setNewPassword(e.detail.value!)} />
+                </IonItem>
+              </>
+            )}
           </IonList>
           <IonButton expand="block" className="btn button-block" onClick={handleSubmit}>
-            {segment === 'login' ? 'Login' : 'Sign Up'}
+            {segment === 'login' ? 'Login' : segment === 'signup' ? 'Sign Up' : 'Reset Password'}
           </IonButton>
+          {segment === 'login' && (
+            <IonButton expand="block" className="btn button-block" onClick={requestPasswordReset}>
+              Forgot Password?
+            </IonButton>
+          )}
         </div>
 
-        <div className={styles.social_media}>
+        <div className="social_media_login">
           <p>Or connect with</p>
           <IonRow>
             <IonCol>
@@ -119,7 +173,7 @@ const Auth: React.FC = () => {
             </IonCol>
             <IonCol>
               <IonButton className="btn google_btn" expand="block">
-                <IonIcon/>
+                <IonIcon />
                 Google
               </IonButton>
             </IonCol>
@@ -131,15 +185,42 @@ const Auth: React.FC = () => {
             <>
               Don't have an account? <span onClick={() => handleSegmentChange('signup')}>Sign up</span>
             </>
-          ) : (
+          ) : segment === 'signup' ? (
             <>
               Already have an account? <span onClick={() => handleSegmentChange('login')}>Login</span>
+            </>
+          ) : (
+            <>
+              Remembered your password? <span onClick={() => handleSegmentChange('login')}>Login</span>
             </>
           )}
         </h6>
       </IonContent>
+      <IonToast
+        isOpen={showToast}
+        onDidDismiss={() => setShowToast(false)}
+        message={toastMessage}
+        duration={3000}
+      />
+      <IonActionSheet
+        isOpen={showActionSheet}
+        onDidDismiss={() => setShowActionSheet(false)}
+        buttons={[
+          {
+            text: 'Submit Reset Code',
+            handler: () => {
+              handleSegmentChange('reset');
+              setShowActionSheet(false);
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+        ]}
+      />
     </IonPage>
   );
 };
 
-export default Auth;
+export default AuthComponent;

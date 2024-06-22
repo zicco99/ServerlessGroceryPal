@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtHeader, SigningKeyCallback } from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { JwksClient } from 'jwks-rsa';
 
 declare module 'express' {
@@ -67,7 +67,7 @@ export class CheckAuthCognitoMiddleware implements NestMiddleware {
     });
   }
 
-  private getSigningKey(header: JwtHeader, callback: SigningKeyCallback) {
+  private getSigningKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
     this.client.getSigningKey(header.kid as string, (error, key) => {
       if (error) {
         callback(error, undefined);

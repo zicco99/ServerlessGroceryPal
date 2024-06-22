@@ -22,7 +22,7 @@ export class RecipesService {
     });
   }
 
-  async getRecipeAndRel(id: string) {
+  async getEnhancedRecipe(id: string) {
     return await this.db_client.recipe.findUnique({
       where: { id },
       include: {
@@ -32,3 +32,5 @@ export class RecipesService {
     });
   }
 }
+
+

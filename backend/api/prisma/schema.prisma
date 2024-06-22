@@ -12,7 +12,7 @@ generator js_client {
 }
 
 model User {
-  id         Int          @id @default(autoincrement())
+  id         String          @id
   name       String
   email      String
   profilePic String?
@@ -23,7 +23,7 @@ model User {
 model Feedback {
   id       Int     @id @default(autoincrement())
   user     User    @relation(fields: [userId], references: [id])
-  userId   Int
+  userId   String
   recipe   Recipe  @relation(fields: [recipeId], references: [id])
   recipeId String
   isChosen Boolean
@@ -103,7 +103,7 @@ model Fridge {
 model UserFridge {
   id       Int     @id @default(autoincrement())
   user     User    @relation(fields: [userId], references: [id])
-  userId   Int
+  userId   String
   fridge   Fridge  @relation(fields: [fridgeId], references: [id])
   fridgeId Int
   isAdmin  Boolean

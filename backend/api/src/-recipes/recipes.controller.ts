@@ -21,9 +21,9 @@ export class RecipesController {
     }
 
     @Get(':id/show')
-    async getRecipeAndRel(@Param('id') id: string): Promise<LambdaResponse> {
+    async getEnhancedRecipe(@Param('id') id: string): Promise<LambdaResponse> {
         try {
-            const recipes = await this.recipesService.getRecipeAndRel(id);
+            const recipes = await this.recipesService.getEnhancedRecipe(id);
             return new LambdaResponse(LambdaResponseCode.OK, recipes);
         } catch (error) {
             throw new HttpException(
@@ -59,4 +59,5 @@ export class RecipesController {
             );
         }
     }
+
 }

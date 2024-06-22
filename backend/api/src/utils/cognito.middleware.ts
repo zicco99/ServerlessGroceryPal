@@ -52,7 +52,7 @@ export class CheckAuthCognitoMiddleware implements NestMiddleware {
       next();
     } catch (error) {
       console.error('Error validating token:', error);
-      response.status(401).send('Unauthorized');
+      response.status(401).send('Unauthorized + ' + error);
     }
   }
 

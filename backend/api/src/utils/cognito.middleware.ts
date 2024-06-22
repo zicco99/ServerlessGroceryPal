@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtHeader, SigningKeyCallback } from 'jsonwebtoken';
-import jwksClient from 'jwks-rsa';
+import {JwksClient}  from 'jwks-rsa';
 
 const REGION = 'your_aws_region';
 const USER_POOL_ID = 'your_user_pool_id';
@@ -27,7 +27,7 @@ declare module 'express' {
 
 @Injectable()
 export class CheckAuthCognitoMiddleware implements NestMiddleware {
-  private client = jwksClient({
+  private client = new JwksClient({
     cache: true,
     jwksUri: `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}/.well-known/jwks.json`,
   });

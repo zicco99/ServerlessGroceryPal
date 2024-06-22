@@ -3,6 +3,7 @@ import { AppModule } from './src/app.module';
 import { Callback, Context, Handler } from 'aws-lambda';
 import { SecretsManager } from 'aws-sdk';
 import { configure as serverlessExpress } from '@vendia/serverless-express';
+import { Logger } from '@nestjs/common';
 
 const secretsManager = new SecretsManager({ region: process.env.REGION });
 
@@ -28,7 +29,7 @@ async function setConnectionString(): Promise<void> {
 }
 
 async function bootstrap(): Promise<Handler> {
-    const nestApp = await NestFactory.create(AppModule);
+    const nestApp = await NestFactory.create(AppModule, { logger: new Logger() });
     await nestApp.init();
     
     const expressApp = nestApp.getHttpAdapter().getInstance();

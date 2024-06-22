@@ -21,7 +21,7 @@ import {
 
 import { SignInInput, SignInOutput, SignUpInput, signIn, signUp, ResetPasswordInput} from 'aws-amplify/auth';
 
-import './Auth.module.scss';
+import * as style from './Auth.module.scss';
 
 const AuthComponent: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -110,7 +110,7 @@ const AuthComponent: React.FC = () => {
   };
 
   return (
-    <IonPage className="auth_page">
+    <IonPage className={style.auth_page}>
       <IonContent>
         <div className="auth_banner">
           <IonImg src="assets/imgs/logo.png"/>

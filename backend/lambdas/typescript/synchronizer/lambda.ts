@@ -167,7 +167,7 @@ const handler: Handler = async (
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message: 'Synchronization completed!' }),
+                body: JSON.stringify({ message: 'Synchronization started!' }),
             };
             callback(null, response);
         } 

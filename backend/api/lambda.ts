@@ -60,5 +60,7 @@ export const handler: Handler = async (
         response.headers = headers;
     }
 
+    console.log('Response:', JSON.stringify(response, null, 2));
+
     return response;
 };

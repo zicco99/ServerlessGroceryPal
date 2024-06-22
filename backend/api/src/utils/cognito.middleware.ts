@@ -3,9 +3,9 @@ import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtHeader, SigningKeyCallback } from 'jsonwebtoken';
 import {JwksClient}  from 'jwks-rsa';
 
-const REGION = 'your_aws_region';
-const USER_POOL_ID = 'your_user_pool_id';
-const CLIENT_ID = 'your_client_id';
+const REGION = process.env.REGION;
+const USER_POOL_ID = process.env.COGNITO_USER_POOL_ID;
+const CLIENT_ID = process.env.COGNITO_USER_POOL_CLIENT_ID;
 
 type DecodedToken = {
   header: JwtHeader;

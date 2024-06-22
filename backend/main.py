@@ -171,6 +171,8 @@ class BackendStack(NestedStack):
             security_groups=[lambda_security_group],
             environment={
                 'REGION': self.region,
+                'COGNITO_USER_POOL_ID': params.user_pool.user_pool_id,
+                'COGNITO_USER_POOL_CLIENT_ID': params.user_pool_client.user_pool_client_id,
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
             },

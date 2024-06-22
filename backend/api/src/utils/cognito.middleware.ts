@@ -1,17 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtHeader, SigningKeyCallback } from 'jsonwebtoken';
-import {JwksClient}  from 'jwks-rsa';
-
-const REGION = process.env.REGION;
-const USER_POOL_ID = process.env.COGNITO_USER_POOL_ID;
-const CLIENT_ID = process.env.COGNITO_USER_POOL_CLIENT_ID;
-
-type DecodedToken = {
-  header: JwtHeader;
-  payload: any;
-  signature: string;
-};
+import { JwksClient } from 'jwks-rsa';
 
 declare module 'express' {
   interface Request {
@@ -29,7 +19,7 @@ declare module 'express' {
 export class CheckAuthCognitoMiddleware implements NestMiddleware {
   private client = new JwksClient({
     cache: true,
-    jwksUri: `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}/.well-known/jwks.json`,
+    jwksUri: `https://cognito-idp.${process.env.REGION}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID}/.well-known/jwks.json`,
   });
 
   async use(request: Request, response: Response, next: NextFunction) {
@@ -39,14 +29,14 @@ export class CheckAuthCognitoMiddleware implements NestMiddleware {
 
     try {
       const tokenBearer = request.headers.authorization.split(' ')[1];
-      const decodedToken: DecodedToken = jwt.decode(tokenBearer, { complete: true }) as DecodedToken;
-      if (!decodedToken?.header) {
+      const decodedToken = jwt.decode(tokenBearer, { complete: true }) as jwt.Jwt;
+
+      if (!decodedToken || !decodedToken.header) {
         throw new Error('Invalid token');
       }
 
       const { sub, name, email, 'cognito:groups': roles, 'custom:attribute': customAttribute } = await this.verifyToken(tokenBearer);
 
-      // Enrich request object with user attributes
       request.user = { id: sub, name, email, roles, customAttribute };
 
       next();
@@ -62,8 +52,8 @@ export class CheckAuthCognitoMiddleware implements NestMiddleware {
         tokenBearer,
         this.getSigningKey.bind(this),
         {
-          audience: CLIENT_ID,
-          issuer: `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`,
+          audience: process.env.COGNITO_USER_POOL_CLIENT_ID,
+          issuer: `https://cognito-idp.${process.env.REGION}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID}`,
           algorithms: ['RS256'],
         },
         (error, decoded) => {

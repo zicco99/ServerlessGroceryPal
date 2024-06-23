@@ -160,6 +160,12 @@ class BackendStack(NestedStack):
 
         self.backend_bucket_name = backend_bucket.bucket_name
 
+        nestjs_serverless_timeout = None
+        if(params.stage == "prod"):
+            nestjs_serverless_timeout = Duration.minutes(10)
+        else:
+            nestjs_serverless_timeout = Duration.seconds(40)
+
         nestjs_serverless = lambd.Function(
             self,
             f"{base_name}-nestjs-serverless",
@@ -176,7 +182,7 @@ class BackendStack(NestedStack):
                 'DB_SECRET_ARN': backend_db_creds.secret_arn,
                 "NESTJS_SERVERLESS_BUCKET": backend_bucket.bucket_name,
             },
-            timeout=Duration.minutes(10),
+            timeout=nestjs_serverless_timeout,
             #phemeral_storage_size= Size.mebibytes(1024),
             memory_size=512,
         )

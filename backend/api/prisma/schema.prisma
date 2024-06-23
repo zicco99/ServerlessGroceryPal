@@ -4,17 +4,17 @@ datasource db {
 }
 
 generator js_client {
-  provider = "prisma-client-js"
-  output = "./client"
-  engineType = "binary"
-  binaryTargets = ["native","rhel-openssl-1.0.x"]
+  provider        = "prisma-client-js"
+  output          = "./client"
+  engineType      = "binary"
+  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
   previewFeatures = ["fullTextSearch"]
 }
 
 model User {
-  id         String          @id
-  fridges    UserFridge[]
-  feedbacks  Feedback[]
+  id        String       @id
+  fridges   UserFridge[]
+  feedbacks Feedback[]
 }
 
 model Feedback {
@@ -29,7 +29,7 @@ model Feedback {
 }
 
 model Recipe {
-  id                String                @id
+  id                String             @id
   title             String
   category          String
   imageUrl          String?
@@ -56,7 +56,7 @@ model RecipeIngredient {
   amountText     String
   amount         Float
   Product        Product?   @relation(fields: [productBarcode], references: [barcode])
-  productBarcode Int?
+  productBarcode String?
 }
 
 model Ingredient {
@@ -69,7 +69,7 @@ model Ingredient {
 }
 
 model Product {
-  barcode           Int                 @id
+  barcode           String                 @id
   fridge            Fridge?             @relation(fields: [fridgeId], references: [id])
   fridgeId          Int?
   ingredient        Ingredient          @relation(fields: [ingredientId], references: [id])
@@ -90,38 +90,43 @@ model Product {
 }
 
 model Fridge {
-  id       Int             @id @default(autoincrement())
-  name     String
-  products FridgeProduct[]
-  users    UserFridge[]
-  Product  Product[]
+  id        Int             @id @default(autoincrement())
+  name      String
+  products  FridgeProduct[]
+  users     UserFridge[]
+  Product   Product[]
 }
 
 model UserFridge {
-  id       Int     @id @default(autoincrement())
   user     User    @relation(fields: [userId], references: [id])
   userId   String
   fridge   Fridge  @relation(fields: [fridgeId], references: [id])
   fridgeId Int
   isAdmin  Boolean
   isOwner  Boolean
+
+  @@id([userId, fridgeId])
 }
 
 model FridgeProduct {
-  id             Int     @id @default(autoincrement())
   fridge         Fridge  @relation(fields: [fridgeId], references: [id])
   fridgeId       Int
-  product        Product @relation(fields: [productBarcode], references: [barcode])
-  productBarcode Int
+  ownerId        String
+  product        Product @relation(fields: [barcode], references: [barcode])
+  barcode        String
   quantity       Int
+  is_shared      Boolean
+  expire_date    DateTime @db.Date
+
+  @@id([fridgeId, barcode, ownerId, expire_date])
 }
 
 model IngredientProduct {
   ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
   ingredientId   Int
-  product        Product    @relation(fields: [productBarcode], references: [barcode])
-  productBarcode Int
+  product        Product    @relation(fields: [barcode], references: [barcode])
+  barcode        String
   quantity       Int
 
-  @@id([ingredientId, productBarcode])
+  @@id([ingredientId, barcode])
 }

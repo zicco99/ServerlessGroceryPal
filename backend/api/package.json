@@ -29,6 +29,7 @@
     "@vendia/serverless-express": "^4.12.6",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.814.0",
+    "class-validator": "^0.14.1",
     "copy-webpack-plugin": "^12.0.2",
     "crypto": "^1.0.1",
     "express": "^4.19.2",

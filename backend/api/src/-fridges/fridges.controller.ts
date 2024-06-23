@@ -96,10 +96,21 @@ export class FridgesController {
         let user = JSON.parse(req.headers['x-user']);
         this.check_perm(user.id, parseInt(id), false, true);
         try {
+            
             let fridge_id = parseInt(id)
             if ((isNaN(fridge_id) == true) ) {
                 throw "Fridge Id is not correct";
             }
+
+            // Check if product exists
+            const product = await this.recipesService.getProduct(event_body.barcode);
+            if (product == null) {
+                throw new HttpException(
+                    new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found' }),
+                    LambdaResponseCode.NOT_FOUND
+                );
+            }
+            
 
             const fridge_product = await this.recipesService.addProductToFridge(
                 fridge_id, 

@@ -27,12 +27,14 @@ export class UsersService {
     }
 
     if(!user && isOwnerAsking) {
+        console.log("Allocating user in user: ", id);
       // Cognito space is created but db linked user is missing -> allocate it
       user = await this.db_client.user.create({
         data: {
           id
         }
       });
+      console.log("User created: ", user);
     }
 
     return user;

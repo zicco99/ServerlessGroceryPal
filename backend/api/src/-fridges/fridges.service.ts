@@ -33,7 +33,7 @@ export class FridgesService {
     return await this.db_client.fridge.create({
       data: {
         name: fridge_name,
-        users: { // Create the association between the creator and the fridge (FridgeUser)
+        users: { 
           create: { 
             user: {
               connect: { id: creator_id },
@@ -137,6 +137,15 @@ export class FridgesService {
       },
       include: {
         product: true
+      }
+    })
+  }
+
+
+  async getProduct(barcode: string) {
+    return await this.db_client.product.findUnique({
+      where: {
+        barcode: barcode
       }
     })
   }

@@ -7,13 +7,22 @@ export class UsersService {
   }
 
   //
-  async getUser(id: string) {
-    return await this.db_client.user.findUnique({
+  async getUser(id: string, isOwnerAsking: boolean = false) {
+    const user = await this.db_client.user.findUnique({
       where: { id },
     });
+
+    if(!user && isOwnerAsking) {
+      // Cognito space is created but db linked user is missing -> allocate it
+      await this.db_client.user.create({
+        data: {
+          id
+        }
+      });
+    }
+
+    return user;
   }
-
-
 
 }
 

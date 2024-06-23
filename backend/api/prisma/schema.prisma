@@ -13,9 +13,6 @@ generator js_client {
 
 model User {
   id         String          @id
-  name       String
-  email      String
-  profilePic String?
   fridges    UserFridge[]
   feedbacks  Feedback[]
 }

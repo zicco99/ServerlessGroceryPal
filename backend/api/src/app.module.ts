@@ -5,9 +5,11 @@ import { RecipesModule } from './-recipes/recipes.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaService } from './prisma/prisma.service';
 import {CheckAuthCognitoMiddleware} from './utils/cognito.middleware'
+import { FridgesModule } from './-fridges/fridges.module';
+import { UsersModule } from './-users/users.module';
 
 @Module({
-  imports: [RecipesModule, PrismaModule], // Importing RecipesModule and PrismaModule, we are enheriting from them the controller and the db service
+  imports: [UsersModule, FridgesModule, RecipesModule, PrismaModule],
   controllers: [AppController],
   providers: [
     AppService,

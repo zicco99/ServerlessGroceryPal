@@ -36,8 +36,9 @@ export class CheckAuthCognitoMiddleware implements NestMiddleware {
       }
 
       const { sub, name, email, 'cognito:groups': roles, 'custom:attribute': customAttribute } = await this.verifyToken(tokenBearer);
-
       request.user = { id: sub, name, email, roles, customAttribute };
+
+      console.log("User: ", request.user);
 
       next();
     } catch (error) {

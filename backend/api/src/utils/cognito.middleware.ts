@@ -43,7 +43,7 @@ export class CheckAuthCognitoMiddleware implements NestMiddleware {
       const user = { id: sub, email, firstname: given_name, lastname: family_name };
       console.log('User:', user);
 
-      req.headers['x-user'] = JSON.stringify(user);
+      req.headers['x-user'] = JSON.stringify(user); // Find a better way to do this (avoiding serialization/deserialization)
       next();
     } catch (error) {
       console.error('Error validating token:', error);

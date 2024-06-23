@@ -38,20 +38,12 @@ export class CheckAuthCognitoMiddleware implements NestMiddleware {
 
       console.log('Decoded token:', decodedToken);
 
-      const { sub, name, email, 'cognito:groups': roles, 'custom:attribute': customAttribute } = await this.verifyToken(token);
-      if (!sub || !name || !email || !roles) {
-        throw new Error('Invalid token payload');
-      }
+      const { sub, email, given_name, family_name } = await this.verifyToken(token);
 
-      const user = { id: sub, name, email, roles, customAttribute };
+      const user = { id: sub, email, firstname: given_name, lastname: family_name };
       console.log('User:', user);
 
       req.headers['x-user'] = stringify(user);
-
-      if (customAttribute) {
-        req.headers['x-user-custom-attribute'] = customAttribute;
-      }
-
       next();
     } catch (error) {
       console.error('Error validating token:', error);

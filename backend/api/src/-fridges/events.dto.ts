@@ -3,10 +3,6 @@ import { IsString, IsNotEmpty, IsInt, IsDate } from 'class-validator';
 export class CreateFridgeDto {
     @IsString()
     @IsNotEmpty()
-    creator_id: string;
-
-    @IsString()
-    @IsNotEmpty()
     fridge_name: string;
 }
 

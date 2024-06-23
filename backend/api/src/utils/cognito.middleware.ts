@@ -2,57 +2,67 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { JwksClient } from 'jwks-rsa';
-
-declare module 'express' {
-  interface Request {
-    user?: {
-      id: string;
-      name: string;
-      email: string;
-      roles: string[];
-      customAttribute?: string;
-    };
-  }
-}
+import { stringify } from 'querystring';
 
 @Injectable()
 export class CheckAuthCognitoMiddleware implements NestMiddleware {
-  private client = new JwksClient({
-    cache: true,
-    jwksUri: `https://cognito-idp.${process.env.REGION}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID}/.well-known/jwks.json`,
-  });
+  private client: JwksClient;
 
-  async use(request: Request, response: Response, next: NextFunction) {
-    if (!request.headers.authorization) {
-      return response.status(401).send('Unauthorized');
+  constructor() {
+    const { REGION, COGNITO_USER_POOL_ID } = process.env;
+    if (!REGION || !COGNITO_USER_POOL_ID) {
+      throw new Error('Environment variables REGION and COGNITO_USER_POOL_ID are required');
+    }
+    this.client = new JwksClient({
+      cache: true,
+      jwksUri: `https://cognito-idp.${REGION}.amazonaws.com/${COGNITO_USER_POOL_ID}/.well-known/jwks.json`,
+    });
+  }
+
+  async use(req: Request, res: Response, next: NextFunction) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).send('Unauthorized: No token provided');
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return res.status(401).send('Unauthorized: Malformed token');
     }
 
     try {
-      const tokenBearer = request.headers.authorization.split(' ')[1];
-      const decodedToken = jwt.decode(tokenBearer, { complete: true }) as jwt.Jwt;
-
+      const decodedToken = jwt.decode(token, { complete: true }) as jwt.Jwt;
       if (!decodedToken || !decodedToken.header) {
         throw new Error('Invalid token');
       }
 
-      console.log("Decoded token: ", decodedToken);
+      console.log('Decoded token:', decodedToken);
 
-      const { sub, name, email, 'cognito:groups': roles, 'custom:attribute': customAttribute } = await this.verifyToken(tokenBearer);
-      request.user = { id: sub, name, email, roles, customAttribute };
+      const { sub, name, email, 'cognito:groups': roles, 'custom:attribute': customAttribute } = await this.verifyToken(token);
+      if (!sub || !name || !email || !roles) {
+        throw new Error('Invalid token payload');
+      }
 
-      console.log("User: ", request.user);
+      const user = { id: sub, name, email, roles, customAttribute };
+      console.log('User:', user);
+
+      req.headers['x-user'] = stringify(user);
+
+      if (customAttribute) {
+        req.headers['x-user-custom-attribute'] = customAttribute;
+      }
 
       next();
     } catch (error) {
       console.error('Error validating token:', error);
-      response.status(401).send('Unauthorized + ' + error);
+      res.status(401).send(`Unauthorized: ${error.message}`);
     }
   }
 
-  private async verifyToken(tokenBearer: string): Promise<any> {
+  private async verifyToken(token: string): Promise<any> {
     return new Promise((resolve, reject) => {
       jwt.verify(
-        tokenBearer,
+        token,
         this.getSigningKey.bind(this),
         {
           audience: process.env.COGNITO_USER_POOL_CLIENT_ID,

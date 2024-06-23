@@ -1,7 +1,7 @@
 import { Get, Injectable, Controller, HttpException, HttpStatus, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LambdaResponse, LambdaResponseCode } from '../utils/lambda';
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 
 @Injectable()
 @Controller('users')
@@ -9,20 +9,19 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
-  async getUser(
-    @Param('id') id: string,
-    req: Request, 
-    res: Response, 
-    next: NextFunction
-  ): Promise<LambdaResponse> {
+  async getUser(@Param('id') id: string, req: Request): Promise<LambdaResponse> {
     try {
-        console.log("Asking user stuff populated by the middleware: ", req.user);
-        console.log("User asked for: ", id);
 
-        if (id === req.user.id) {
+        const asker_user = JSON.parse(req.headers['x-user']);
+        const asked_user_id = id;
+
+        console.log("Asking user stuff populated by the middleware: ", asker_user);
+        console.log("User asked for: ", asked_user_id);
+
+        if (asked_user_id === asker_user.id) {
             // If the user asking for his own profile
-            const dataFromDB = await this.usersService.getUser(req.user.id);
-            const enhancedUser = { ...req.user, ...dataFromDB };
+            const dataFromDB = await this.usersService.getUser(asker_user.id);
+            const enhancedUser = { ...asker_user, ...dataFromDB };
             return new LambdaResponse(LambdaResponseCode.OK, enhancedUser);
         } else { 
             // If the user asking for another user

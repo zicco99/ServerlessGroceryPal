@@ -1,4 +1,4 @@
-import { Get, Injectable, Controller, HttpException, HttpStatus, Param } from '@nestjs/common';
+import { Get, Injectable, Controller, HttpException, HttpStatus, Param, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LambdaResponse, LambdaResponseCode } from '../utils/lambda';
 import { Response, NextFunction } from 'express';
@@ -9,7 +9,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
-  async getUser(@Param('id') id: string, req: Request): Promise<LambdaResponse> {
+  async getUser(@Param('id') id: string, @Req() req: Request): Promise<LambdaResponse> {
     try {
 
         const asker_user = JSON.parse(req.headers['x-user']);

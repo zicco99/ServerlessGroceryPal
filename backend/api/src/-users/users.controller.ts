@@ -16,21 +16,23 @@ export class UsersController {
     next: NextFunction
   ): Promise<LambdaResponse> {
     try {
-      console.log(`User ID: ${req.user.id}`);
-      console.log(`User Name: ${req.user.name}`);
+        console.log("Asking user stuff populated by the middleware: ", req.user);
+        console.log("User asked for: ", id);
 
-      if (id === req.user.id) { 
-        const dataFromDB = await this.usersService.getUser(req.user.id);
-        const enhancedUser = { ...req.user, ...dataFromDB };
-        return new LambdaResponse(LambdaResponseCode.OK, enhancedUser);
-      } else { 
-        const dataFromDB = await this.usersService.getUser(id, true);
-        const hiddenStuff = ['email'];
-        const publicUser = Object.fromEntries(
-          Object.entries(dataFromDB).filter(([key]) => !hiddenStuff.includes(key))
-        );
-        return new LambdaResponse(LambdaResponseCode.OK, publicUser);
-      }
+        if (id === req.user.id) {
+            // If the user asking for his own profile
+            const dataFromDB = await this.usersService.getUser(req.user.id);
+            const enhancedUser = { ...req.user, ...dataFromDB };
+            return new LambdaResponse(LambdaResponseCode.OK, enhancedUser);
+        } else { 
+            // If the user asking for another user
+            const dataFromDB = await this.usersService.getUser(id, true);
+            const hiddenStuff = ['email'];
+            const publicUser = Object.fromEntries(
+            Object.entries(dataFromDB).filter(([key]) => !hiddenStuff.includes(key))
+            );
+            return new LambdaResponse(LambdaResponseCode.OK, publicUser);
+        }
     } catch (error) {
       console.error('Error fetching users:', error);
       throw new HttpException(

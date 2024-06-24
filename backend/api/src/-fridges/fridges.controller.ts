@@ -8,49 +8,73 @@ import { CreateFridgeDto, addProductToFridgeDto, updateProductFromFridgeDto } fr
 export class FridgesController {
     constructor(private readonly recipesService: FridgesService) {}
 
-    async check_perm(user_id: string, fridge_id: number, should_be_fridge_owner: boolean, should_be_fridge_admin: boolean) {
-        const user_fridge = await this.recipesService.userBelongsToFridge(user_id, fridge_id);
-        if (user_fridge == null) {
-            console.log("User is not a member of the fridge")
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.UNAUTHORIZED, { message: 'Unauthorized' }),
-                LambdaResponseCode.UNAUTHORIZED
-            );
-        }
-        if (should_be_fridge_owner == true && user_fridge.isOwner == false) {
-            console.log("User is not fridge owner")
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'Forbidden' }),
-                LambdaResponseCode.FORBIDDEN
-            );
-        }
-        if (should_be_fridge_admin == true && user_fridge.isAdmin == false) {
-            console.log("User is not fridge admin")
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'Forbidden' }),
-                LambdaResponseCode.FORBIDDEN
-            );
+    async check_perm(
+        user_id: string, 
+        fridge_id: number, 
+        should_be_fridge_owner: boolean, 
+        should_be_fridge_admin: boolean
+    ): Promise<{ isAllowed: boolean, response: LambdaResponse }> {
+        try {
+            const user_fridge = await this.recipesService.userBelongsToFridge(user_id, fridge_id);
+
+            if (!user_fridge) {
+                console.log("User is not a member of the fridge");
+                return {
+                    isAllowed: false,
+                    response: new LambdaResponse(LambdaResponseCode.UNAUTHORIZED, { message: 'Unauthorized' })
+                };
+            }
+
+            if (should_be_fridge_owner && !user_fridge.isOwner) {
+                console.log("User is not fridge owner");
+                return {
+                    isAllowed: false,
+                    response: new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'Forbidden' })
+                };
+            }
+
+            if (should_be_fridge_admin && !user_fridge.isAdmin) {
+                console.log("User is not fridge admin");
+                return {
+                    isAllowed: false,
+                    response: new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'Forbidden' })
+                };
+            }
+
+            return {
+                isAllowed: true,
+                response: new LambdaResponse(LambdaResponseCode.OK, { message: 'Authorized' })
+            };
+        } catch (error) {
+            console.log("Error checking permissions: ", error);
+            return {
+                isAllowed: false,
+                response: new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' })
+            };
         }
     }
 
-
     @Get(':id')
     async getFridge(@Req() req: Request, @Param('id') id: string): Promise<LambdaResponse> {
-        const user_id = JSON.parse(req.headers['x-user']).id
-        this.check_perm(user_id, parseInt(id), false, false);
         try {
-            let fridge_id = parseInt(id)
-            if ((isNaN(fridge_id) == true) ) {
-                throw "Fridge Id is not correct";
+            const user_id = JSON.parse(req.headers['x-user']).id;
+            const fridge_id = parseInt(id);
+
+            if (isNaN(fridge_id)) {
+                console.log("Fridge Id is not correct");
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
             }
+
+            const { isAllowed, response } = await this.check_perm(user_id, fridge_id, false, false);
+            if (!isAllowed) {
+                return response;
+            }
+
             const fridge = await this.recipesService.getFridge(fridge_id);
             return new LambdaResponse(LambdaResponseCode.OK, fridge);
         } catch (error) {
-            console.log("Error getting fridge: ", error)
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
-                LambdaResponseCode.INTERNAL_SERVER_ERROR
-            );
+            console.log("Error getting fridge: ", error);
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' });
         }
     }
 

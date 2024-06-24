@@ -18,14 +18,12 @@ export class UsersController {
         console.log("Asking user stuff populated by the middleware: ", asker_user);
         console.log("User asked for: ", asked_user_id);
 
+        const dataFromDB = await this.usersService.getUser(asker_user.id, asked_user_id === asker_user.id);
+
         if (asked_user_id === asker_user.id) {
-            // If the user asking for his own profile
-            const dataFromDB = await this.usersService.getUser(asker_user.id);
             const enhancedUser = { ...asker_user, ...dataFromDB };
             return new LambdaResponse(LambdaResponseCode.OK, enhancedUser);
         } else {
-            // If the user asking for another user
-            const dataFromDB = await this.usersService.getUser(id, true);
             const hiddenStuff = ['email'];
             const publicUser = Object.fromEntries(
             Object.entries(dataFromDB).filter(([key]) => !hiddenStuff.includes(key))

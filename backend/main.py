@@ -266,6 +266,7 @@ class BackendStack(NestedStack):
             allow_methods=apigateway.Cors.ALL_METHODS,
             allow_headers=["*"],
             expose_headers=["*"],
+            disable_cache=True
         )
 
         api = apigateway.RestApi(

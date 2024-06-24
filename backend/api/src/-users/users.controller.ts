@@ -20,13 +20,10 @@ export class UsersController {
 
         if (asked_user_id === asker_user.id) {
             // If the user asking for his own profile
-            console.log("The are the same because: ", asked_user_id === asker_user.id);
             const dataFromDB = await this.usersService.getUser(asker_user.id);
             const enhancedUser = { ...asker_user, ...dataFromDB };
             return new LambdaResponse(LambdaResponseCode.OK, enhancedUser);
         } else {
-            console.log("The are different because: ", asked_user_id !== asker_user.id);
-            console.log("User asking for: ", asked_user_id);
             // If the user asking for another user
             const dataFromDB = await this.usersService.getUser(id, true);
             const hiddenStuff = ['email'];

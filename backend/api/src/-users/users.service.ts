@@ -9,7 +9,7 @@ export class UsersService {
   //
   async getUser(id: string, isOwnerAsking: boolean = false) {
 
-    let user;
+    let user: any = null;
 
     if (isOwnerAsking) {
         user = await this.db_client.user.findUnique({
@@ -19,12 +19,15 @@ export class UsersService {
               fridges: true
             }
           });
+        
+        console.log("User: ", user);
 
         if(!user) {
+            console.log("User not found, creating...");
             user = await this.db_client.user.create({
                 data: {
                   id
-                }
+                },
               });
 
             console.log("User created: ", user);

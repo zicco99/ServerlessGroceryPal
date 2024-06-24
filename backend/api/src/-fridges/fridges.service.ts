@@ -18,6 +18,20 @@ export class FridgesService {
     })
   }
 
+  async userExists(owner_id: string) {
+    let user = await this.db_client.user.findUnique({
+      where: {
+        id: owner_id
+      }
+    })
+
+    if (user) {
+      return true
+    } else {
+      return false
+    }
+  }
+
 
   async getFridge(id: number) {
     return await this.db_client.fridge.findUnique({

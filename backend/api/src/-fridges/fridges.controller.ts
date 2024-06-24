@@ -96,7 +96,7 @@ export class FridgesController {
         let user = JSON.parse(req.headers['x-user']);
         this.check_perm(user.id, parseInt(id), false, true);
         try {
-            
+
             let fridge_id = parseInt(id)
             if ((isNaN(fridge_id) == true) ) {
                 throw "Fridge Id is not correct";

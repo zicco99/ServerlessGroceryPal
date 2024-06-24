@@ -33,6 +33,7 @@ model Recipe {
   title             String
   category          String
   imageUrl          String?
+  
   recipeIngredients RecipeIngredient[]
   steps             Step[]
   feedbacks         Feedback[]
@@ -41,6 +42,7 @@ model Recipe {
 model Step {
   id         Int     @id @default(autoincrement())
   recipe     Recipe  @relation(fields: [recipeId], references: [id])
+
   recipeId   String
   nStep      Int
   imageUrl   String?
@@ -49,10 +51,12 @@ model Step {
 
 model RecipeIngredient {
   id             Int        @id @default(autoincrement())
+
   recipe         Recipe     @relation(fields: [recipeId], references: [id])
   recipeId       String
   ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
   ingredientId   Int
+
   amountText     String
   amount         Float
   Product        Product?   @relation(fields: [productBarcode], references: [barcode])
@@ -70,10 +74,6 @@ model Ingredient {
 
 model Product {
   barcode           String                 @id
-  fridge            Fridge?             @relation(fields: [fridgeId], references: [id])
-  fridgeId          Int?
-  ingredient        Ingredient          @relation(fields: [ingredientId], references: [id])
-  ingredientId      Int
   name              String
   brand             String
   labels            Boolean
@@ -84,6 +84,7 @@ model Product {
   meal              Boolean
   allergens         String
   quantity          Int
+  canBeUsedAs       Ingredient[]
   fridges           FridgeProduct[]
   recipeIngredients RecipeIngredient[]
   IngredientProduct IngredientProduct[]
@@ -94,39 +95,42 @@ model Fridge {
   name      String
   products  FridgeProduct[]
   users     UserFridge[]
-  Product   Product[]
 }
 
 model UserFridge {
-  user     User    @relation(fields: [userId], references: [id])
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   String
-  fridge   Fridge  @relation(fields: [fridgeId], references: [id])
+  fridge   Fridge  @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
   fridgeId Int
+
   isAdmin  Boolean
   isOwner  Boolean
-
+  
   @@id([userId, fridgeId])
 }
 
 model FridgeProduct {
-  fridge         Fridge  @relation(fields: [fridgeId], references: [id])
-  fridgeId       Int
   ownerId        String
-  product        Product @relation(fields: [barcode], references: [barcode])
-  barcode        String
+  
+  fridge         Fridge  @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+  fridgeId       Int
+  product        Product @relation(fields: [productBarcode], references: [barcode], onDelete: Cascade)
+  productBarcode String
+
   quantity       Int
   is_shared      Boolean
   expire_date    DateTime @db.Date
 
-  @@id([fridgeId, barcode, ownerId, expire_date])
+  @@id([fridgeId, productBarcode, ownerId, expire_date])
 }
 
 model IngredientProduct {
   ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
   ingredientId   Int
-  product        Product    @relation(fields: [barcode], references: [barcode])
-  barcode        String
+  product        Product    @relation(fields: [productBarcode], references: [barcode])
+  productBarcode String
+
   quantity       Int
 
-  @@id([ingredientId, barcode])
+  @@id([ingredientId, productBarcode])
 }

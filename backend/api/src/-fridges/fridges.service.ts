@@ -62,10 +62,7 @@ export class FridgesService {
 
   async removeFridge(id: number) {
     return await this.db_client.fridge.delete({
-      where: { id },
-      include:{
-        products: true
-      }
+      where: { id }
     });
   }
 
@@ -93,9 +90,9 @@ export class FridgesService {
   async getFridgeProduct(fridge_id: number, barcode: string, owner_id: string, expire_date: Date) {
     return await this.db_client.fridgeProduct.findUnique({
       where: {
-        fridgeId_barcode_ownerId_expire_date : {
+        fridgeId_productBarcode_ownerId_expire_date : {
           fridgeId: fridge_id,
-          barcode: barcode,
+          productBarcode: barcode,
           ownerId: owner_id,
           expire_date: expire_date
         }
@@ -106,12 +103,12 @@ export class FridgesService {
   async removeProductFromFridge(owner_id: string, fridge_id: number, barcode: string, expire_date: Date) {
     return await this.db_client.fridgeProduct.delete({
       where: {
-          fridgeId_barcode_ownerId_expire_date : {
-            fridgeId: fridge_id,
-            barcode: barcode,
-            ownerId: owner_id,
-            expire_date: expire_date
-          }
+        fridgeId_productBarcode_ownerId_expire_date : {
+          fridgeId: fridge_id,
+          productBarcode: barcode,
+          ownerId: owner_id,
+          expire_date: expire_date
+        }
       },
     })
   }
@@ -119,9 +116,9 @@ export class FridgesService {
   async updateQuantityFromFridge(owner_id: string, fridge_id: number, barcode: string, expire_date: Date, quantity: number) {
     return await this.db_client.fridgeProduct.update({
       where: {
-        fridgeId_barcode_ownerId_expire_date : {
+        fridgeId_productBarcode_ownerId_expire_date : {
           fridgeId: fridge_id,
-          barcode: barcode,
+          productBarcode: barcode,
           ownerId: owner_id,
           expire_date: expire_date
         }

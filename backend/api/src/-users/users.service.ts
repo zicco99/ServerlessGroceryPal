@@ -11,7 +11,7 @@ export class UsersService {
 
     let user: any = null;
 
-    if (isOwnerAsking) {
+    if (isOwnerAsking == true) {
         user = await this.db_client.user.findUnique({
             where: { id },
             include: {

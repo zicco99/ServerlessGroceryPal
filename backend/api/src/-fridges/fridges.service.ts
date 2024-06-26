@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { LambdaResponse, LambdaResponseCode } from '../utils/lambda';
 
 @Injectable()
 export class FridgesService {
@@ -44,21 +45,39 @@ export class FridgesService {
   }
 
   async createFridge(creator_id: string, fridge_name: string) {
-    return await this.db_client.fridge.create({
-      data: {
-        name: fridge_name,
-        users: { 
-          create: { 
-            user: {
-              connect: { id: creator_id },
+    try {
+      const existingFridges = await this.db_client.fridge.findMany({
+        where: {
+          name: fridge_name
+        }
+      })
+
+      if (existingFridges && existingFridges.length > 0) {
+        return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'A fridge with this name already exists.' });
+      }
+
+      const newFridge = await this.db_client.fridge.create({
+        data: {
+          name: fridge_name,
+          users: {
+            create: {
+              user: {
+                connect: { id: creator_id },
+              },
+              isAdmin: true,
+              isOwner: true,
             },
-            isAdmin: true,
-            isOwner: true,
           },
         },
-      },
-    });
+      });
+
+      return newFridge;
+    } catch (error) {
+      console.error("Error creating fridge:", error);
+      return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Could not create fridge. Please try again later.' });
+    }
   }
+
 
   async removeFridge(id: number) {
     return await this.db_client.fridge.delete({

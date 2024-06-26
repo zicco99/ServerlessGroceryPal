@@ -6,7 +6,7 @@ import { CreateFridgeDto, addProductToFridgeDto, updateProductFromFridgeDto } fr
 @Injectable()
 @Controller('fridges')
 export class FridgesController {
-    constructor(private readonly recipesService: FridgesService) {}
+    constructor(private readonly fridgesService: FridgesService) {}
 
     async check_perm(
         user_id: string, 
@@ -15,7 +15,7 @@ export class FridgesController {
         should_be_fridge_admin: boolean
     ): Promise<{ isAllowed: boolean, response: LambdaResponse }> {
         try {
-            const user_fridge = await this.recipesService.userBelongsToFridge(user_id, fridge_id);
+            const user_fridge = await this.fridgesService.userBelongsToFridge(user_id, fridge_id);
 
             if (!user_fridge) {
                 console.log("User is not a member of the fridge");
@@ -70,75 +70,91 @@ export class FridgesController {
                 return response;
             }
 
-            const fridge = await this.recipesService.getFridge(fridge_id);
+            const fridge = await this.fridgesService.getFridge(fridge_id);
+            if (!fridge) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge does not exist' });
+            }
+
             return new LambdaResponse(LambdaResponseCode.OK, fridge);
         } catch (error) {
             console.log("Error getting fridge: ", error);
-            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' });
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error retrieving fridge info' });
         }
     }
 
     @Post('')
-    async createFridge(@Req() req: Request, @Body () event_body: CreateFridgeDto): Promise<LambdaResponse> {
-        let user = JSON.parse(req.headers['x-user']);
+    async createFridge(@Req() req: Request, @Body() event_body: CreateFridgeDto): Promise<LambdaResponse> {
+        const user = JSON.parse(req.headers['x-user']);
         try {
-            const fridge = await this.recipesService.createFridge(user.id, event_body.fridge_name);
+            const fridge = await this.fridgesService.createFridge(user.id, event_body.fridge_name);
             console.log("Fridge: ", fridge);
-            return new LambdaResponse(LambdaResponseCode.OK,"Created");
+            return new LambdaResponse(LambdaResponseCode.OK, "Created");
         } catch (error) {
-            console.log("Error creating fridge: ", error)
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
-                LambdaResponseCode.INTERNAL_SERVER_ERROR
-            );
+            console.log("Error creating fridge: ", error);
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error creating fridge' });
         }
     }
 
     @Delete(':id')
     async deleteFridge(@Req() req: Request, @Param('id') id: string): Promise<LambdaResponse> {
-        let user = JSON.parse(req.headers['x-user']);
-        this.check_perm(user.id, parseInt(id), true, true);
+        const user = JSON.parse(req.headers['x-user']);
+        const fridge_id = parseInt(id);
+
         try {
-            let fridge_id = parseInt(id)
-            if ((isNaN(fridge_id) == true) ) {
-                throw "Fridge Id is not correct";
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, true, true);
+            if (!isAllowed) {
+                return response;
             }
-            const fridge = await this.recipesService.removeFridge(fridge_id);
+
+            if (isNaN(fridge_id)) {
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            const fridge = await this.fridgesService.removeFridge(fridge_id);
             console.log("Fridge: ", fridge);
-            return new LambdaResponse(LambdaResponseCode.OK,"Deleted");
+            return new LambdaResponse(LambdaResponseCode.OK, "Deleted");
         } catch (error) {
-            console.log("Error deleting fridge: ", error)
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
-                LambdaResponseCode.INTERNAL_SERVER_ERROR
-            );
+            console.log("Error deleting fridge: ", error);
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Fridge deletion failed' });
         }
     }
 
     @Put(':id')
     async addProductToFridge(@Req() req: Request, @Body() event_body: addProductToFridgeDto, @Param('id') id: string): Promise<LambdaResponse> {
-        let user = JSON.parse(req.headers['x-user']);
-        this.check_perm(user.id, parseInt(id), false, true);
-        try {
+        const user = JSON.parse(req.headers['x-user']);
+        const fridge_id = parseInt(id);
 
-            let fridge_id = parseInt(id)
-            if ((isNaN(fridge_id) == true) ) {
-                throw "Fridge Id is not correct";
+        try {
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
+            if (!isAllowed) {
+                return response;
+            }
+
+            if (isNaN(fridge_id)) {
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            // Check if fridge exists
+            const fridge = await this.fridgesService.getFridge(fridge_id);
+            if (!fridge) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge does not exist' });
             }
 
             // Check if product exists
-            const product = await this.recipesService.getProduct(event_body.barcode);
-            if (product == null) {
-                throw new HttpException(
-                    new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found' }),
-                    LambdaResponseCode.NOT_FOUND
-                );
+            const product = await this.fridgesService.getProduct(event_body.barcode);
+            if (!product) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found' });
             }
-            
 
-            const fridge_product = await this.recipesService.addProductToFridge(
-                fridge_id, 
-                user.id, 
+            // Check if product is already added
+            const existingProduct = await this.fridgesService.getFridgeProduct(fridge_id, event_body.barcode, user.id, new Date());
+            if (existingProduct) {
+                return new LambdaResponse(LambdaResponseCode.CONFLICT, { message: 'Product already added' });
+            }
+
+            const fridge_product = await this.fridgesService.addProductToFridge(
+                fridge_id,
+                user.id,
                 event_body.barcode,
                 event_body.quantity,
                 event_body.is_shared,
@@ -146,88 +162,81 @@ export class FridgesController {
             );
 
             console.log("Fridge product: ", fridge_product);
-            
-            return new LambdaResponse(LambdaResponseCode.OK,"Product added to fridge");
+
+            return new LambdaResponse(LambdaResponseCode.OK, "Product added to fridge");
         } catch (error) {
-            console.log("Error adding product to fridge: ", error)
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
-                LambdaResponseCode.INTERNAL_SERVER_ERROR
-            );
+            console.log("Error adding product to fridge: ", error);
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error adding product to fridge' });
         }
     }
 
     @Get(':id/product/:barcode')
     async getFridgeProduct(@Req() req: Request, @Param('id') id: string, @Param('barcode') barcode: string): Promise<LambdaResponse> {
-
-        let user = JSON.parse(req.headers['x-user']);
-        this.check_perm(user.id, parseInt(id), false, true);
+        const user = JSON.parse(req.headers['x-user']);
+        const fridge_id = parseInt(id);
 
         try {
-            let fridge_id = parseInt(id)
-            if ((isNaN(fridge_id) == true) ) {
-                throw "Fridge Id is not correct";
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
+            if (!isAllowed) {
+                return response;
             }
-            const fridge_product = await this.recipesService.getFridgeProduct(fridge_id, barcode, user.id, new Date());
+
+            if (isNaN(fridge_id)) {
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            const fridge_product = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, new Date());
+            if (!fridge_product) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found in fridge' });
+            }
+
             console.log("Fridge product: ", fridge_product);
             return new LambdaResponse(LambdaResponseCode.OK, fridge_product);
         } catch (error) {
-            console.log("Error getting product from fridge: ", error)
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
-                LambdaResponseCode.INTERNAL_SERVER_ERROR
-            );
+            console.log("Error getting product from fridge: ", error);
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error retrieving fridge product info' });
         }
     }
 
     @Put(':id/product/:barcode')
     async updateProductFromFridge(@Req() req: Request, @Param('id') id: string, @Param('barcode') barcode: string, @Body() event_body: updateProductFromFridgeDto): Promise<LambdaResponse> {
-        
+        const user = JSON.parse(req.headers['x-user']);
+        const fridge_id = parseInt(id);
+
         try {
-            let fridge_id = parseInt(id)
-            if ((isNaN(fridge_id) == true) ) {
-                throw "Fridge Id is not correct";
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
+            if (!isAllowed) {
+                return response;
             }
 
-            let user = JSON.parse(req.headers['x-user']);
-            this.check_perm(user.id, fridge_id, false, true);
-
-            const fridge_product = await this.recipesService.getFridgeProduct(fridge_id,user.id, barcode, event_body.expire_date)
-
-            if(fridge_product == null) {
-                throw new HttpException(
-                    new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found' }),
-                    LambdaResponseCode.NOT_FOUND
-                );
-
+            if (isNaN(fridge_id)) {
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
             }
 
-            if(event_body.operation=="remove") {
+            const fridge_product = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, event_body.expire_date);
+            if (!fridge_product) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found in fridge' });
+            }
+
+            if (event_body.operation === "remove") {
                 if (fridge_product.quantity < event_body.quantity) {
-                    throw new HttpException(
-                        new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'You cant remove more than you have' }),
-                        LambdaResponseCode.BAD_REQUEST
-                    );
+                    return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'You cannot remove more than you have' });
                 }
 
-                if (fridge_product.quantity == event_body.quantity) {
-                    await this.recipesService.removeProductFromFridge(user.id, fridge_id, barcode, event_body.expire_date)
+                if (fridge_product.quantity === event_body.quantity) {
+                    await this.fridgesService.removeProductFromFridge(user.id, fridge_id, barcode, event_body.expire_date);
                 } else {
-
-                    await this.recipesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date, fridge_product.quantity - event_body.quantity)
+                    await this.fridgesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date, fridge_product.quantity - event_body.quantity);
                 }
 
-            } else if(event_body.operation=="add") {
-                await this.recipesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date, fridge_product.quantity + event_body.quantity)
+            } else if (event_body.operation === "add") {
+                await this.fridgesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date, fridge_product.quantity + event_body.quantity);
             }
 
-            return new LambdaResponse(LambdaResponseCode.OK,"Product removed from fridge");
+            return new LambdaResponse(LambdaResponseCode.OK, "Product updated in fridge");
         } catch (error) {
-            console.log("Error updating product from fridge: ", error)
-            throw new HttpException(
-                new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Internal Server Error' }),
-                LambdaResponseCode.INTERNAL_SERVER_ERROR
-            );
+            console.log("Error updating product from fridge: ", error);
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error updating fridge product' });
         }
     }
 }

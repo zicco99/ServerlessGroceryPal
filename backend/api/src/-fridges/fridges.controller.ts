@@ -213,7 +213,7 @@ export class FridgesController {
                 return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
             }
 
-            if (await this.fridgesService.existsFridge(fridge_id) == false) {
+            if (await this.fridgesService.existsFridge(fridge_id) === false) {
                 return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge does not exist' });
             }
 
@@ -272,7 +272,7 @@ export class FridgesController {
             await this.fridgesService.removeFridgeProduct(fridge_id, barcode, user.id, event_body.expire_date);
 
             return new LambdaResponse(LambdaResponseCode.OK, "Product deleted from fridge");
-            
+
         } catch (error) {
             console.log("Error deleting product from fridge: ", error);
             return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error deleting fridge product' });

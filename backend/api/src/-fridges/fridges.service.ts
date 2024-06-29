@@ -4,83 +4,59 @@ import { LambdaResponse, LambdaResponseCode } from '../utils/lambda';
 
 @Injectable()
 export class FridgesService {
-  constructor(private readonly db_client: PrismaService) {
+  constructor(private readonly dbClient: PrismaService) {}
+
+  // Helper Methods
+  private async entityExists(entity: string, where: object): Promise<boolean> {
+    const result = await this.dbClient[entity].findUnique({ where });
+    return !!result;
   }
 
-  async userBelongsToFridge(owner_id: string, fridge_id: number) {
-    return await this.db_client.userFridge.findUnique({
-      where: {
-        userId_fridgeId: {
-          userId: owner_id,
-          fridgeId: fridge_id
-        }
-      }
-    })
+  private async findUnique(entity: string, where: object, include?: object): Promise<any> {
+    return this.dbClient[entity].findUnique({ where, include });
   }
 
-  async userExists(owner_id: string) {
-    let user = await this.db_client.user.findUnique({
-      where: {
-        id: owner_id
-      }
-    })
-
-    if (user) {
-      return true
-    } else {
-      return false
-    }
+  private async findMany(entity: string, where: object, include?: object): Promise<any> {
+    return this.dbClient[entity].findMany({ where, include });
   }
 
+  // User Related Methods
+  async userExists(ownerId: string): Promise<boolean> {
+    return this.entityExists('user', { id: ownerId });
+  }
 
-  async getFridge(id: number) {
-    return await this.db_client.fridge.findUnique({
-      where: { id },
-      include: {
-        users: true,
-        products: true
-      }
+  async userBelongsToFridge(ownerId: string, fridgeId: number): Promise<any> {
+    return this.findUnique('userFridge', {
+      userId_fridgeId: { userId: ownerId, fridgeId },
     });
   }
 
-  async existsFridge(id: number) {
-    let fridge = await this.db_client.fridge.findUnique({
-      where: { id }
-    })
-
-    if (fridge) {
-      return true
-    } else {
-      return false
-    }
+  // Fridge Related Methods
+  async existsFridge(id: number): Promise<boolean> {
+    return this.entityExists('fridge', { id });
   }
 
-  async existsFridgeByName(name: string) {
-    let fridges = await this.db_client.fridge.findMany({
-      where: { name }
-    })
-
-    if (fridges && fridges.length > 0) {
-      return true
-    } else {
-      return false
-    }
+  async existsFridgeByName(name: string): Promise<boolean> {
+    const fridges = await this.findMany('fridge', { name });
+    return fridges.length > 0;
   }
 
-  async createFridge(creator_id: string, fridge_name: string) {
+  async getFridge(id: number): Promise<any> {
+    return this.findUnique('fridge', { id }, { users: true, products: true });
+  }
+
+  async createFridge(creatorId: string, fridgeName: string): Promise<LambdaResponse | any> {
     try {
-      if ((await this.existsFridgeByName(fridge_name))===true) {
+      if (await this.existsFridgeByName(fridgeName)) {
         return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'A fridge with this name already exists.' });
       }
 
-      const newFridge = await this.db_client.fridge.create({
+      const newFridge = await this.dbClient.fridge.create({
         data: {
-          name: fridge_name,
+          name: fridgeName,
           users: {
             create: {
-              user: {
-                connect: { id: creator_id },
-              },
+              user: { connect: { id: creatorId } },
               isAdmin: true,
               isOwner: true,
             },
@@ -89,30 +65,38 @@ export class FridgesService {
       });
 
       return newFridge;
-    } catch (error: any) {
-      console.error("Error creating fridge:", error);
+    } catch (error) {
+      console.error('Error creating fridge:', error);
       return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Could not create fridge. Please try again later.' });
     }
   }
 
-
-  async removeFridge(id: number) {
+  async removeFridge(id: number): Promise<LambdaResponse | any> {
     if (!(await this.existsFridge(id))) {
       return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge not found' });
     }
 
-    return await this.db_client.fridge.delete({
-      where: { id }
-    });
+    return this.dbClient.fridge.delete({ where: { id } });
   }
 
-  async addProductToFridge(fridge_id: number, owner_id: string, barcode: string, quantity: number, is_shared: boolean, expire_date: Date) {
+  // Product Related Methods
+  async getProduct(barcode: string): Promise<any> {
+    return this.findUnique('product', { barcode });
+  }
 
-    if (!(await this.existsFridge(fridge_id))) {
+  async addProductToFridge(
+    fridgeId: number,
+    ownerId: string,
+    barcode: string,
+    quantity: number,
+    isShared: boolean,
+    expireDate: Date
+  ): Promise<LambdaResponse | any> {
+    if (!(await this.existsFridge(fridgeId))) {
       return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge not found' });
     }
 
-    if (!(await this.userBelongsToFridge(owner_id, fridge_id))) {
+    if (!(await this.userBelongsToFridge(ownerId, fridgeId))) {
       return new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'You are not a member of this fridge' });
     }
 
@@ -120,128 +104,116 @@ export class FridgesService {
       return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found' });
     }
 
-    // Add product to fridge
-    return await this.db_client.fridgeProduct.create({
+    return this.dbClient.fridgeProduct.create({
       data: {
-        fridge: { connect: { id: fridge_id } },
-        product: { connect: { barcode: barcode } },
-        ownerId: owner_id,
-        is_shared: is_shared,
-        quantity: quantity,
-        expire_date: expire_date
+        fridge: { connect: { id: fridgeId } },
+        product: { connect: { barcode } },
+        ownerId,
+        is_shared: isShared,
+        quantity,
+        expire_date: expireDate,
       },
-    })
+    });
   }
 
-  async getFridgeProducts(fridge_id: number) {
-    if (!(await this.existsFridge(fridge_id))) {
+  async updateQuantityFromFridge(
+    ownerId: string,
+    fridgeId: number,
+    barcode: string,
+    expireDate: Date,
+    quantity: number
+  ): Promise<LambdaResponse | any> {
+    if (!(await this.existsFridge(fridgeId))) {
       return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge not found' });
     }
 
-    return await this.db_client.fridgeProduct.findMany({
+    return this.dbClient.fridgeProduct.update({
       where: {
-        fridgeId: fridge_id
-      }
-    })
+        fridgeId_productBarcode_ownerId_expire_date: {
+          fridgeId,
+          productBarcode: barcode,
+          ownerId,
+          expire_date: expireDate,
+        },
+      },
+      data: { quantity },
+    });
   }
 
-  async getFridgeProduct(fridge_id: number, barcode: string, owner_id: string, expire_date: Date) {
-    if (!(await this.existsFridge(fridge_id))) {
+  async removeProductFromFridge(
+    ownerId: string,
+    fridgeId: number,
+    barcode: string,
+    expireDate: Date
+  ): Promise<any> {
+    return this.dbClient.fridgeProduct.delete({
+      where: {
+        fridgeId_productBarcode_ownerId_expire_date: {
+          fridgeId,
+          productBarcode: barcode,
+          ownerId,
+          expire_date: expireDate,
+        },
+      },
+    });
+  }
+
+  async getFridgeProducts(fridgeId: number): Promise<LambdaResponse | any> {
+    if (!(await this.existsFridge(fridgeId))) {
       return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge not found' });
     }
 
-    
-
-    return await this.db_client.fridgeProduct.findUnique({
-      where: {
-        fridgeId_productBarcode_ownerId_expire_date : {
-          fridgeId: fridge_id,
-          productBarcode: barcode,
-          ownerId: owner_id,
-          expire_date: expire_date
-        }
-      }
-    })
-  }
-  
-
-  async removeProductFromFridge(owner_id: string, fridge_id: number, barcode: string, expire_date: Date) {
-    return await this.db_client.fridgeProduct.delete({
-      where: {
-        fridgeId_productBarcode_ownerId_expire_date : {
-          fridgeId: fridge_id,
-          productBarcode: barcode,
-          ownerId: owner_id,
-          expire_date: expire_date
-        }
-      },
-    })
+    return this.findMany('fridgeProduct', { fridgeId });
   }
 
-  async updateQuantityFromFridge(owner_id: string, fridge_id: number, barcode: string, expire_date: Date, quantity: number) {
-    if (!(await this.existsFridge(fridge_id))) {
+  async getFridgeProduct(
+    fridgeId: number,
+    barcode: string,
+    ownerId: string,
+    expireDate: Date
+  ): Promise<LambdaResponse | any> {
+    if (!(await this.existsFridge(fridgeId))) {
       return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge not found' });
     }
 
-    return await this.db_client.fridgeProduct.update({
+    return this.findUnique('fridgeProduct', {
+      fridgeId_productBarcode_ownerId_expire_date: {
+        fridgeId,
+        productBarcode: barcode,
+        ownerId,
+        expire_date: expireDate,
+      },
+    });
+  }
+
+  async getAllOwnedProductsFromFridge(ownerId: string, fridgeId: number): Promise<any> {
+    return this.findMany('fridgeProduct', {
+      ownerId,
+      fridgeId,
+    }, { product: true });
+  }
+
+  async getAllProductsFromFridge(fridgeId: number): Promise<any> {
+    return this.findMany('fridgeProduct', {
+      fridgeId,
+    }, { product: true });
+  }
+
+  async removeFridgeProduct(
+    fridgeId: number,
+    barcode: string,
+    ownerId: string,
+    expireDate: Date
+  ): Promise<any> {
+    return this.dbClient.fridgeProduct.delete({
       where: {
-        fridgeId_productBarcode_ownerId_expire_date : {
-          fridgeId: fridge_id,
+        fridgeId_productBarcode_ownerId_expire_date: {
+          fridgeId,
           productBarcode: barcode,
-          ownerId: owner_id,
-          expire_date: expire_date
-        }
+          ownerId,
+          expire_date: expireDate,
+        },
       },
-      data: {
-        quantity: quantity
-      }
-    })
+    });
   }
-
-  async getAllOwnedProductsFromFridge(owner_id: string, fridge_id: number) {
-    return await this.db_client.fridgeProduct.findMany({
-      where: {
-        ownerId: owner_id,
-        fridgeId: fridge_id
-      },
-      include: {
-        product: true
-      }
-    })
-  }
-
-  async getAllProductsFromFridge(fridge_id: number) {
-    return await this.db_client.fridgeProduct.findMany({
-      where: {
-        fridgeId: fridge_id
-      },
-      include: {
-        product: true
-      }
-    })
-  }
-
-
-  async getProduct(barcode: string) {
-    return await this.db_client.product.findUnique({
-      where: {
-        barcode: barcode
-      }
-    })
-  }
-
-  async removeFridgeProduct(fridge_id: number, barcode: string, owner_id: string, expire_date: Date) {
-    return await this.db_client.fridgeProduct.delete({
-      where: {
-        fridgeId_productBarcode_ownerId_expire_date : {
-          fridgeId: fridge_id,
-          productBarcode: barcode,
-          ownerId: owner_id,
-          expire_date: expire_date
-        }
-      },
-    })
-  }
-  
 }
-

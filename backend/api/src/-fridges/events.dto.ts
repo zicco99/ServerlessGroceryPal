@@ -38,5 +38,10 @@ export class updateProductFromFridgeDto {
     @IsDate()
     @IsNotEmpty()
     expire_date: Date;
+}
 
+export class deleteProductFromFridgeDto {
+    @IsString()
+    @IsNotEmpty()
+    expire_date: Date;
 }

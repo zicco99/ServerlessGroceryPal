@@ -1,7 +1,7 @@
 import { Get, Delete, Injectable, Param, Controller, HttpException, Post, Body, Put, Req, Query } from '@nestjs/common';
 import { FridgesService } from './fridges.service';
 import { LambdaResponse, LambdaResponseCode } from '../utils/lambda';
-import { CreateFridgeDto, addProductToFridgeDto, updateProductFromFridgeDto } from './events.dto';
+import { CreateFridgeDto, addProductToFridgeDto, deleteProductFromFridgeDto, updateProductFromFridgeDto } from './events.dto';
 
 @Injectable()
 @Controller('fridges')
@@ -245,7 +245,7 @@ export class FridgesController {
     }
 
     @Delete(':id/product/:barcode')
-    async deleteFridgeProduct(@Req() req: Request, @Param('id') id: string, @Param('barcode') barcode: string): Promise<LambdaResponse> {
+    async deleteFridgeProduct(@Req() req: Request, @Param('id') id: string, @Param('barcode') barcode: string, @Body() event_body: deleteProductFromFridgeDto): Promise<LambdaResponse> {
         const user = JSON.parse(req.headers['x-user']);
         const fridge_id = parseInt(id);
 
@@ -263,15 +263,16 @@ export class FridgesController {
                 return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge does not exist' });
             }
 
-            const fridge_product = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, new Date());
+            const fridge_product = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, event_body.expire_date);
 
             if (!fridge_product) {
                 return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found in fridge' });
             }
             
-            await this.fridgesService.deleteFridgeProduct(fridge_id, barcode, user.id, new Date());
+            await this.fridgesService.removeFridgeProduct(fridge_id, barcode, user.id, event_body.expire_date);
 
-            return await this.fridgesService.(fridge_id, barcode, user.id, new Date());
+            return new LambdaResponse(LambdaResponseCode.OK, "Product deleted from fridge");
+            
         } catch (error) {
             console.log("Error deleting product from fridge: ", error);
             return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error deleting fridge product' });

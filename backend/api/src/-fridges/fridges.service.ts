@@ -182,7 +182,7 @@ export class FridgesService {
     if (!(await this.existsFridge(fridge_id))) {
       return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge not found' });
     }
-    
+
     return await this.db_client.fridgeProduct.update({
       where: {
         fridgeId_productBarcode_ownerId_expire_date : {
@@ -230,5 +230,18 @@ export class FridgesService {
     })
   }
 
+  async removeFridgeProduct(fridge_id: number, barcode: string, owner_id: string, expire_date: Date) {
+    return await this.db_client.fridgeProduct.delete({
+      where: {
+        fridgeId_productBarcode_ownerId_expire_date : {
+          fridgeId: fridge_id,
+          productBarcode: barcode,
+          ownerId: owner_id,
+          expire_date: expire_date
+        }
+      },
+    })
+  }
+  
 }
 

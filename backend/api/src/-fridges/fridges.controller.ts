@@ -243,4 +243,38 @@ export class FridgesController {
             return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error updating fridge product' });
         }
     }
+
+    @Delete(':id/product/:barcode')
+    async deleteFridgeProduct(@Req() req: Request, @Param('id') id: string, @Param('barcode') barcode: string): Promise<LambdaResponse> {
+        const user = JSON.parse(req.headers['x-user']);
+        const fridge_id = parseInt(id);
+
+        try {
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, true, true);
+            if (!isAllowed) {
+                return response;
+            }
+
+            if (isNaN(fridge_id)) {
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            if (await this.fridgesService.existsFridge(fridge_id) == false) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge does not exist' });
+            }
+
+            const fridge_product = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, new Date());
+
+            if (!fridge_product) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found in fridge' });
+            }
+            
+            await this.fridgesService.deleteFridgeProduct(fridge_id, barcode, user.id, new Date());
+
+            return await this.fridgesService.(fridge_id, barcode, user.id, new Date());
+        } catch (error) {
+            console.log("Error deleting product from fridge: ", error);
+            return new LambdaResponse(LambdaResponseCode.INTERNAL_SERVER_ERROR, { message: 'Error deleting fridge product' });
+        }
+    }
 }

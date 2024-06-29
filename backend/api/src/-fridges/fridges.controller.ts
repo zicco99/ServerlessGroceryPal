@@ -213,26 +213,30 @@ export class FridgesController {
                 return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
             }
 
-            const fridge_product = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, event_body.expire_date);
+            if (await this.fridgesService.existsFridge(fridge_id) == false) {
+                return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge does not exist' });
+            }
+
+            const fridge_product : any = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, new Date());
+
             if (!fridge_product) {
                 return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found in fridge' });
             }
 
-            if (event_body.operation === "remove") {
-                if (fridge_product.quantity < event_body.quantity) {
-                    return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'You cannot remove more than you have' });
-                }
-
-                if (fridge_product.quantity === event_body.quantity) {
-                    await this.fridgesService.removeProductFromFridge(user.id, fridge_id, barcode, event_body.expire_date);
-                } else {
-                    await this.fridgesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date, fridge_product.quantity - event_body.quantity);
-                }
-
-            } else if (event_body.operation === "add") {
-                await this.fridgesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date, fridge_product.quantity + event_body.quantity);
+            if (event_body.expire_date < new Date()) {
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Product already expired' });
             }
 
+            switch (event_body.operation) {
+                case "add":
+                    this.fridgesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date,fridge_product.quantity + event_body.quantity);
+                    break;
+                case "remove":
+                    this.fridgesService.updateQuantityFromFridge(user.id, fridge_id, barcode, event_body.expire_date,Math.min(0,fridge_product.quantity - event_body.quantity));
+                    break;
+                default:
+                    return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid operation' });
+            }
             return new LambdaResponse(LambdaResponseCode.OK, "Product updated in fridge");
         } catch (error) {
             console.log("Error updating product from fridge: ", error);

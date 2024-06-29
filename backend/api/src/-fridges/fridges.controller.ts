@@ -21,7 +21,7 @@ export class FridgesController {
                 console.log("User is not a member of the fridge");
                 return {
                     isAllowed: false,
-                    response: new LambdaResponse(LambdaResponseCode.UNAUTHORIZED, { message: 'Unauthorized' })
+                    response: new LambdaResponse(LambdaResponseCode.UNAUTHORIZED, { message: 'User does not belong to the fridge' })
                 };
             }
 
@@ -29,7 +29,7 @@ export class FridgesController {
                 console.log("User is not fridge owner");
                 return {
                     isAllowed: false,
-                    response: new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'Forbidden' })
+                    response: new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'User is not fridge owner' })
                 };
             }
 
@@ -37,7 +37,7 @@ export class FridgesController {
                 console.log("User is not fridge admin");
                 return {
                     isAllowed: false,
-                    response: new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'Forbidden' })
+                    response: new LambdaResponse(LambdaResponseCode.FORBIDDEN, { message: 'User is not fridge admin' })
                 };
             }
 

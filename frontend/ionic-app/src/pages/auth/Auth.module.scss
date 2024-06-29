@@ -4,12 +4,14 @@
 .auth_page {
 
     .auth_container {
-        background-color: var(--primary);
+        background-color: var(--color);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
+
+    background-color: #dddddd;
 
     display: flex;
     flex-direction: column;

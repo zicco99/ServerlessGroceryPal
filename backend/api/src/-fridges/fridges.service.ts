@@ -8,7 +8,6 @@ export class FridgesService {
   }
 
   async userBelongsToFridge(owner_id: string, fridge_id: number) {
-    // -> exists a relation between the user and the fridge
     return await this.db_client.userFridge.findUnique({
       where: {
         userId_fridgeId: {

@@ -24,6 +24,7 @@
 
 		ion-icon {
 			font-size: 1.5rem;
+
 		}
 	}
   
@@ -36,7 +37,6 @@
 
 .scan-button {
 	--background: var(--secundary);
-	box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.4);
 
 	position: fixed;
     bottom: 10%;
@@ -44,7 +44,6 @@
     transform: translateX(-50%);
     width: 70px;
     height: 70px;
-    box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;

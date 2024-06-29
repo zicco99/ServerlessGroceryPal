@@ -1,4 +1,4 @@
-import { Get, Delete, Injectable, Param, Controller, HttpException, Post, Body, Put, Req, Query } from '@nestjs/common';
+import { Get, Delete, Injectable, Param, Controller, Post, Body, Put, Req } from '@nestjs/common';
 import { FridgesService } from './fridges.service';
 import { LambdaResponse, LambdaResponseCode } from '../utils/lambda';
 import { CreateFridgeDto, addProductToFridgeDto, deleteProductFromFridgeDto, updateProductFromFridgeDto } from './events.dto';
@@ -18,7 +18,7 @@ export class FridgesController {
             const user_fridge = await this.fridgesService.userBelongsToFridge(user_id, fridge_id);
 
             if (!user_fridge) {
-                console.log("User is not a member of the fridge");
+                console.log("User does not belong to the fridge");
                 return {
                     isAllowed: false,
                     response: new LambdaResponse(LambdaResponseCode.UNAUTHORIZED, { message: 'User does not belong to the fridge' })
@@ -61,7 +61,7 @@ export class FridgesController {
             const fridge_id = parseInt(id);
 
             if (isNaN(fridge_id)) {
-                console.log("Fridge Id is not correct");
+                console.log("Invalid Fridge ID");
                 return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
             }
 
@@ -101,13 +101,13 @@ export class FridgesController {
         const fridge_id = parseInt(id);
 
         try {
+            if (isNaN(fridge_id)) {
+                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
             const { isAllowed, response } = await this.check_perm(user.id, fridge_id, true, true);
             if (!isAllowed) {
                 return response;
-            }
-
-            if (isNaN(fridge_id)) {
-                return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
             }
 
             const fridge = await this.fridgesService.removeFridge(fridge_id);
@@ -125,13 +125,14 @@ export class FridgesController {
         const fridge_id = parseInt(id);
 
         try {
-            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
-            if (!isAllowed) {
-                return response;
-            }
 
             if (isNaN(fridge_id)) {
                 return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
+            if (!isAllowed) {
+                return response;
             }
 
             // Check if fridge exists
@@ -176,13 +177,14 @@ export class FridgesController {
         const fridge_id = parseInt(id);
 
         try {
-            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
-            if (!isAllowed) {
-                return response;
-            }
 
             if (isNaN(fridge_id)) {
                 return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
+            if (!isAllowed) {
+                return response;
             }
 
             const fridge_product = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, new Date());
@@ -204,20 +206,21 @@ export class FridgesController {
         const fridge_id = parseInt(id);
 
         try {
-            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
-            if (!isAllowed) {
-                return response;
-            }
 
             if (isNaN(fridge_id)) {
                 return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, false, true);
+            if (!isAllowed) {
+                return response;
             }
 
             if (await this.fridgesService.existsFridge(fridge_id) === false) {
                 return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Fridge does not exist' });
             }
 
-            const fridge_product : any = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, new Date());
+            const fridge_product : any = await this.fridgesService.getFridgeProduct(fridge_id, barcode, user.id, event_body.expire_date);
 
             if (!fridge_product) {
                 return new LambdaResponse(LambdaResponseCode.NOT_FOUND, { message: 'Product not found in fridge' });
@@ -250,13 +253,14 @@ export class FridgesController {
         const fridge_id = parseInt(id);
 
         try {
-            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, true, true);
-            if (!isAllowed) {
-                return response;
-            }
 
             if (isNaN(fridge_id)) {
                 return new LambdaResponse(LambdaResponseCode.BAD_REQUEST, { message: 'Invalid Fridge ID' });
+            }
+
+            const { isAllowed, response } = await this.check_perm(user.id, fridge_id, true, true);
+            if (!isAllowed) {
+                return response;
             }
 
             if (await this.fridgesService.existsFridge(fridge_id) == false) {

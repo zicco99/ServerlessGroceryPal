@@ -1,6 +1,6 @@
 import { Get, Delete, Injectable, Param, Controller, HttpException } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
-import { LambdaResponse, LambdaResponseCode } from '../utils/lambda'; // Adjust the import path as needed
+import { LambdaResponse, LambdaResponseCode } from '../utils/lambda';
 
 @Injectable()
 @Controller('recipes')

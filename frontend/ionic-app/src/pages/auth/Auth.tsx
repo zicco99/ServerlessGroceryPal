@@ -18,9 +18,7 @@ import {
   IonImg,
   IonText,
 } from '@ionic/react';
-
-import { SignInInput, SignInOutput, SignUpInput, signIn, signUp, ResetPasswordInput} from 'aws-amplify/auth';
-
+import { signIn, signUp } from 'aws-amplify/auth';
 import * as style from './Auth.module.scss';
 
 const AuthComponent: React.FC = () => {
@@ -32,7 +30,6 @@ const AuthComponent: React.FC = () => {
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
-
   const router = useIonRouter();
 
   const handleSegmentChange = (value: 'login' | 'signup' | 'reset') => {
@@ -41,11 +38,7 @@ const AuthComponent: React.FC = () => {
 
   const login = async () => {
     try {
-      const input : SignInInput = {
-        username: email,
-        password: password,
-      }
-      await signIn(input);
+      await signIn({ username: email, password });
       console.log('Signed in with', email);
       router.push('/home', 'forward', 'replace');
     } catch (error: any) {
@@ -56,11 +49,7 @@ const AuthComponent: React.FC = () => {
 
   const signup = async () => {
     try {
-      const input : SignUpInput = {
-        username: email,
-        password: password
-      }
-      await signUp(input);
+      await signUp({ username: email, password });
       setToastMessage('Sign up successful! Please confirm your email.');
       setShowToast(true);
       handleSegmentChange('login');
@@ -72,7 +61,7 @@ const AuthComponent: React.FC = () => {
 
   const requestPasswordReset = async () => {
     try {
-      //Implement reset Password
+      // Implement reset Password
       setToastMessage('Password reset code sent to your email.');
       setShowToast(true);
       setShowActionSheet(true);
@@ -84,7 +73,7 @@ const AuthComponent: React.FC = () => {
 
   const resetPassword = async () => {
     try {
-      //Implement reset Password
+      // Implement reset Password
       setToastMessage('Password reset successful! You can now log in with your new password.');
       setShowToast(true);
       handleSegmentChange('login');
@@ -112,7 +101,7 @@ const AuthComponent: React.FC = () => {
   return (
     <IonPage className={style.auth_page}>
       <IonContent>
-        <div className="auth_banner">
+        <div className={style.auth_banner}>
           <IonImg src="assets/imgs/logo.png"/>
           <IonText color="light">GroceryPal [alpha]</IonText>
           <IonSegment value={segment} onIonChange={e => handleSegmentChange(e.detail.value as 'login' | 'signup' | 'reset')}>
@@ -128,7 +117,7 @@ const AuthComponent: React.FC = () => {
           </IonSegment>
         </div>
 
-        <div className="login-form">
+        <div className={style.login_form}>
           <IonList>
             <IonItem>
               <IonLabel position="floating">Email</IonLabel>
@@ -153,26 +142,26 @@ const AuthComponent: React.FC = () => {
               </>
             )}
           </IonList>
-          <IonButton expand="block" className="btn button-block" onClick={handleSubmit}>
+          <IonButton expand="block" className={style.btn + ' ' + style.button_block} onClick={handleSubmit}>
             {segment === 'login' ? 'Login' : segment === 'signup' ? 'Sign Up' : 'Reset Password'}
           </IonButton>
           {segment === 'login' && (
-            <IonButton expand="block" className="btn button-block" onClick={requestPasswordReset}>
+            <IonButton expand="block" className={style.btn + ' ' + style.button_block} onClick={requestPasswordReset}>
               Forgot Password?
             </IonButton>
           )}
         </div>
 
-        <div className="social_media_login">
+        <div className={style.social_media_login}>
           <p>Or connect with</p>
           <IonRow>
             <IonCol>
-              <IonButton className="btn fb_btn" expand="block">
+              <IonButton className={style.btn + ' ' + style.fb_btn} expand="block">
                 <img src="/assets/facebook.png" alt="Facebook" />
               </IonButton>
             </IonCol>
             <IonCol>
-              <IonButton className="btn google_btn" expand="block">
+              <IonButton className={style.btn + ' ' + style.google_btn} expand="block">
                 <IonIcon />
                 Google
               </IonButton>
